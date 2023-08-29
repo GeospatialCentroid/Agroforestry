@@ -36,9 +36,9 @@ Generic method for detection of non forested trees within Nebraska
 
 **July 2024** : All funding spent.
 
-## Description of Project Stages 
+## Description of Project Stages
 
-### Stage 1: Replicating results from an existing study to evaluate the effectiveness of the methods.  
+### Stage 1: Replicating results from an existing study to evaluate the effectiveness of the methods.
 
 -   Researchers confidently apply the segmentation and classification methodology to any area where trees outside of forest have previously been mapped.
 
@@ -46,7 +46,7 @@ Generic method for detection of non forested trees within Nebraska
 
 -   Tuned model parameters for both the image segmentation process and classification algorithm become the base for testing the method at different spatial and temporal locations.
 
-### Stage 2: Independently evaluating how the segmentation and classification models can detect trees outside forests in a  distinct geographic areas.  
+### Stage 2: Independently evaluating how the segmentation and classification models can detect trees outside forests in a distinct geographic areas.
 
 -   Hand digitized validation maps of trees outside forest will be produce at represenative testing locations across the state.
 
@@ -54,7 +54,7 @@ Generic method for detection of non forested trees within Nebraska
 
 -   An evaluation of the extent to which the initial models can be applied to different geographic locations is generated to allow for the prediction of how many unique models will be required to capture the ecological variability within the state.
 
-### Stage 3: Evaluate the effectiveness of the segmentation and classification models across specific time ranges.  
+### Stage 3: Evaluate the effectiveness of the segmentation and classification models across specific time ranges.
 
 -   Technicians develop validation maps of trees outside forest across the state at different time periods using the same testing site defined in stage 2.
 
@@ -62,7 +62,7 @@ Generic method for detection of non forested trees within Nebraska
 
 -   An evaluation of the extent to which the initial models can be applied to different years and image sets is generated.
 
-### Stage 4: Test methods for developing a mask layer that can be applied to limit the area of analysis required to perform a classification on. 
+### Stage 4: Test methods for developing a mask layer that can be applied to limit the area of analysis required to perform a classification on.
 
 -   Evaluate at least state level (ideally national) layers that can be used as a mask for the NAIP imagery.
 
@@ -76,7 +76,7 @@ Generic method for detection of non forested trees within Nebraska
 
 -   develop a docker container that can flexible handle user inputs on model selection, year of classification and AIO.
 
-### Stage 6: Apply the segmentation and classification model to the full area of interest for 2010, 2015, 2020. 
+### Stage 6: Apply the segmentation and classification model to the full area of interest for 2010, 2015, 2020.
 
 -   Develop a visually sampled point based validation set that can be used for all three time periods
 
@@ -84,11 +84,9 @@ Generic method for detection of non forested trees within Nebraska
 
 -   Validated the spatial classification looking specifically for any regions with high observed areas as this would represent an over reach a specific model.
 
-### Stage 7: Make the continued development of this work as seamless as possible.  
+### Stage 7: Make the continued development of this work as seamless as possible.
 
--   Develop a report noting the considerations and limitations that should
-    be accounted for when attempting to apply the process to a new
-    geographic area
+-   Develop a report noting the considerations and limitations that should be accounted for when attempting to apply the process to a new geographic area
 
 -   Suggestions on how best to expand the work based on geographic regions.
 
