@@ -1,5 +1,35 @@
 Edited : 2023-09-18
 
+
+# After the initial setup.
+
+If you have not run through the initial setup yet please skip to `Goal` header.
+
+## reloading the environment
+
+Once you've created you virtual environment you'll be able to get back to working in fewer steps.
+
+open a `git bash` in the agroforesty file folder.
+
+type `git pull origin <branchName>` *replace <branchName> with the actual name of the branch.
+
+if you forgot the branch you are working on type `git status`
+
+This is specific important if multiple people are working on the same branch.
+
+After ensuring the git repo is up to date, open command prompt
+
+type `cd /d <path to you agroforesty directory>`
+
+Once inside of the project directly type `agro-venv\Scripts\activate.bat`
+
+If successful you will see a `(agro-venv)` to the left of you file path in command prompt.
+
+Then type `jupyter notebook` to launch the web based editor.
+
+*end of reloading section*
+
+
 # Goal :
 setup a python environment on a windows machine that allows for the execution of the sampling methodology.  
 
@@ -8,7 +38,6 @@ The user will be able to
 - manage library installs via `pip` and a `requirements.txt`
 - use `git` to access and apply version control to a code
 - launch and edit a `jupyter notebook`
-- authenticate `google earth engine`
 
 More information may be added to cover the sampling methodology in more detial.
 
@@ -188,3 +217,75 @@ You can avoid this by
 *check to make sure the name of your virtual environment is present in the .gitignore before attempting to commit any changes to the repo*
 
 ## open the jupyter lab
+
+Installing the libraries did a lot of work. The main change is we can now start engaging in python outside of the command prompt structure. We will be using `jupyter notebooks` for all the editing and sampling going forward.
+
+Launch a notebook by typing
+
+`jupyter notebook`
+
+into the counsol and hitting enter.
+
+Within the print out in the `shell` you will find a url starting with `http://localhost:8888`
+
+Select this url and open it if possible.
+
+If not copy the full line, should look something like
+http://localhost:8888/tree?token=1c1eb471607ce7675a0839e2581f849c6222cd525af10c24
+and paste it into a web browser.
+
+You can now mostly ignore the `shell` and work directly in the interfrace provided within the web browser.
+
+`Jupyter notebook` does require that the `shell` remain open in order to run so do not close it until your done working for the day.
+
+*If you ever close your notebook in you browser tab, you can reopen as long as the `shell` is still running by typing `localhost:8888` into you browsers search.
+
+## Managing work within jupyter notebooks
+
+Any files that you create from the browser based interface of jupyter notebooks will be save in your local file system.
+
+Once you complete you work for the day you will want to push you content back to github.
+
+Close the browser page and open the `shell` that the `jupyter notebook` was running out of. Select the `shell` and type `control + c` to stop the `jupyter notebook` instance.   
+
+It's best practice to deactivate your `virtural environment` as well with the following command.
+
+`deactivate`
+
+Close the shell
+
+
+## Using version control to track changes
+Open `git bash` by navigating to the agroforestry folder and right clicking and selecting `git bash`
+
+First we will check the status of the changes using
+
+`git status`
+
+This will print what `branch` your repo is on and what files have been modified.
+
+If files have been changed and you want to back up those files as a version on github you can continue with
+
+`git add .`
+
+The `.` notes that all changed files will be added. You can type out specific paths to files if you want to be more specific.
+
+Test this by typing `git status`
+
+This should report that the modified files (previous red text) are nor ready to be staged (green text)
+
+Type `git commit -m'details about the changes' ` into the `git bash`. You can edit the text between the single quotes to describe what changes had been made.
+
+Again check with `git status`
+
+This will say changes are ahead of the origin branch and are ready to be pushed.
+
+Do so by `git push origin branchName`
+
+*We will discuss branching on a individual basis, just replace branchName here with the name of the branch print as part of the `git status` call from earlier
+
+You can also check on the GitHub to see if the push was successful  
+
+## Next Steps
+
+More walk throughs will be provided on the sampling method. If questions arise on the set up please contact Dan at carverd@colostate.edu
