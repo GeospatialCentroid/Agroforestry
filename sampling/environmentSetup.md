@@ -118,14 +118,73 @@ Once you hit enter you will see a lot of message from git. At the end of the dow
 Choose a file location that you want to store this project in and repeat the process. The nice thing about `git bash` is you can launch the `shell` from a specific file folder structure, just right click `open git bash` from the windows `file explorer` location you want the data pulled too. This can be a local or external drive.
 
 ## use command promt to navigate to your working git repo
+For reference, the folder in this example is at
 
+`C:\Users\carverd\Desktop\Agroforestry`
+
+This will be different but regradless of where it is you will want the full path. You can grab this from the file explorer. Navigate to the folder location of you git repo and `hold shift + right click` to open up the options menu. select `copy as path` to grab the full path of the folder. *hint : this method can be used to grab the full path of files as well*
+
+Next open your `command prompt` and type
+`cd /d C:\Users\carverd\Desktop\Agroforestry` replace the path with the location on your computer.
+
+the `cd` call is for change directory. the `/d` is to indicate that your moving to a different drive location. This may or may not be turn but it doesn't have ill effects so I've listed it here. The full path is the location that you terminal will be running out of.
+
+Next type `dir` and hit enter.
+
+The printed output should be a list of all files and directories within that location. You should see things like the `.gitignore` file and the `data` directory.
+
+Because the current terminal is within this specific file folder any files that are created will be stored in the `Agroforesty` folder.   
 
 ## create a venv within repository
 
+To isolate the development environment for this project from other python implimentations you might have on you pc we are going to create a `virtual environment` and use that to install the specific libraries we need.
+
+Think of a `virtual environment` as a box. Thing that happen inside the box can occur within unique conditions that are not present outside of the box. It's contained.
+
+Python comes with a `virtual environment` library preinstalled it's call `venv`.
+
+In you terminal type
+
+`python -m venv agro-env`
+
+This will take some time to render but you will end up with a new file folder called `agro-env`
+
+Using file explorer navigate into the new folder and just look at some of the objects that have been created.
+
 ## activate venv
 
+`Virtual environments` only effect python so we will need to activate it in order to use it.
+
+Type
+
+`agro-env\Scripts\activate.bat`
+
+and hit enter
+
+If successful you will have a label `(agro-env)` on the left side of your current path in cmd line.
+
 ## install libraries into the venv
+With the `virtual environment` activated, we will now install the required libraries for this project. Because we are using a `virtural environment` all these libraries will only exist inside of it. The are being install inside the container.
+
+We will do this by utilizing a `requirements` text file that has been created through initial development proceses. This file is part of the git repo and should be in your primary agroforesty folder
+
+type
+
+`pip install -r requirements.txt`
+
+and hit enter.
+
+This is going to take a while so watch to see if it's running without errors then take a break
 
 
+### Virtual environments and Git/Github
+You do not want to pass your virtual environment to git because it is large and cumbersome. The requirements.txt is a short hand version that allow the virtual environment to be regenerated as needed.
+
+You can avoid this by
+
+1. Installing your virtual environments outside of you project folder.
+2. Ensuring that the folder the virtural environment is held within is included within the `.gitignore` file.
+
+*check to make sure the name of your virtual environment is present in the .gitignore before attempting to commit any changes to the repo*
 
 ## open the jupyter lab
