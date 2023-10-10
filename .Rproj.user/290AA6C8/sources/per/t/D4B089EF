@@ -1,0 +1,26 @@
+{
+    "id": "D4B089EF",
+    "path": "C:/Users/carverd/Desktop/Agroforestry/modeling/processCountyNAIP.R",
+    "project_path": "modeling/processCountyNAIP.R",
+    "type": "r_source",
+    "hash": "1443400515",
+    "contents": "",
+    "dirty": false,
+    "created": 1696365538010.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "15,29",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1696376352,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1696376352854,
+    "read_only": false,
+    "read_only_alternatives": []
+}
