@@ -192,6 +192,11 @@ and hit enter
 
 If successful you will have a label `(agro-env)` on the left side of your current path in cmd line.
 
+### activate venv linux 
+
+`source agro-env/bin/activate`
+
+
 ## install libraries into the venv
 With the `virtual environment` activated, we will now install the required libraries for this project. Because we are using a `virtural environment` all these libraries will only exist inside of it. The are being install inside the container.
 
