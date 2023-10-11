@@ -1,7 +1,7 @@
 ### temp doc for developing the work flow 
-
 pacman::p_load(dplyr,terra,sf, readr, stringr, tidyr, tmap, glcm, raster, furrr)
 tmap_mode("view")
+
 
 data <- list.files("data/testFeatures", all.files = TRUE, full.names = TRUE,recursive = TRUE)
 
@@ -9,6 +9,11 @@ n1 <- rast(data[1]) |>
   terra::project("epsg:4326")
 
 names(n1) <- c("r", "g","b","n")
+
+
+# Source functions  -------------------------------------------------------
+
+source("testing/generateIndicies.R")
 
 
 
@@ -58,29 +63,10 @@ points <- bind_rows(p2,a2)
 
 
 
-# generate indices -------------------------------------------------------
-
-createNDVI <- function(raster){
-  # (NIR - R) / (NIR + R)
-  r1 <- (raster$n - raster$r) / (raster$n + raster$r)
-}
-# slow so for now only running on the green band
-## test at smaller areas to figure out a realistic run time 
-createGLCM <- function(band){
-  name <- names(band)
-  vals <- glcm(band,
-               window = c(3, 3),
-               statistics = 
-                 c("entropy", 
-                   "second_moment",
-                   "correlation")
-               )
-  names(vals) <- paste0(name,"_", names(vals))
-  return(vals)
-}
-
-
+# generate indices ------------------------------------------------------
 ndvi <- createNDVI(n1)
+
+
 names(ndvi) <- "ndvi"
 # generate a multiband feature  -------------------------------------------
 n2 <- c(n1, ndvi)
@@ -110,15 +96,9 @@ for(i in 1:nlyr(n2_3_3)){
   l1[[i]] <- raster(n2_3_3[[i]])
 }
 
-library(tictoc)
-tic()
-ndvi1 <- createGLCM(band = raster(n2_3_3$n))
-toc()
 
 plan(multisession, workers = 5)
-tic()
 d2 <- furrr::future_map(.x = l1, createGLCM )
-toc()
 
 # convert back to 
 d3 <- map(d2, rast) |> rast() 
