@@ -5,8 +5,10 @@
 #'
 #' @return single band raster with NDVI values 
 createNDVI <- function(raster){
+  r <- raster
   # (NIR - R) / (NIR + R)
-  r1 <- (raster$n - raster$r) / (raster$n + raster$r)
+  r1 <- (r[[4]] - r[[1]]) / (r[[4]] + r[[1]])
+  names(r1) <- paste0(names(r1),"_NDVI")
   return(r1)
 }
 
@@ -17,9 +19,7 @@ createNDVI <- function(raster){
 #' @param band single raster object 
 #'
 #' @return three raster bands with basic on the input layer
-createGLCM <- function(band){
-  # grab the name of the input feature 
-  name <- names(band)
+createGLCM <- function(band, name){
   # run the glcm function
   ## currently the window and the statistics are hard coded. Need to be selective
   ## about this so might want to move to the parameters
