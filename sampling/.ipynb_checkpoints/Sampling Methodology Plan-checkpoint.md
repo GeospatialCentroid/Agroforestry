@@ -27,5 +27,4 @@
 - Approximate one hour for 100 hundred points precense set. 1 hour 30 for more forested areas (southeast especially) 
 - Issues identifying dense tree stands from murky water in the wetland portion of the state (north central).
 - Can usually differentiate between water and trees using different bands, unless water is algae covered which is common in the north.
-- Tree cover does not change very often between 2010 to 2020. Usually use the opacity feature to check.
-- 100 precense points pretty dense for western section of state, could need high density of points for easter with high tree percentage. 
+- Tree cover does not change very often between 2010 to 2020. Usually use the opacity feature to check.  
