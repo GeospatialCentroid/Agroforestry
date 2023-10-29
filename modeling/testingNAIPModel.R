@@ -11,3 +11,4 @@ plotRGB(t1)
 # (NIR - R) / (NIR + R)
 ndvi <- (t1$nr - t1$r)/(t1$nr + t1$r)
 plot(ndvi)
+
