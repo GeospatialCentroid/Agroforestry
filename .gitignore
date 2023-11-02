@@ -2,4 +2,5 @@
 /agro-env
 /data
 *.tif
+*.Rproj.user
 .Rproj.user
