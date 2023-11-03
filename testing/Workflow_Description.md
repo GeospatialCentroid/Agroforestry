@@ -7,20 +7,21 @@
 
 ### Organized at the Collection Grid level
 
-**inputs** : lat lon values from a relivent sampling location 
+**inputs** : 
 
-1. Spilt the collection grid into smaller segements 
+- lat lon values from a sampling location 
 
-2. Pull naip imagery from earth engine for each segement (python)
+- reference grid object
 
-3. Aggregate imagery to a scale that is approprate for the RF and segementation work 
 
-4. generate indices uses in the modeling process 
+1. train a RF model within GEE based on the input sampling data (python)
 
-5. generate a segmentation model 
+2. For each aoi, generate a subgrid feauture (r)
 
-## questions 
-- not sure about the sequence of the segementation and RF modeling process 
+3. itorate of the subgrid projecting the model and downloading the resulting binary raster
 
-- working exclusiveling in GEE might be a reasonable option as well. 
+4. bind all the outfiles to single feature and delete the smalled subsets
+
+5. evaluated the projected rasted against the known dataset. 
+- statistics hear influence the segementation parameterization as well as goal %PCC for future RF Models
 

@@ -79,7 +79,7 @@ rfModel = generateRFModel( year=year, points=points, size=size, compactness=comp
 
 ```
 
-## define the AOI 
+## define the sub grid AOI 
 ```{r}
 source("~/GitHub/Agroforestry/testing/subsetAOI.R")
 gridSF <- sf::st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/twelve_mi_grid_uid.gpkg")
