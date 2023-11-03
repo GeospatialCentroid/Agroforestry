@@ -7,92 +7,82 @@ import ee
 import os
 import geemap 
 import geopandas as gpd
-import sys
-# source functions 
-# something like this but it's weirded be
-from src import establishSamplingPoints
-from src import prepNAIPImagery
-from src import runSegmentation
-
+# earthengine calls 
+ee.Initialize()
 ```
 
 ## define the initial parameters 
 
 ```{python}
-# this is the general areas of interest the feature that we will be itoreting over
+# read in all gpd objects 
+grid = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/twelve_mi_grid_uid.gpkg")
+ne = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/data/referenceData/nebraska_counties.gpkg")
+points = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/testSamplingData.geojson")
 aoiID = 'X12-695'
-# year 
 year = 2016
-# reference grid opbject
-grid = gpd.read_file("data/twelve_mi_grid_uid.gpkg")
-### as geopandas class 
-aoi_pandas = grid[grid.Unique_ID == aoiID]
-### as ee object -- used to set bounding box for most functions 
-aoi_ee = geemap.gdf_to_ee(aoi_pandas)
-```
-
-
-## prep the presence absence data 
-We'll need to have some code set up for selecting the specific reference data to use for now it's just hard coded
-```{python}
-filePath = "data/testSamplingData.geojson"
-pa = establishSamplingPoints(filePath)
-```
-
-## Grab NAIP and generate important indicies 
-Frist real section of GEE code 
-```{python}
-naip = prepNAIP(aoi_ee, year)
-```
-
-
-## Run the Segmentation algorythem and add output back onto NAIP feaute 
-```{python}
-# parameters for the segmentation process
 size = 30 
 compactness = 0.1
 connectivity = 8 
-
-imagery = runSegmentation(image = naip, size = size,compactness = compactness,connectivity=connectivity)
 ```
 
 
-## Extract values to points 
+## define classification function
+We'll need to have some code set up for selecting the specific reference data to use for now it's just hard coded
 ```{python}
-extract_vals = imagery.sampleRegions(collection = pa,scale = 4,geometries = False)
+def generateRFModel(year,points,size,compactness, connectivity):
+  # convert to an ee object 
+  sp1 = geemap.gdf_to_ee(points)
+  
+  # map to show relative locations of features 
+  # ax = aoi_pandas.plot(color="palegreen", edgecolor="green", figsize=(20, 10))
+  # s.plot(ax=ax, color="red")
+  # plt.show()
+  # 
+  
+  # grab naip for area and year 
+  naip1 = geemap.get_annual_NAIP(year).filterBounds(sp1).mosaic() # 
+  # generate NDVI 
+  ndvi = naip1.normalizedDifference(["N","R"])
+  # add ndvi to naip image 
+  naip = naip1.addBands(ndvi)
+  
+  
+  # parameters for the segmentation process
+
+  # run the segementation
+  snic = ee.Algorithms.Image.Segmentation.SNIC(naip,size,compactness,connectivity)
+  # select specific bands and combine with original image
+  snicModel = snic.select('R_mean', 'G_mean', 'B_mean','N_mean', "nd_mean").addBands(naip)
+  
+  ## Extract values to points 
+  extract_vals = snicModel.sampleRegions(collection=sp1, scale=1)
+  # print(extract_vals.getInfo())
+  # easiest print statement
+  geemap.ee_to_gdf(extract_vals)
+  
+  
+  # generate a rf model 
+  trainingclassifier = ee.Classifier.smileRandomForest(numberOfTrees = 10, seed = 7).train(features= extract_vals,classProperty = 'presence')
+  
+  # dont really need this at the moment. 
+  # confusionMatrix = trainingclassifier.confusionMatrix()
+  # print(confusionMatrix.getInfo())
+  
+  return trainingclassifier
+
 ```
 
-
-
-## Run the random forest classification 
+## run the classification function
 ```{python}
-# generate a rf model 
-trainingclassifier = ee.Classifier.smileRandomForest(
-                  numberOfTrees = 10, seed = 7
-                  ).train( 
-                    features= extract_vals,classProperty = 'presence'
-                    )
-```
-
-## Produce classification accuracy 
-
-```{python}
-confusionMatrix = trainingclassifier.confusionMatrix()
-```
-
-## Apply the model to the input imagery 
-```{python}
-classified = imagery.classify(trainingclassifier);
-# Map.addLayer(classified, {min:0, max:1, palette:['white', 'green']}, 'classified', true, 0.6)
+rfModel = generateRFModel( year=year, points=points, size=size, compactness=compactness, connectivity=connectivity)
+# vals contains a cl
 
 ```
 
+## define the AOI 
+```{r}
+source("~/GitHub/Agroforestry/testing/subsetAOI.R")
+gridSF <- sf::st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/twelve_mi_grid_uid.gpkg")
+aoiSub <- subsetAOI(aoiID = aoiID, aoiSF = gridSF)
 
-## export the image, classification accuracy, points, and parameter values from GEE 
-```{python}
-# convert from gee to tiff 
-## use the downloadFromGEE as a template for this step. 
 ```
-
-
-
