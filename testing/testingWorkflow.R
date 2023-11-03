@@ -19,6 +19,7 @@ source("testing/aggregateImagery.R")
 
 print("temp")
 
+
 # silly stuff to prep the test input data ---------------------------------
 p1 <- read_csv(data[4]) |> 
   dplyr::select(WKT) |>
@@ -125,7 +126,7 @@ dat <- values |>
   tidyr::drop_na() |>
   dplyr::select("r_4","g_4","b_4","n_4","n_4_NDVI","green_glcm_entropy",
                 "green_glcm_second_moment",presence) # issue with "green_glcm_correlation" 
-  # it does have a NA value, but droping that row doesn't seem to resolve the issue, droping the 
+  # it does have a NA value, but droping that row doesn't seem  to resolve the issue, droping the 
 
 # call rf function 
 rfm <- randomForest(formula=presence~., data=dat)

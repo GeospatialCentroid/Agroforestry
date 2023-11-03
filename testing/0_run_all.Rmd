@@ -1,0 +1,98 @@
+
+
+# set up the python environment 
+
+```{python}
+import ee
+import os
+import geemap 
+import geopandas as gpd
+import sys
+# source functions 
+# something like this but it's weirded be
+from src import establishSamplingPoints
+from src import prepNAIPImagery
+from src import runSegmentation
+
+```
+
+## define the initial parameters 
+
+```{python}
+# this is the general areas of interest the feature that we will be itoreting over
+aoiID = 'X12-695'
+# year 
+year = 2016
+# reference grid opbject
+grid = gpd.read_file("data/twelve_mi_grid_uid.gpkg")
+### as geopandas class 
+aoi_pandas = grid[grid.Unique_ID == aoiID]
+### as ee object -- used to set bounding box for most functions 
+aoi_ee = geemap.gdf_to_ee(aoi_pandas)
+```
+
+
+## prep the presence absence data 
+We'll need to have some code set up for selecting the specific reference data to use for now it's just hard coded
+```{python}
+filePath = "data/testSamplingData.geojson"
+pa = establishSamplingPoints(filePath)
+```
+
+## Grab NAIP and generate important indicies 
+Frist real section of GEE code 
+```{python}
+naip = prepNAIP(aoi_ee, year)
+```
+
+
+## Run the Segmentation algorythem and add output back onto NAIP feaute 
+```{python}
+# parameters for the segmentation process
+size = 30 
+compactness = 0.1
+connectivity = 8 
+
+imagery = runSegmentation(image = naip, size = size,compactness = compactness,connectivity=connectivity)
+```
+
+
+## Extract values to points 
+```{python}
+extract_vals = imagery.sampleRegions(collection = pa,scale = 4,geometries = False)
+```
+
+
+
+## Run the random forest classification 
+```{python}
+# generate a rf model 
+trainingclassifier = ee.Classifier.smileRandomForest(
+                  numberOfTrees = 10, seed = 7
+                  ).train( 
+                    features= extract_vals,classProperty = 'presence'
+                    )
+```
+
+## Produce classification accuracy 
+
+```{python}
+confusionMatrix = trainingclassifier.confusionMatrix()
+```
+
+## Apply the model to the input imagery 
+```{python}
+classified = imagery.classify(trainingclassifier);
+# Map.addLayer(classified, {min:0, max:1, palette:['white', 'green']}, 'classified', true, 0.6)
+
+```
+
+
+## export the image, classification accuracy, points, and parameter values from GEE 
+```{python}
+# convert from gee to tiff 
+## use the downloadFromGEE as a template for this step. 
+```
+
+
+
