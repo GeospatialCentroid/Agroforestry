@@ -1,5 +1,5 @@
-aoiID <- "X12-10"
-aoiSF <- sf::st_read("data/griddedFeatures/twelve_mi_grid_uid.gpkg")
+# aoiID <- "X12-10"
+# aoiSF <- sf::st_read("data/griddedFeatures/twelve_mi_grid_uid.gpkg")
 
 
 #' Subset AOI 
@@ -20,8 +20,8 @@ subsetAOI <- function(aoiID, aoiSF){
     # return feature 
     return(g2)
 }
-
-pacman::p_load(dplyr,sf)
-
-d1 <- subsetAOI(aoiID, aoiSF)
-sf::st_write(obj = d1, dsn = "data/griddedFeatures/subgrid_test.gpkg" )
+# 
+# pacman::p_load(dplyr,sf)
+# 
+# d1 <- subsetAOI(aoiID, aoiSF)
+# sf::st_write(obj = d1, dsn = "data/griddedFeatures/subgrid_test.gpkg" )

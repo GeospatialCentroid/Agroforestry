@@ -23,8 +23,13 @@ createGLCM <- function(band, name){
   # run the glcm function
   ## currently the window and the statistics are hard coded. Need to be selective
   ## about this so might want to move to the parameters
+  if(class(band)== "SpatRaster"){
+    band <- raster(band)
+  }
+  
   vals <- glcm(band,
-               window = c(3, 3),
+               window = c(3,3),
+               shift=list(c(0,1), c(1,1), c(1,0), c(1,-1)),
                statistics = 
                  c("entropy", 
                    "second_moment",
@@ -33,5 +38,5 @@ createGLCM <- function(band, name){
   # rename the values as these will be part of the stack of multiple indicies
   names(vals) <- paste0(name,"_", names(vals))
   
-  return(vals)
+  return(rast(vals))
 }
