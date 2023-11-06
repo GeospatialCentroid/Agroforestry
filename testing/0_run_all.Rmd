@@ -18,7 +18,6 @@ ee.Initialize()
 grid = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/twelve_mi_grid_uid.gpkg")
 ne = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/data/referenceData/nebraska_counties.gpkg")
 points = gpd.read_file("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/testSamplingData.geojson")
-aoiID = 'X12-695'
 year = 2016
 size = 30 
 compactness = 0.1
@@ -29,6 +28,68 @@ connectivity = 8
 ## define classification function
 We'll need to have some code set up for selecting the specific reference data to use for now it's just hard coded
 ```{python}
+
+def geePrint(feature):
+  print(feature.getInfo());
+
+def generateSNICData(year,aoi,size,compactness, connectivity):
+  # convert to an ee object 
+  sp1 = geemap.gdf_to_ee(aoi)
+  
+  # grab naip for area and year 
+  naip1 = geemap.get_annual_NAIP(year).filterBounds(sp1).mosaic()  
+  
+  # generate NDVI 
+  ndvi = naip1.normalizedDifference(["N","R"])
+  
+  # add ndvi to naip image 
+  naip = naip1.addBands(ndvi)
+  
+  # run the segementation
+  snic = ee.Algorithms.Image.Segmentation.SNIC(naip,size,compactness,connectivity)
+  
+  # select specific bands and combine with original image
+  snicModel = snic.select('R_mean', 'G_mean', 'B_mean','N_mean', "nd_mean").addBands(naip);
+  
+  return snicModel
+
+
+def applyRFModel(snicModel, rfmodel):
+  # apply the model to the imagery 
+  classified = snicModel.classify(rfmodel);
+  return classified
+
+
+def exportRFModel(downloadPath, classifiedImage,year,aoiSubNet):
+  # Convert the aoi object to a GEE feature 
+  sp_ee = geemap.gdf_to_ee(aoiSubNet)
+  # grab the number of features to itorate over 
+  size = sp_ee.size().getInfo()
+  for i in range(size): # set to size when running
+    print(i)
+    # grab a subset of the area 
+    sp2 = aoiSubNet.iloc[[i]]
+    # convert to gee object for 
+    sp_ee2 = geemap.gdf_to_ee(sp2).geometry()
+    # filter the image 
+    image = classifiedImage.clip(sp_ee2)
+    # define file name 
+    ### need to work on the download location path
+    # filename = downloadPath + "/naip"+str(year)+"_" + str(i) + ".tif"
+    filename = "naip"+str(year)+"_" + str(i) + ".tif"
+
+    geemap.ee_export_image(
+        image,
+        filename=filename,
+        scale = 1, # scale in meters probably best to call best on x,y of image rather then define.
+        region=sp_ee2,
+        file_per_band=False)
+        ;
+  
+
+
+
+
 def generateRFModel(year,points,size,compactness, connectivity):
   # convert to an ee object 
   sp1 = geemap.gdf_to_ee(points)
@@ -60,13 +121,15 @@ def generateRFModel(year,points,size,compactness, connectivity):
   # easiest print statement
   geemap.ee_to_gdf(extract_vals)
   
-  
+
+def generateRF(points,snicModel,nTrees):
+  # convert to an ee object 
+  sp1 = geemap.gdf_to_ee(points)
+  #extract values to points 
+  extract_vals = snicModel.sampleRegions(collection=sp1, scale=1)
+
   # generate a rf model 
-  trainingclassifier = ee.Classifier.smileRandomForest(numberOfTrees = 10, seed = 7).train(features= extract_vals,classProperty = 'presence')
-  
-  # dont really need this at the moment. 
-  # confusionMatrix = trainingclassifier.confusionMatrix()
-  # print(confusionMatrix.getInfo())
+  trainingclassifier = ee.Classifier.smileRandomForest(numberOfTrees = 10, seed = 7).train(features= extract_vals,classProperty = 'presence');
   
   return trainingclassifier
 
@@ -74,15 +137,81 @@ def generateRFModel(year,points,size,compactness, connectivity):
 
 ## run the classification function
 ```{python}
-rfModel = generateRFModel( year=year, points=points, size=size, compactness=compactness, connectivity=connectivity)
-# vals contains a cl
+# generate the snic model based on the training dataset points 
+snicModel = generateSNICData(year=year,aoi=points, size=size,compactness=compactness, connectivity=connectivity)
+
+#produce the random forest model from the 
+rfModel = generateRF(points=points, snicModel=snicModel, nTrees= 20)
+```
+
+
+## define R environment 
+```{r}
+pacman::p_load(sf,terra, dplyr,tmap)
+tmap_mode("view")
+
+#define AOI 
+aoiID <- 'X12-695'
+# this is not loading as a gpkg, saved as a geojson and moving on.. 
+gridSF <- sf::st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/ne12Grid.geojson")
 
 ```
 
 ## define the sub grid AOI 
+get the aoi and export a subgrid of 100 features(probably want to adjust the number of elements base on the download limit in GEE)
 ```{r}
 source("~/GitHub/Agroforestry/testing/subsetAOI.R")
-gridSF <- sf::st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/testing/data/twelve_mi_grid_uid.gpkg")
 aoiSub <- subsetAOI(aoiID = aoiID, aoiSF = gridSF)
+# Export the grided feature 
+aoiSub |> 
+  st_write("gridTemp.gpkg")
 
 ```
+
+
+## Use grided features to project model and export results 
+
+```{python}
+# read in AOI element 
+aoi = gpd.read_file("gridTemp.gpkg")
+# generate a SNIC model 
+snicAOI = generateSNICData(year=year,aoi=aoi, size=size,compactness=compactness,connectivity=connectivity )
+# apply the rf model 
+rfAOI = applyRFModel(snicModel=snicAOI,rfmodel=rfModel)
+# export the model 
+exportRFModel(classifiedImage=rfAOI,year=2016,aoiSubNet=aoi,downloadPath="NA")
+### 20231106 -- classification took about 45 to download all files. This is not reasonable. Need to evaluated larger areas our different method etirely. 
+```
+
+
+## compare the classified elements against the existing layer 
+
+```{r}
+# merge all images back into a single object. 
+allFeats <- list.files(pattern = ".tif",full.names = TRUE) |>
+  purrr::map(rast) 
+
+## this works but it is slow. 
+for(i in seq_along(allFeats)){
+  if(i == 1){
+    r2 <- allFeats[[i]]
+  }else{
+    r2 <- terra::mosaic(x = r2, y = allFeats[[i]])
+  }
+}
+
+```
+
+
+```{r}
+# convert the reference layer to a raster object 
+ref1 <- "~/GitHub/Agroforestry/data/referenceData/Antelope_ALL_metrics_LCC_edited.shp"
+sp2 <- terra::vect(ref1)
+# create a raster object based on the dim of the shp file 
+
+ras1 <- terra::rasterize(x = sp2)
+```
+
+
+
+
