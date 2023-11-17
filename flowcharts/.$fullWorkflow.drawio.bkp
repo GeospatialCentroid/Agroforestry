@@ -1,0 +1,84 @@
+<mxfile host="Electron" modified="2023-11-16T23:38:42.351Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="17IhAx7d1x9_u5iib8lx" version="22.1.2" type="device">
+  <diagram name="Page-1" id="ru0vsOrcMmmFmGAPN0gL">
+    <mxGraphModel dx="1175" dy="1147" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="_angMufh-uXH8s0b8wE8-1" value="Input Dataset" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontSize=13;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="30" y="115.72" width="133.33" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-2" value="&lt;b style=&quot;font-size: 30px;&quot;&gt;Workflow summary of the Agroforestry Modeling Effort&lt;br&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="20" y="40" width="810" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-4" value="Output Data&lt;br&gt;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="360" y="112.86000000000001" width="160" height="68.57" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-6" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Function&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="101.43" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-7" target="_angMufh-uXH8s0b8wE8-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="540" />
+              <mxPoint x="190" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-7" value="NAIP Imagery" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontSize=13;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="11.669999999999987" y="500" width="133.33" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-9" value="Parameter" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.document2;whiteSpace=wrap;size=0.25;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="600" y="121.43" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-11" target="_angMufh-uXH8s0b8wE8-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-11" value="Year" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.document2;whiteSpace=wrap;size=0.25;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="26.67" y="400" width="103.33" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-13" target="_angMufh-uXH8s0b8wE8-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-13" value="Area of Interest" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.document2;whiteSpace=wrap;size=0.25;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="610" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-14" target="_angMufh-uXH8s0b8wE8-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-14" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;ProcessNAIP&lt;/b&gt;&lt;br&gt;select, clip, moasic, ndvi, other bands&lt;br&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="250" y="460" width="150" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-19" value="&lt;span style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;testTrainSplit&lt;/b&gt;&lt;br&gt;split presence absence data into testing and trainign sets&lt;br&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="270" y="730" width="160" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-20" value="PA datasets" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;fontSize=13;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="30" y="810" width="133.33" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-21" value="split ratio" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.document2;whiteSpace=wrap;size=0.25;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="45" y="720" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.004;entryY=0.433;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-20" target="_angMufh-uXH8s0b8wE8-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=-0.001;entryY=0.441;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-21" target="_angMufh-uXH8s0b8wE8-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-24" value="Test Train PA data" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="490" y="760.71" width="160" height="68.57" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.076;entryY=0.526;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-19" target="_angMufh-uXH8s0b8wE8-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-28" value="Multiband NAIP&amp;nbsp;" style="shape=parallelogram;html=1;strokeWidth=2;perimeter=parallelogramPerimeter;whiteSpace=wrap;rounded=1;arcSize=12;size=0.23;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="490" y="481" width="160" height="68.57" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-33" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;snicModel&lt;/b&gt;&lt;br&gt;Define seeds, run segementation, project results&lt;br&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="730" y="435.28999999999996" width="210" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="_angMufh-uXH8s0b8wE8-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=-0.001;entryY=0.694;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="_angMufh-uXH8s0b8wE8-28" target="_angMufh-uXH8s0b8wE8-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
