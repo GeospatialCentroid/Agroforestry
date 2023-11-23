@@ -5,7 +5,8 @@ import geopandas as gpd
 grid = gpd.read_file(r"data\processed\griddedFeatures\twelve_mi_grid_uid.gpkg")
 ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
 points = gpd.read_file(r"data\processed\testSamplingData.geojson")
-
+# once we establish a sampling method we should need points with classes. 
+pointsWithClasses = gpd.read_file(r"data\processed\agroforestrySamplingData.geojson")
 # define year
 year = 2016
 
