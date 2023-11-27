@@ -13,16 +13,16 @@ ee.Initialize()
 
 # import training dataset 
 trainingData = gpd.read_file(filename="data/processed/trainingdataset.geojson")
-print(trainingData)
+# print(trainingData)
 # convert to ee object
 # pointsEE = geemap.gdf_to_ee(trainingData)
 
 # define our aoi 
-aoiID <- 'X12-695' # something to itorate over 
+aoiID = 'X12-695' # something to itorate over 
 # this becomes the AOI to used in the prepNAIP function. I'll need to edit it so that it converts the input data into a bbox 
 print(grid)
-
-
+gridSelect = grid.loc[grid.Unique_ID == aoiID]
+print(gridSelect)
 # # generate NAIP layer 
 # naipEE = prepNAIP(aoi=pointsEE, year=year)
 # # geePrint(naipEE)
