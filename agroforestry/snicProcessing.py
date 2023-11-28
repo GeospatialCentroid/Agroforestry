@@ -17,10 +17,11 @@ def snicOutputs(naip, SNIC_NeighborhoodSize,SNIC_SeedShape,
                                                     seeds = seed1)
        
        # reproject to ensure that clusters are drawn at the native resolution
-       snic_Proj=snic.reproject(crs = 'EPSG:3857', scale = nativeScaleOfImage)
+       # some issues with this step... come back to ti. 
+       # snic_Proj=snic.reproject(crs = 'EPSG:3857', scale = nativeScaleOfImage)
 
         # select specific bands and combine with original image
-       snic2 = snic_Proj.select(bandsToUse_Cluster).addBands(naip)
+       snic2 = snic.select(bandsToUse_Cluster).addBands(naip)
 
        # return ee image 
        return snic2

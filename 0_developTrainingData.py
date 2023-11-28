@@ -41,11 +41,14 @@ snicData = snicOutputs(naip = normalizedNAIP, SNIC_NeighborhoodSize = SNIC_Neigh
 # extract values for the training and testing datasets 
 extractedReferenceData = snicData.sampleRegions(collection = pointsEE, 
                                                 scale = nativeScaleOfImage,
-                                                geometries = False)
+                                                geometries = True)
 # geePrint(extractedReferenceData)
 # export data 
 refData = geemap.ee_to_geojson(ee_object=extractedReferenceData,
                                filename="data/processed/trainingdataset_withClasses.geojson")
+# options to export to different file types
+# refData2 = geemap.ee_to_csv(ee_object=extractedReferenceData,
+#                             filename="data/processed/trainingdataset_withClasses.csv")
 # print(refData)
 
                               
