@@ -26,5 +26,6 @@ def testRFClassifier(testingData,classifier):
     ## these return two values, need to figure out what actually being said and how best to store them
     # consumer = accuracy1.consumersAccuracy()
     # producer = accuracy1.producersAccuracy()
-    # need to find a way to convert these from GEE objects to straight numbers to export in DF 
+    # need to find a way to convert these from GEE objects to straight numbers to export in DF
+    # Only a single object will print.  
     return total

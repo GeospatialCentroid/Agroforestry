@@ -5,10 +5,15 @@ import geopandas as gpd
 grid = gpd.read_file(r"data\processed\griddedFeatures\twelve_mi_grid_uid.gpkg")
 ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
 points = gpd.read_file(r"data\processed\testSamplingData.geojson")
+subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
 # once we establish a sampling method we should need points with classes. 
 pointsWithClasses = gpd.read_file(r"data\processed\agroforestrySamplingData.geojson")
+# usda tree reference layer 
+usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
 year = 2016
+# define initial sub grid 
+initGridID = "X12-601"
 
 
 # define constant variables. -- this will probably be moved into the config.py file

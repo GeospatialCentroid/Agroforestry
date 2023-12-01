@@ -21,7 +21,7 @@ ee.Initialize()
 print("training data is being develop for the " + str(year)+ " time period")
      
 # convert the reference points to gee object 
-pointsEE = geemap.gdf_to_ee(pointsWithClasses)
+pointsEE = geemap.gdf_to_ee(subSamplePoints)
 # geePrint(pointsEE)
 
 # generate NAIP layer 

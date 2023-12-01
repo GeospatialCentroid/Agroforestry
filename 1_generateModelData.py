@@ -7,6 +7,7 @@ from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 from agroforestry.randomForest import *
+from agroforestry.processUSDARef import *
 
 
 
@@ -18,7 +19,7 @@ ee.Initialize()
 trainingData = gpd.read_file(filename="data/processed/trainingdataset_withClasses.geojson")
 # print(type(trainingData))
 # select the training class of interest and drop unnecessary columns
-trainingSubset =  trainingData[trainingData.sampleStrat == "original"]
+trainingSubset =  trainingData[trainingData.sampleStrat == "subgrid"]
 # print(trainingSubset)
 # convert to ee object
 pointsEE = geemap.gdf_to_ee(gdf=trainingSubset)
@@ -33,21 +34,19 @@ clusterValidation = testRFClassifier(classifier=rfCluster, testingData= testing)
 pixelValidation = testRFClassifier(classifier=rfPixel, testingData= testing)
 # cant print tuple with this function
 #geePrint(clusterValidation)
-
+#geePrint(pixelValidation)
 
 
 
 # define the aoi
-aoiID = 'X12-695' # something to itorate over 
+aoiID = initGridID # something to itorate over for now is defined based on the input training dataset 
 # this becomes the AOI to used in the prepNAIP function. I'll need to edit it so that it converts the input data into a bbox 
 gridSelect = grid.loc[grid.Unique_ID == aoiID]
 # convert to a gee object 
 aoi1 = geemap.gdf_to_ee(gridSelect)
 
-# generate random points to used as the validation set
-randomPoints = ee.FeatureCollection.randomPoints(
-    region=aoi1, points=500, seed=setSeed)
-# geePrint(randomPoints)
+# generate the USDA reference object 
+usda1 = processUSDARef(aoiGrid = gridSelect, usdaRef=usdaRef)
 
 # generate NAIP layer 
 naipEE = prepNAIP(aoi=aoi1, year=year)
@@ -61,51 +60,31 @@ snicData = snicOutputs(naip = normalizedNAIP, SNIC_NeighborhoodSize = SNIC_Neigh
                        SNIC_Compactness = SNIC_Compactness, SNIC_Connectivity = SNIC_Connectivity,
                        nativeScaleOfImage = nativeScaleOfImage, bandsToUse_Cluster = bandsToUse_Cluster)
 # geePrint(snicData.bandNames())
-# this hold all the data for bands used in the modeling process, need to grab a presenec absense fromt he 
-# model products and rename to presence, then I can get validation data from the new imagery 
-testData = snicData.sampleRegions(collection= randomPoints,
-                                scale= 1,
-                                geometries= True)
 
-# # apply the rf model to the cluster imagery 
+# apply the rf model to the cluster imagery 
 classifiedClusters = applyRFModel(imagery=snicData, bands=bandsToUse_Cluster, classifier=rfCluster)
-# # geePrint(classifiedClusters)
+# geePrint(classifiedClusters)
 
+# apply the rf model to the pixels 
+classifiedPixels = applyRFModel(imagery=snicData, bands=bandsToUse_Pixel,classifier=rfPixel)
 
-# extract the values to the test data -- build into a function 
-## need to rename the value to presence to work in the existing function 
-classC_rename = classifiedClusters.rename('presence')
-# geePrint(classC_rename.bandNames())
-stratifedTest = classC_rename.stratifiedSample(numPoints = 500, seed = setSeed) 
-geePrint(stratifedTest)
+# generate the ensamble model 
+combinedModels = classifiedPixels.add(classifiedClusters)
+# reclass the image so it is a 0,1 value set 
+from_list = [0, 1, 2]
+# A corresponding list of replacement values (10 becomes 1, 20 becomes 2, etc).
+to_list = [0, 0, 1]
+combinedModelsReclass =  combinedModels.remap(from_list, to_list, bandName='classification')
+geePrint(combinedModelsReclass)
 
-# testDataCluster = classC_rename.sampleRegions(collection = testData,
-#                                                    scale = 1)
-# # geePrint(testDataCluster)
+# extact values to the testing  dataset
+combinedModelsExtractedVals = combinedModelsReclass.sampleRegions(
+    collection=testing, scale=1, geometries=False
+)
 
-# # next run the class testRFClassifier
-# test1 = testRFClassifier(classifier=rfCluster,testingData=testDataCluster)
-# geePrint(test1)
+# Generate a confusion matrix on the current classification 
+combinedAccuracy = combinedModelsExtractedVals.errorMatrix("presence", "remapped")
+geePrint(combinedAccuracy)
+geePrint(combinedAccuracy.accuracy())
 
-
-# # run validation against the random points 
-# clusterTestVals = classifiedClusters.sampleRegions(collection= randomPoints,
-#                                 scale= 1,
-#                                 geometries= False);    
-# # geePrint(clusterTest)
-# clusterTestResults = testRFClassifier(classifier=rfCluster,testingData=clusterTestVals)
-# geePrint(clusterTestResults)
-# apply the rf model to the pixel base classification 
-# classifedPixels = applyRFModel(imagery=snicData, bands=bandsToUse_Pixel, classifier=rfPixel)
-# geePrint(classifedPixels)
-
-
-
-# # create a dataframe to store the parameters changed and the classification accuracies 
-# df = pd.DataFrame(columns=['Column 1', 'Column 2', 'Column 3'])
-
-
-# # generate the ensamble model 
-# # while this is the final output I can acutally validate it because I don't have a specific classified for the output. 
-# # combinedModels = classifed_pixels.add(classified_clusters)
-# # geePrint(combinedModels)
+# comparison against the existing forest class. 
