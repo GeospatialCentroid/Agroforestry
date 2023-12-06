@@ -1,4 +1,5 @@
 import ee
+import os
 import geemap
 import geopandas as gpd
 import pandas as pd
@@ -77,6 +78,7 @@ to_list = [0, 0, 1]
 combinedModelsReclass =  combinedModels.remap(from_list, to_list, bandName='classification')
 geePrint(combinedModelsReclass)
 
+
 # extact values to the testing  dataset
 combinedModelsExtractedVals = combinedModelsReclass.sampleRegions(
     collection=testing, scale=1, geometries=False
@@ -87,4 +89,22 @@ combinedAccuracy = combinedModelsExtractedVals.errorMatrix("presence", "remapped
 geePrint(combinedAccuracy)
 geePrint(combinedAccuracy.accuracy())
 
-# comparison against the existing forest class. 
+
+
+# # attempt to export the image 
+out_dir = os.path.expanduser('~\Downloads')
+cProj = combinedModelsReclass.reproject(crs="EPSG:3857")
+# seems like the fishnet and the projected image are not lining up.
+# fishnet = geemap.fishnet(data = geemap.image_bounds(cProj), cols=10, rows=10)
+# tried generating on the image bound and getting an install error inthe `localtileserver` package
+# geemap.download_ee_image_tiles(image = cProj, features=fishnet)
+# export to geotiff
+# geemap.ee_to_geotiff(cProj, output=out_dir,resolution=1) #issue with the gdal installation 
+#export to numpy array 
+# Image.sampleRectangle: Too many pixels in sample; must be <= 262144. Got 507180756.
+n1 = geemap.ee_to_numpy(ee_object=cProj,region=aoi1)
+
+
+##
+# Total request size (749851530 bytes) must be less than or equal to 50331648 bytes.
+geemap.ee_export_image(combinedModelsReclass, filename="data.tif", region=aoi1.geometry(), scale=1)

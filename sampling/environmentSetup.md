@@ -21,7 +21,7 @@ After ensuring the git repo is up to date, open command prompt
 
 type `cd /d <path to you agroforesty directory>`
 
-Once inside of the project directly type `agro-venv\Scripts\activate.bat`
+Once inside of the project directly type `agro-env\Scripts\activate.bat`
 
 If successful you will see a `(agro-venv)` to the left of you file path in command prompt.
 
@@ -192,7 +192,7 @@ and hit enter
 
 If successful you will have a label `(agro-env)` on the left side of your current path in cmd line.
 
-### activate venv linux 
+### activate venv linux
 
 `source agro-env/bin/activate`
 
