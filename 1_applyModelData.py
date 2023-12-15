@@ -56,8 +56,10 @@ naipEE = prepNAIP(aoi=aoi1, year=year)
 normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
 
 # produce the SNIC object 
-snicData = snicOutputs(naip = normalizedNAIP, SNIC_NeighborhoodSize = SNIC_NeighborhoodSize,
-                       SNIC_SeedShape = SNIC_SeedShape, SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
+snicData = snicOutputs(naip = normalizedNAIP,
+                       SNIC_NeighborhoodSize = SNIC_NeighborhoodSize,
+                       SNIC_SeedShape = SNIC_SeedShape, 
+                       SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
                        SNIC_Compactness = SNIC_Compactness, SNIC_Connectivity = SNIC_Connectivity,
                        nativeScaleOfImage = nativeScaleOfImage, bandsToUse_Cluster = bandsToUse_Cluster)
 # geePrint(snicData.bandNames())
@@ -90,21 +92,5 @@ geePrint(combinedAccuracy)
 geePrint(combinedAccuracy.accuracy())
 
 
+# save model parameters to a spreadsheet 
 
-# # attempt to export the image 
-out_dir = os.path.expanduser('~\Downloads')
-cProj = combinedModelsReclass.reproject(crs="EPSG:3857")
-# seems like the fishnet and the projected image are not lining up.
-# fishnet = geemap.fishnet(data = geemap.image_bounds(cProj), cols=10, rows=10)
-# tried generating on the image bound and getting an install error inthe `localtileserver` package
-# geemap.download_ee_image_tiles(image = cProj, features=fishnet)
-# export to geotiff
-# geemap.ee_to_geotiff(cProj, output=out_dir,resolution=1) #issue with the gdal installation 
-#export to numpy array 
-# Image.sampleRectangle: Too many pixels in sample; must be <= 262144. Got 507180756.
-n1 = geemap.ee_to_numpy(ee_object=cProj,region=aoi1)
-
-
-##
-# Total request size (749851530 bytes) must be less than or equal to 50331648 bytes.
-geemap.ee_export_image(combinedModelsReclass, filename="data.tif", region=aoi1.geometry(), scale=1)

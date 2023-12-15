@@ -29,3 +29,28 @@ def testRFClassifier(testingData,classifier):
     # need to find a way to convert these from GEE objects to straight numbers to export in DF
     # Only a single object will print.  
     return total
+
+#"data/processed/trainingdataset_withClasses.geojson"
+def trainModels(filename,test_train_ratio,nTrees,setSeed,bandsToUse_Cluster,bandsToUse_Pixel):
+    import ee
+    import geemap
+    import geopandas as gpd    
+    # import training dataset 
+    trainingData = gpd.read_file(filename=filename)
+    # print(type(trainingData))
+    # select the training class of interest and drop unnecessary columns
+    trainingSubset =  trainingData[trainingData.sampleStrat == "subgrid"]
+    # print(trainingSubset)
+    # convert to ee object
+    pointsEE = geemap.gdf_to_ee(gdf=trainingSubset)
+    # subset testing and training data 
+    training = pointsEE.filter(ee.Filter.gt('random', test_train_ratio))
+    testing = pointsEE.filter(ee.Filter.lte('random',test_train_ratio))
+    # traing the rf model 
+    rfCluster = trainRFModel(bands=bandsToUse_Cluster, inputFeature=training, nTrees=nTrees,setSeed=setSeed)
+    rfPixel = trainRFModel(bands=bandsToUse_Pixel, inputFeature=training, nTrees=nTrees,setSeed=setSeed)
+    ## run validation using the testing set 
+    clusterValidation = testRFClassifier(classifier=rfCluster, testingData= testing)
+    pixelValidation = testRFClassifier(classifier=rfPixel, testingData= testing)
+    # cant print tuple with this function'
+    return(testing, rfCluster, rfPixel)
