@@ -119,6 +119,7 @@ def testModel(normalizedNAIP,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness
 
 
 # apply over a SNIC_SeedShape_range
+# this only has two options 
 for i in SNIC_SeedShape_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
@@ -133,7 +134,8 @@ for i in SNIC_SeedShape_range:
               testParaName = "SNIC_SeedShape_range")
     
 
-# # apply over a SNIC_Connectivity_range
+# apply over a SNIC_Connectivity_range
+# this only has two options 
 for i in SNIC_Connectivity_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
@@ -172,21 +174,21 @@ for i in SNIC_SuperPixelSize_range:
               SNIC_Compactness=SNIC_Compactness,
               SNIC_Connectivity=SNIC_Connectivity,
               SNIC_SeedShape=SNIC_SeedShape,
-              SNIC_SuperPixelSize= i,
+              SNIC_SuperPixelSize= str(i),
               testParaName = "SNIC_SuperPixelSize_range")
 
 # # apply over a SNIC_SeedShape_range
-# for i in SNIC_SeedShape_range:
-#     print(i)
-#     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
-#               bandsToUse_Pixel=bandsToUse_Pixel,
-#               normalizedNAIP=normalizedNAIP,
-#               rfCluster=rfCluster,
-#               SNIC_Compactness=SNIC_Compactness,
-#               SNIC_Connectivity=SNIC_Connectivity,
-#               SNIC_SeedShape=i,
-#               SNIC_SuperPixelSize= SNIC_SuperPixelSize,
-#               testParaName = "SNIC_SeedShape_range")
+for i in SNIC_SeedShape_range:
+    print(i)
+    testModel(bandsToUse_Cluster=bandsToUse_Cluster,
+              bandsToUse_Pixel=bandsToUse_Pixel,
+              normalizedNAIP=normalizedNAIP,
+              rfCluster=rfCluster,
+              SNIC_Compactness=SNIC_Compactness,
+              SNIC_Connectivity=SNIC_Connectivity,
+              SNIC_SeedShape=i,
+              SNIC_SuperPixelSize= SNIC_SuperPixelSize,
+              testParaName = "SNIC_SeedShape_range")
 
 # # apply over a SNIC_SeedShape_range
 # for i in SNIC_SeedShape_range:

@@ -92,5 +92,19 @@ geePrint(combinedAccuracy)
 geePrint(combinedAccuracy.accuracy())
 
 
-# save model parameters to a spreadsheet 
+# save model parameters to a spreadsheet 1
+# create a dictionary so we can export information 
+dic2 = ee.Dictionary({
+    "gridID" : initGridID,
+    "naipYear" : year,
+    "totalNumberTest" :  testing.size(),
+    "SNIC_SuperPixelSize" : SNIC_SuperPixelSize, 
+    "SNIC_Compactness" : SNIC_Compactness,
+    "SNIC_Connectivity": SNIC_Connectivity, 
+    "SNIC_SeedShape": SNIC_SeedShape,
+    "nTrees": nTrees,
+    'allValues' : combinedAccuracy.array(),
+    'overallAccuracy' : combinedAccuracy.accuracy()})
+geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" +     "naipYear" : year,
+ +".csv")
 

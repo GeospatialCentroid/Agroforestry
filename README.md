@@ -37,6 +37,8 @@ Following the strucutre outline [here](https://gist.github.com/ericmjl/27e50331f
 
 |- requirements.txt : specifics about the library requirements of for the project
 
+|- referenceMaterial : Supporting files and documentation related to method develop or environment setup 
+
 
 
 

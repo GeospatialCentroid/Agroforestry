@@ -1,5 +1,7 @@
 # config.py
 import geopandas as gpd
+import numpy as np
+np.arange(0.0, 1.0, 0.1)
 
 # read in all gpd objects --- state the paths within the config file 
 grid = gpd.read_file(r"data\processed\griddedFeatures\twelve_mi_grid_uid.gpkg")
@@ -43,17 +45,17 @@ nativeScaleOfImage = 4 # this should be one for production, using larger number 
 # SNIC based parametes 
 ## Defining the Seed Grid
 # The superpixel seed location spacing, in pixels. Has a big effect on the total number of clusters generated
-SNIC_SuperPixelSize= 8
-SNIC_SuperPixelSize_range = [3,5,8,12,16,20,30,50,80,100] # this is the parameter with the most number of options   
+SNIC_SuperPixelSize= 30
+SNIC_SuperPixelSize_range = np.arange(3, 100, 5)# this is the parameter with the most number of options   
 # Either 'square' or 'hex'. hex has a more variable position set across the landscape
-SNIC_SeedShape='hex'
+SNIC_SeedShape='square'
 SNIC_SeedShape_range = ["hex","square"]
 
 ## snic algorythem changes directly
 # Larger values cause clusters to be more compact (square/hexagonal). Anything over 1 seems to cause this. 
 # Setting this to 0 disables spatial distance weighting.
-SNIC_Compactness=0
-SNIC_Compactness_range = [0,0.25,0.5,0.75,1]
+SNIC_Compactness=0.75
+SNIC_Compactness_range = np.arange(0.0, 1.1, 0.1)
 # Connectivity. Either 4 or 8. Did not seem to effect to much... 
 SNIC_Connectivity=4
 SNIC_Connectivity_range = [4,8]
@@ -64,7 +66,7 @@ SNIC_Connectivity_range = [4,8]
 # RandomForest parameters
 ### need to do a little reading to understand what is really worth testing here. 0
 nTrees = 10
-nTrees_range = [2,4,6,10,20]
+nTrees_range = np.arange(2, 20, 2)
 setSeed = 5
 
 # Parameters to test 

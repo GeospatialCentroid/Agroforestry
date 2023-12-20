@@ -62,7 +62,7 @@ data <- compileCSVS(relativePath = relativePath,
 
 
 
-data# generate plots 
+# generate plots 
 parameters <- c("SNIC_SuperPixelSize", "SNIC_SeedShape", "SNIC_Compactness","SNIC_Connectivity")
 
 generatePlots <- function(relativePath, parameters){
@@ -79,26 +79,41 @@ generatePlots <- function(relativePath, parameters){
                       pattern = "*.csv",
                       full.names = TRUE)
   
-  for(i in parameters){
-    f2 <- files[grepl(pattern = i, x = files)]
+  figs <- list()
+  
+  for(i in seq_along(parameters)){
+    name = parameters[i]
+    
+    f2 <- files[grepl(pattern = name, x = files)]
     # read and bind the dataframes 
     d2 <- f2 |>
       purrr::map(read_csv) |>
       dplyr::bind_rows() |>
       generateConfusionMatrixStats()
     
-    d2$xVal <- d2[,names(d2)==i] |> pull()
-    xVal <- d2[,names(d2)==i] |> sort()
+    # set the x value data of interest to a standard column name for ploting
+    d2$xVal <- d2[,names(d2)==name] |> pull()
     
     # plot the false posivity rate, fasle negtive rate, and the overall accuracy for each value 
     fig <- plot_ly(data = d2, x = ~xVal) |>
-      add_trace(y = ~overallAccuracy, name = 'Overall Accuracy',mode = 'markers')|>
-      add_trace(y = ~truePositiveRate, name = 'True Positive Rate',mode = 'markers') |>
-      add_trace(y = ~trueNegitiveRate, name = 'True Negitive Rate',mode = 'markers')
-    # add the x label and set the extent of the x axis to zero
-    # need to figure out how to pass a generic column name to the xaxis
+      add_trace(y = ~overallAccuracy, name = 'Overall Accuracy',mode = 'markers', type = "scatter")|>
+      add_trace(y = ~truePositiveRate, name = 'True Positive Rate',mode = 'markers', type = "scatter") |>
+      add_trace(y = ~trueNegitiveRate, name = 'True Negitive Rate',mode = 'markers', type = "scatter")|>
+      layout(title = paste0('Accuracy Plots of ',name),
+              plot_bgcolor = "#e5ecf6", 
+              xaxis = list(title = name), 
+             yaxis = list(title = 'Accuracy',
+                          range=c(0,1.1)), 
+             legend = list(title=list(text='<b> Measures of Accuracy </b>')))
+    
+    
+    figs[[i]]<-fig
+    
     
   }
-  
+  return(figs)
 }
+
+plots <- generatePlots(relativePath = relativePath,
+              parameters = parameters)
  
