@@ -6,6 +6,7 @@ from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 
+"C:\Users\carverd\AppData\Local\r-miniconda\python.exe" 
 
 # establish connection with ee account. might require some additional configuration based on local machine 
 ee.Initialize()

@@ -48,6 +48,8 @@ aoi1 = geemap.gdf_to_ee(gridSelect)
 
 # generate the USDA reference object 
 usda1 = processUSDARef(aoiGrid = gridSelect, usdaRef=usdaRef)
+## this is still a vector product
+
 
 # generate NAIP layer 
 naipEE = prepNAIP(aoi=aoi1, year=year)
@@ -57,11 +59,12 @@ normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
 
 # produce the SNIC object 
 snicData = snicOutputs(naip = normalizedNAIP,
-                       SNIC_NeighborhoodSize = SNIC_NeighborhoodSize,
                        SNIC_SeedShape = SNIC_SeedShape, 
                        SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
-                       SNIC_Compactness = SNIC_Compactness, SNIC_Connectivity = SNIC_Connectivity,
-                       nativeScaleOfImage = nativeScaleOfImage, bandsToUse_Cluster = bandsToUse_Cluster)
+                       SNIC_Compactness = SNIC_Compactness, 
+                       SNIC_Connectivity = SNIC_Connectivity,
+                       # nativeScaleOfImage = nativeScaleOfImage, 
+                       bandsToUse_Cluster = bandsToUse_Cluster)
 # geePrint(snicData.bandNames())
 
 # apply the rf model to the cluster imagery 
@@ -92,6 +95,28 @@ geePrint(combinedAccuracy)
 geePrint(combinedAccuracy.accuracy())
 
 
+## add a condtional statement here to determine if the file should be downloaded or not. 
+## also improve the 
+if download
+# downloading the data 
+geemap.ee_to_geotiff(combinedModelsReclass, output="test.tif")
+fishnet = geemap.fishnet(aoi1, h_interval=1000, v_interval=1000)
+## 
+test1 = combinedModelsReclass.clip(aoi1)
+## exports at 10 meters this works!  
+geemap.ee_export_image(
+    test1, filename="data/processed/appliedModels/imagery/" + initGridID+ "_"+ year+ ".tif",
+      scale=10,
+        region=aoi1.geometry()
+)
+# doing comparison at 10m
+
+
+## export at 1 meter --- needs to be 14 times smaller 
+# geemap.ee_export_image(
+#     test1, filename="tests1.tif", scale=5, region=aoi1.geometry(), file_per_band=False
+#)
+
 # save model parameters to a spreadsheet 1
 # create a dictionary so we can export information 
 dic2 = ee.Dictionary({
@@ -105,6 +130,7 @@ dic2 = ee.Dictionary({
     "nTrees": nTrees,
     'allValues' : combinedAccuracy.array(),
     'overallAccuracy' : combinedAccuracy.accuracy()})
-geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" +     "naipYear" : year,
- +".csv")
+
+
+geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" + str(year) + ".csv")
 

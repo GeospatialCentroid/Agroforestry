@@ -3,6 +3,9 @@
 #
 #
 ### 
+library(terra)
+t1 <- rast("C:/Users/carverd/Documents/GitHub/Agroforestry/tests10.tif")
+plot(t1)
 
 # parse out the [[]] columns and generate some confusion matrix statistics 
 generateConfusionMatrixStats <- function(data){
