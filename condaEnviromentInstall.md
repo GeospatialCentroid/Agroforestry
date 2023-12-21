@@ -1,3 +1,6 @@
+PRobably not going stick with pip... we shall see. 
+
+
 # why Conda 
 
 There has been a number of installation dependecy issues related to GDAL install via pip. There is surely a viable option out there for pip install of GDAL, but it's currently provide more trouble then it's worth to find and impliment. As a result conda is being utilized. 
