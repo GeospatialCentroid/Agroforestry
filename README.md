@@ -5,21 +5,19 @@ Generic method for detection of non forested trees within Nebraska
 ## Organization of repository
 Following the strucutre outline [here](https://gist.github.com/ericmjl/27e50331f24db3e8f957d1fe7bbbe510). It might get adjusted overtime, but I'm going to try to follow it closely until there is very good reason too.
 
-|- notebooks : storeage for .ipynb files
+|- notebooks/ : storeage for .ipynb files
 
-|- flowcharts : storage for concept and workflow charts generated with draw.io
+|- flowcharts/ : storage for concept and workflow charts generated with draw.io
 
-|- agroforestry: functions defined as part of this project
+|- agroforestry/: functions defined as part of this project
 
     |- __init__.py  :defines repo as package
 
     |-  config.py : established consistent parameters/environment elements
 
-    |- functions.py : there will be many with unique descriptive names
+    |- {functions}.py : groups of functions used to support overall workflow. 
 
-    |- test_{stuff}.py : not sure if this will be implimented or not
-
-|- data
+|- data/
 
    |- raw : data downloaded from an external source
 
@@ -27,7 +25,13 @@ Following the strucutre outline [here](https://gist.github.com/ericmjl/27e50331f
 
    |- products : finalized datasets that can be shared
 
-   |- README.md : summary of the processing steps connecting raw to products
+   |- README.md : summary of the processing steps connecting raw to product
+   
+|- mapProducts/ : images and off of map features used to support a reporting step of the project. (not finalized outputs)
+
+|- referenceMaterial/ : physical copies of important peer reviewed students that are guiding this work. 
+
+|- sampling/ : abandoned workflow to sample within an .ipynb. Completling sampling within the GEE web interface. 
 
 |- scripts/ : ideally some of the workflow script live in here but I can't get the sourcing function to work well so until then they will live in the primary folder.
 
