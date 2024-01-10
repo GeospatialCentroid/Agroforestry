@@ -15,7 +15,7 @@ def snicOutputs(naip, SNIC_SeedShape, SNIC_SuperPixelSize, SNIC_Compactness, SNI
                                                     connectivity = SNIC_Connectivity,
                                                     # neighborhoodSize = SNIC_NeighborhoodSize, 
                                                     seeds = seed1)
-       
+    # geePrint(snic.bandNames())
        # reproject to ensure that clusters are drawn at the native resolution
        # some issues with this step... come back to ti. 
        # snic_Proj=snic.reproject(crs = 'EPSG:3857', scale = nativeScaleOfImage)

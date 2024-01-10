@@ -6,8 +6,6 @@ from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 
-"C:\Users\carverd\AppData\Local\r-miniconda\python.exe" 
-
 # establish connection with ee account. might require some additional configuration based on local machine 
 ee.Initialize()
 # if initialization, comment out the line above and go through the authentication process
@@ -23,28 +21,37 @@ print("training data is being develop for the " + str(year)+ " time period")
      
 # convert the reference points to gee object 
 pointsEE = geemap.gdf_to_ee(subSamplePoints)
-# geePrint(pointsEE)
+#geePrint(pointsEE)
 
 # generate NAIP layer 
-naipEE = prepNAIP(aoi=pointsEE, year=year)
-# geePrint(naipEE)
+naipEE = prepNAIP(aoi=pointsEE, year=year, windowSize= windowSize)
 
-# normal the naip data
-normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
+
+# normal the naip data -- skipping this step because it errors with the NDVI values. If I need to do 
+# i'll have to normalize within the prepNAIP function
+# normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
+# geePrint(normalizedNAIP)
 
 # # produce the SNIC object 
-snicData = snicOutputs(naip = normalizedNAIP, SNIC_NeighborhoodSize = SNIC_NeighborhoodSize,
-                       SNIC_SeedShape = SNIC_SeedShape, SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
-                       SNIC_Compactness = SNIC_Compactness, SNIC_Connectivity = SNIC_Connectivity,
-                       nativeScaleOfImage = nativeScaleOfImage, bandsToUse_Cluster = bandsToUse_Cluster)
-# geePrint(snicData)
+snicData = snicOutputs(naip = naipEE,
+                        SNIC_SeedShape = SNIC_SeedShape,
+                        SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
+                        SNIC_Compactness = SNIC_Compactness,
+                        SNIC_Connectivity = SNIC_Connectivity,
+                        # nativeScaleOfImage = nativeScaleOfImage,
+                        bandsToUse_Cluster = bandsToUse_Cluster)
+# geePrint(snicData.bandNames()) # this full list is what is used to create the pixel model 
 
 # extract values for the training and testing datasets 
 extractedReferenceData = snicData.sampleRegions(collection = pointsEE, 
                                                 scale = nativeScaleOfImage,
                                                 geometries = True)
+###! still taking a very long time to print anything... 
+# geePrint(extractedReferenceData.first())
+# geePrint(extractedReferenceData.size()) 
 # geePrint(extractedReferenceData)
-# export data 
+
+# export data --- takes a long time, maybe 5 minutes
 refData = geemap.ee_to_geojson(ee_object=extractedReferenceData,
                                filename="data/processed/trainingdataset_withClasses.geojson")
 # options to export to different file types

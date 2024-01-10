@@ -1,4 +1,10 @@
 {
     "r.lsp.promptToInstall": false,
-    "python.REPL.enableREPLSmartSend": false
+    "python.REPL.enableREPLSmartSend": true
 }
+"macros": {  // Note: this requires macros extension by publisher:"geddski" 
+        "pythonExecSelectionAndCursorDown": [
+            "python.execSelectionInTerminal", 
+            "cursorDown" 
+        ]
+    }

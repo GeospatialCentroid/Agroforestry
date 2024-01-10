@@ -34,8 +34,15 @@ test_train_ratio = 0.4
 # these are hard coded parameters come back to them if you start
 # altering the number of input bands to the SNIC function
 # selection layers to use in the pixel based and cluster based modeling process 
-bandsToUse_Pixel = ['R', 'G','B', "N", "nd",'R_mean', 'G_mean','B_mean', "N_mean", "nd_mean" ] 
-bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean"]
+bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean',
+                     'contrast_n_mean', 'corr_n_mean', 'entropy_n_mean', 'R', 'G', 'B', 'N', 'contrast_g', 'corr_g', 'entropy_g',
+                       'contrast_n', 'corr_n', 'entropy_n', 'nd', 'nd_sd_neighborhood', 'nd_mean_neighborhood']
+## only bands that are based on mean area measures
+bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean', 'contrast_n_mean',
+                       'corr_n_mean', 'entropy_n_mean']
+
+
+
 # define the max value of the individuals to normalize elemenst 
 bandMaxes=[255, 255, 255,255,1] #  represents 'R', 'G','B', "N", "nd"
 
@@ -68,5 +75,9 @@ SNIC_Connectivity_range = [4,8]
 nTrees = 10
 nTrees_range = np.arange(2, 20, 2)
 setSeed = 5
+
+# window size for average NDVI and glcm 
+windowSize = 10
+
 
 # Parameters to test 

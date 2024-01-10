@@ -1,15 +1,12 @@
 import ee
-import os
 import geemap
 import geopandas as gpd
-import pandas as pd
 from agroforestry.config import * 
 from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 from agroforestry.randomForest import *
-from agroforestry.processUSDARef import *
-
+from agroforestry.exportFunctions import *
 
 
 # establish connection with ee account. might require some additional configuration based on local machine 
@@ -34,8 +31,8 @@ rfPixel = trainRFModel(bands=bandsToUse_Pixel, inputFeature=training, nTrees=nTr
 clusterValidation = testRFClassifier(classifier=rfCluster, testingData= testing)
 pixelValidation = testRFClassifier(classifier=rfPixel, testingData= testing)
 # cant print tuple with this function
-#geePrint(clusterValidation)
-#geePrint(pixelValidation)
+geePrint(clusterValidation)
+geePrint(pixelValidation)
 
 
 
@@ -43,29 +40,31 @@ pixelValidation = testRFClassifier(classifier=rfPixel, testingData= testing)
 aoiID = initGridID # something to itorate over for now is defined based on the input training dataset 
 # this becomes the AOI to used in the prepNAIP function. I'll need to edit it so that it converts the input data into a bbox 
 gridSelect = grid.loc[grid.Unique_ID == aoiID]
+# create a sub grid for downloading 
+downloadGrids = create_grid(gdf=gridSelect,n_cells=5,crs=gridSelect.crs)
 # convert to a gee object 
 aoi1 = geemap.gdf_to_ee(gridSelect)
 
 # generate the USDA reference object 
-usda1 = processUSDARef(aoiGrid = gridSelect, usdaRef=usdaRef)
+# usda1 = processUSDARef(aoiGrid = gridSelect, usdaRef=usdaRef)
 ## this is still a vector product
 
 
 # generate NAIP layer 
-naipEE = prepNAIP(aoi=aoi1, year=year)
+naipEE = prepNAIP(aoi=aoi1, year=year,windowSize=windowSize)
 
 # normal the naip data
-normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
+# normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
 
 # produce the SNIC object 
-snicData = snicOutputs(naip = normalizedNAIP,
+snicData = snicOutputs(naip = naipEE,
                        SNIC_SeedShape = SNIC_SeedShape, 
                        SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
                        SNIC_Compactness = SNIC_Compactness, 
                        SNIC_Connectivity = SNIC_Connectivity,
                        # nativeScaleOfImage = nativeScaleOfImage, 
                        bandsToUse_Cluster = bandsToUse_Cluster)
-# geePrint(snicData.bandNames())
+geePrint(snicData.bandNames())
 
 # apply the rf model to the cluster imagery 
 classifiedClusters = applyRFModel(imagery=snicData, bands=bandsToUse_Cluster, classifier=rfCluster)
@@ -96,20 +95,30 @@ geePrint(combinedAccuracy.accuracy())
 
 
 ## add a condtional statement here to determine if the file should be downloaded or not. 
-## also improve the 
-if download
+
 # downloading the data 
-geemap.ee_to_geotiff(combinedModelsReclass, output="test.tif")
-fishnet = geemap.fishnet(aoi1, h_interval=1000, v_interval=1000)
-## 
+# geemap.ee_to_geotiff(combinedModelsReclass, output="test.tif")
+# fishnet = geemap.fishnet(aoi1, h_interval=1000, v_interval=1000)
+## Shouldn't need to clip here but were doing it any way 
+
 test1 = combinedModelsReclass.clip(aoi1)
-## exports at 10 meters this works!  
-geemap.ee_export_image(
-    test1, filename="data/processed/appliedModels/imagery/" + initGridID+ "_"+ year+ ".tif",
-      scale=10,
-        region=aoi1.geometry()
-)
-# doing comparison at 10m
+geePrint(aoi1.geometry())
+# subset based on geometry. 
+subarea = downloadGrids.iloc[:1]
+area2 = geemap.gdf_to_ee(subarea).geometry()
+test2 = combinedModelsReclass.clip(area2)
+geePrint(test1.geometry())
+geePrint(test2.geometry())
+
+
+
+
+testGrid = geemap.gdf_to_ee(downloadGrids.iloc[0:4])
+### parallel version of this does require some more package install. PRobably worth evaluating 
+### best option at the moment because it gives some text outputs. Might want to assign a CRS to the image before this step.
+### as I think that's what is slowing things fones. 
+geemap.download_ee_image_tiles(
+    test1, testGrid, out_dir="data/processed/appliedModels/imagery/", scale=5, crs = "EPSG:3857")
 
 
 ## export at 1 meter --- needs to be 14 times smaller 
@@ -134,3 +143,26 @@ dic2 = ee.Dictionary({
 
 geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" + str(year) + ".csv")
 
+
+
+## extra
+# ## didn't work the second time around 
+# geemap.ee_export_image(
+#     test2, 
+#     filename="data/processed/appliedModels/imagery/" + initGridID + "_"+ str(year)+ ".tif",
+#     scale=3,
+#     region=area2
+# )
+
+### export to google drive
+### slow ~ > 10m for export but it does seem to work.... 
+### should probably try at 1m just to see what happens. 
+### track progress at https://code.earthengine.google.com/tasks
+# task = ee.batch.Export.image.toDrive(
+#     image=test1,
+#     scale= 10,
+#     description='testExport',
+#     folder='agroforestry',
+#     region=aoi1.geometry(),
+# )
+# task.start()

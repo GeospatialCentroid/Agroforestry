@@ -8,7 +8,6 @@ from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 from agroforestry.randomForest import *
-
 # read in the parameter testing script 
 pTest = pd.read_csv(r"data\raw\parameterTesting.csv")
 
@@ -25,8 +24,11 @@ ee.Initialize()
 
 ## define the input dataset. This determines you gereral training location and will be changed for modeling different areas over time 
 vals = trainModels(filename="data/processed/trainingdataset_withClasses.geojson",
-                   nTrees=nTrees,setSeed=setSeed,test_train_ratio=test_train_ratio,
-                   bandsToUse_Cluster=bandsToUse_Cluster,bandsToUse_Pixel=bandsToUse_Pixel)
+                   nTrees=nTrees,
+                   setSeed=setSeed,
+                   test_train_ratio=test_train_ratio,
+                   bandsToUse_Cluster=bandsToUse_Cluster,
+                   bandsToUse_Pixel=bandsToUse_Pixel)
 testing = vals[0]
 rfCluster = vals[1]
 rfPixel = vals[2]
@@ -47,20 +49,24 @@ gridSelect = grid.loc[grid.Unique_ID == aoiID]
 aoi1 = geemap.gdf_to_ee(gridSelect)
 
 # generate NAIP layer 
-naipEE = prepNAIP(aoi=aoi1, year=year)
+naipEE = prepNAIP(aoi=aoi1, year=year,windowSize=windowSize)
 
 # normal the naip data
-normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
+# normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
 
 ###
 # section 3: generate the snic modeling and run the classification. Result is a cobimed ensamble binary model. 
 # 
 ### it be great to have this store in a function somewhere but I'm unable to reference other functions from the library 
 ### when I call it from a file... 
-def testModel(normalizedNAIP,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness,SNIC_Connectivity,bandsToUse_Cluster,
+def testModel(naip,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness,SNIC_Connectivity,bandsToUse_Cluster,
               rfCluster, rfPixel, bandsToUse_Pixel,testParaName):
+    def geePrint(feature):
+        return print(feature.getInfo())
+
+
     # produce the SNIC object 
-    snicData = snicOutputs(naip = normalizedNAIP,
+    snicData = snicOutputs(naip = naip,
                         SNIC_SeedShape = SNIC_SeedShape, 
                         SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
                         SNIC_Compactness = SNIC_Compactness, 
@@ -111,7 +117,7 @@ def testModel(normalizedNAIP,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness
         'allValues' : combinedAccuracy.array(),
         'overallAccuracy' : combinedAccuracy.accuracy()})
     
-    geemap.dict_to_csv(dic2, out_csv= "data/processed/parameterTesting/" + testParaName+ "_" + str(i) +".csv")
+    geemap.dict_to_csv(dic2, out_csv= "data/processed/parameterTesting/" + testParaName+ "_" + str(i) +"20240110.csv")
 
 
 
@@ -124,7 +130,7 @@ for i in SNIC_SeedShape_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
               bandsToUse_Pixel=bandsToUse_Pixel,
-              normalizedNAIP=normalizedNAIP,
+              naip=naipEE,
               rfCluster=rfCluster,
               rfPixel=rfPixel,
               SNIC_Compactness=SNIC_Compactness,
@@ -140,7 +146,7 @@ for i in SNIC_Connectivity_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
               bandsToUse_Pixel=bandsToUse_Pixel,
-              normalizedNAIP=normalizedNAIP,
+              naip=naip,
               rfCluster=rfCluster,
               rfPixel=rfPixel,
               SNIC_Compactness=SNIC_Compactness,
@@ -154,7 +160,7 @@ for i in SNIC_Compactness_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
               bandsToUse_Pixel=bandsToUse_Pixel,
-              normalizedNAIP=normalizedNAIP,
+              naip=naip,
               rfCluster=rfCluster,
                 rfPixel=rfPixel,
               SNIC_Compactness=i,
@@ -168,13 +174,13 @@ for i in SNIC_SuperPixelSize_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
               bandsToUse_Pixel=bandsToUse_Pixel,
-              normalizedNAIP=normalizedNAIP,
+              naip=naip,
               rfCluster=rfCluster,
               rfPixel=rfPixel,
               SNIC_Compactness=SNIC_Compactness,
               SNIC_Connectivity=SNIC_Connectivity,
               SNIC_SeedShape=SNIC_SeedShape,
-              SNIC_SuperPixelSize= str(i),
+              SNIC_SuperPixelSize= int(i),
               testParaName = "SNIC_SuperPixelSize_range")
 
 # # apply over a SNIC_SeedShape_range
@@ -182,7 +188,7 @@ for i in SNIC_SeedShape_range:
     print(i)
     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
               bandsToUse_Pixel=bandsToUse_Pixel,
-              normalizedNAIP=normalizedNAIP,
+              naip=naip,
               rfCluster=rfCluster,
               SNIC_Compactness=SNIC_Compactness,
               SNIC_Connectivity=SNIC_Connectivity,

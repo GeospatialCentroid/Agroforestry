@@ -2,8 +2,9 @@
 
 
 # Gather the naip  image and generate additional indicies 
-def prepNAIP(year,aoi):
+def prepNAIP(year,aoi,windowSize):
     import geemap
+    import ee
     # # convert AOI to a gg object 
     # sp1 = aoi.bounds()
     # grab naip for the year of interest, filter, mask, mosaic to a single image
@@ -17,11 +18,11 @@ def prepNAIP(year,aoi):
     naip2 = naip1.addBands(glcm_g).addBands(glcm_n)
 
     # average and standard deviation NDVI
-    ndvi_sd =  ndvi.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize))
-    ndvi_mean =  ndvi.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize))
+    ndvi_sd_neighborhood =  ndvi.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize)).rename(["nd_sd_neighborhood"])
+    ndvi_mean_neighborhood =  ndvi.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize)).rename(["nd_mean_neighborhood"])
 
     # Bind ndvi after the glcm processall the bands together 
-    naip = naip2.addBands(ndvi).addBands(ndvi_sd).addBands(ndvi_mean)
+    naip = naip2.addBands(ndvi).addBands(ndvi_sd_neighborhood).addBands(ndvi_mean_neighborhood)
     # export a ee object of the NAIP imagery 
     return naip
 
