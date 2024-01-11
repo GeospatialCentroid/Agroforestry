@@ -14,7 +14,8 @@ ee.Initialize()
 # ee.Authenticate() 
 ## pursue the gcloud installation if you have the time and will be utilizing your current machine in the future 
 ## if your short on time you can use the notebook authentication which will give you about a week of use on the current machine 
-# ee.Authenticate(auth_mode = notebook)
+# ee.Authenticate(auth_mode = "notebook")
+
 
 
 print("training data is being develop for the " + str(year)+ " time period")

@@ -11,7 +11,7 @@ subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
 # once we establish a sampling method we should need points with classes. 
 pointsWithClasses = gpd.read_file(r"data\processed\agroforestrySamplingData.geojson")
 # usda tree reference layer 
-usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
+# usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
 year = 2016
 # define initial sub grid 
