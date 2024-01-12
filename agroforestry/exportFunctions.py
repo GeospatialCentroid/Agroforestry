@@ -10,6 +10,7 @@ def create_grid(gdf=None, bounds=None, n_cells=10, overlap=False, crs = None):
 
     import geopandas as gpd
     import shapely
+    import numpy as np
 
     if bounds != None:
         xmin, ymin, xmax, ymax= bounds

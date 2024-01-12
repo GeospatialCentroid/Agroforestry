@@ -23,39 +23,45 @@ generateConfusionMatrixStats <- function(data){
   return(d2)
 }
 
-
+workingDirectory <- "C:/Users/carverd/Documents/GitHub/Agroforestry"
 relativePath <- "data/processed/parameterTesting"
 outputfilename <- paste0("gatheredData_", Sys.Date())
-
-compileCSVS <- function(relativePath, outputfilename){
+date <- "20240110"
+compileCSVS <- function(workingDirectory, relativePath, outputfilename, date){
   library(readr)
   library(dplyr)
   library(purrr)
   # produce the full dataset ------------------------------------------------
   # define path
-  wd <- getwd()
-  path <- paste0(wd,"/",relativePath) 
+  path <- paste0(workingDirectory,"/",relativePath) 
   # read in files 
   files <- list.files(path = path,
                       pattern = "*.csv",
                       full.names = TRUE)
+  # grab files from the specific dat run 
+  files2 <- files[grepl(pattern = date, x = files)]
+  
   
   # read and bind the dataframes 
-  data <- files |>
+  data <- files2 |>
     purrr::map(read_csv) |>
     dplyr::bind_rows() |>
     generateConfusionMatrixStats()
+  ###! we are getting different number of tested points between runs, this should not be the case... 
   
   # export file 
-  readr::write_csv(x = data, file = paste0(wd,"/",relativePath,"/combinedData/", outputfilename))
+  readr::write_csv(x = data, file = paste0(path, "/combinedData/", outputfilename))
   
   return(data)
 }
 
 
 # run the process 
-data <- compileCSVS(relativePath = relativePath,
-                    outputfilename = outputfilename)
+data <- compileCSVS(workingDirectory = "C:/Users/carverd/Documents/GitHub/Agroforestry", 
+                    relativePath = relativePath,
+                    outputfilename = outputfilename,
+                    date = "20240110"
+                    )
 
 
 
@@ -66,28 +72,29 @@ data <- compileCSVS(relativePath = relativePath,
 
 
 # generate plots 
+## some redundent steps in here. Ok because it makes for easier parseing of data for plots. 
 parameters <- c("SNIC_SuperPixelSize", "SNIC_SeedShape", "SNIC_Compactness","SNIC_Connectivity")
 
-generatePlots <- function(relativePath, parameters){
+generatePlots <- function(workingDirectory, relativePath, parameters,date){
   library(readr)
   library(dplyr)
   library(purrr)
   library(plotly)
   # define path
-  wd <- getwd()
-  path <- paste0(wd,"/",relativePath) 
+  path <- paste0(workingDirectory,"/",relativePath) 
   
   # read in files 
   files <- list.files(path = path,
                       pattern = "*.csv",
                       full.names = TRUE)
+  files2 <- files[grepl(pattern = date, x = files)]
   
   figs <- list()
   
   for(i in seq_along(parameters)){
     name = parameters[i]
     
-    f2 <- files[grepl(pattern = name, x = files)]
+    f2 <- files2[grepl(pattern = name, x = files2)]
     # read and bind the dataframes 
     d2 <- f2 |>
       purrr::map(read_csv) |>
@@ -117,6 +124,8 @@ generatePlots <- function(relativePath, parameters){
   return(figs)
 }
 
-plots <- generatePlots(relativePath = relativePath,
-              parameters = parameters)
+plots <- generatePlots(workingDirectory = workingDirectory,
+                       relativePath = relativePath,
+                       parameters = parameters,
+                       date = date)
  

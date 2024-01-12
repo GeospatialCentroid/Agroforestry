@@ -1,7 +1,7 @@
 # config.py
 import geopandas as gpd
 import numpy as np
-np.arange(0.0, 1.0, 0.1)
+
 
 # read in all gpd objects --- state the paths within the config file 
 grid = gpd.read_file(r"data\processed\griddedFeatures\twelve_mi_grid_uid.gpkg")
@@ -17,6 +17,8 @@ year = 2016
 # define initial sub grid 
 initGridID = "X12-601"
 
+# run version
+runVersion = "testing1"
 
 
 # define constant variables. -- this will probably be moved into the config.py file
@@ -62,7 +64,7 @@ SNIC_SeedShape_range = ["hex","square"]
 # Larger values cause clusters to be more compact (square/hexagonal). Anything over 1 seems to cause this. 
 # Setting this to 0 disables spatial distance weighting.
 SNIC_Compactness=0.75
-SNIC_Compactness_range = np.arange(0.0, 1.1, 0.1)
+SNIC_Compactness_range = np.arange(0.0, 1.4, 0.2)
 # Connectivity. Either 4 or 8. Did not seem to effect to much... 
 SNIC_Connectivity=4
 SNIC_Connectivity_range = [4,8]

@@ -1,6 +1,7 @@
 import ee
 import geemap
 import geopandas as gpd
+import numpy as np
 from agroforestry.config import * 
 from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
@@ -79,7 +80,7 @@ combinedModels = classifiedPixels.add(classifiedClusters)
 from_list = [0, 1, 2]
 # A corresponding list of replacement values (10 becomes 1, 20 becomes 2, etc).
 to_list = [0, 0, 1]
-combinedModelsReclass =  combinedModels.remap(from_list, to_list, bandName='classification')
+combinedModelsReclass =  combinedModels.remap(from_list, to_list, bandName='classification').clip(aoi1.geometry())
 geePrint(combinedModelsReclass)
 
 
@@ -141,7 +142,7 @@ dic2 = ee.Dictionary({
     'overallAccuracy' : combinedAccuracy.accuracy()})
 
 
-geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" + str(year) + ".csv")
+geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" + str(year) + runVersion+  ".csv")
 
 
 
@@ -158,11 +159,16 @@ geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ 
 ### slow ~ > 10m for export but it does seem to work.... 
 ### should probably try at 1m just to see what happens. 
 ### track progress at https://code.earthengine.google.com/tasks
-# task = ee.batch.Export.image.toDrive(
-#     image=test1,
-#     scale= 10,
-#     description='testExport',
-#     folder='agroforestry',
-#     region=aoi1.geometry(),
-# )
-# task.start()
+for i in range(len(downloadGrids)):
+    print(i)
+    subarea = downloadGrids.iloc[:i]
+    area2 = geemap.gdf_to_ee(subarea).geometry()
+    test2 = combinedModelsReclass.clip(area2)
+    task = ee.batch.Export.image.toDrive(
+        image=test2,
+        scale= 1,
+        description='testExport'+i,
+        folder='agroforestry',
+        region= area2.geometry(),
+    )
+task.start()
