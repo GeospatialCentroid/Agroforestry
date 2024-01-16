@@ -31,7 +31,8 @@ def testRFClassifier(testingData,classifier):
     return total
 
 #"data/processed/trainingdataset_withClasses.geojson"
-def trainModels(filename,test_train_ratio,nTrees,setSeed,bandsToUse_Cluster,bandsToUse_Pixel):
+def trainModels(filename,test_train_ratio,nTrees,setSeed,bandsToUse_Cluster,bandsToUse_Pixel,bandsToUse_pixelTrim):
+    
     import ee
     import geemap
     import geopandas as gpd    
@@ -49,8 +50,11 @@ def trainModels(filename,test_train_ratio,nTrees,setSeed,bandsToUse_Cluster,band
     # traing the rf model 
     rfCluster = trainRFModel(bands=bandsToUse_Cluster, inputFeature=training, nTrees=nTrees,setSeed=setSeed)
     rfPixel = trainRFModel(bands=bandsToUse_Pixel, inputFeature=training, nTrees=nTrees,setSeed=setSeed)
+    rfPixelTrim = trainRFModel(bands=bandsToUse_pixelTrim, inputFeature=training, nTrees=nTrees,setSeed=setSeed)
     ## run validation using the testing set 
     clusterValidation = testRFClassifier(classifier=rfCluster, testingData= testing)
     pixelValidation = testRFClassifier(classifier=rfPixel, testingData= testing)
+    pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
+
     # cant print tuple with this function'
-    return(testing, rfCluster, rfPixel)
+    return(testing, rfCluster, rfPixel,rfPixelTrim)

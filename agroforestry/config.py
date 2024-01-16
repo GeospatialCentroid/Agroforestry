@@ -43,6 +43,11 @@ bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'contrast
 bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean', 'contrast_n_mean',
                        'corr_n_mean', 'entropy_n_mean']
 
+# vsurf select variables top 10 
+vsurfWithCor = ["entropy_n","contrast_n","contrast_n_mean","entropy_g","nd","entropy_n_mean","entropy_g_mean","nd_mean_neighborhood", "contrast_g","contrast_g_mean"]
+# vsurf select variables with removed correlations
+vsurfNoCor = ["entropy_n","nd","nd_mean_neighborhood", "R_mean","G_mean","B_mean","R","G","B","N","nd_sd_neighborhood","N_mean"]              
+
 
 
 # define the max value of the individuals to normalize elemenst 

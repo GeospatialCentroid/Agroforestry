@@ -28,11 +28,12 @@ vals = trainModels(filename="data/processed/trainingdataset_withClasses.geojson"
                    setSeed=setSeed,
                    test_train_ratio=test_train_ratio,
                    bandsToUse_Cluster=bandsToUse_Cluster,
-                   bandsToUse_Pixel=bandsToUse_Pixel)
+                   bandsToUse_Pixel=bandsToUse_Pixel,
+                   bandsToUse_pixelTrim= vsurfNoCor)
 testing = vals[0]
 rfCluster = vals[1]
 rfPixel = vals[2]
-
+rfPixelTrim = vals[3]
 
 ###
 # section 2 : establish region which models are being applied. This can be change in the standard workflow but will remain consistent in the parameter testing section
@@ -61,6 +62,8 @@ naipEE = prepNAIP(aoi=aoi1, year=year,windowSize=windowSize)
 ### when I call it from a file... 
 def testModel(naip,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness,SNIC_Connectivity,bandsToUse_Cluster,
               rfCluster, rfPixel, bandsToUse_Pixel,testParaName):
+              # bandsToUse_pixelTrim, rfPixelTrim # not added just yet... 
+
     # def geePrint(feature):
     #     return print(feature.getInfo())
 
@@ -142,18 +145,18 @@ def testModel(naip,SNIC_SeedShape,SNIC_SuperPixelSize,SNIC_Compactness,SNIC_Conn
 
 # apply over a SNIC_Connectivity_range
 # this only has two options 
-# for i in SNIC_Connectivity_range:
-#     print(i)
-#     testModel(bandsToUse_Cluster=bandsToUse_Cluster,
-#               bandsToUse_Pixel=bandsToUse_Pixel,
-#               naip=naipEE,
-#               rfCluster=rfCluster,
-#               rfPixel=rfPixel,
-#               SNIC_Compactness=SNIC_Compactness,
-#               SNIC_Connectivity=i,
-#               SNIC_SeedShape=SNIC_SeedShape,
-#               SNIC_SuperPixelSize= SNIC_SuperPixelSize,
-#               testParaName = "SNIC_Connectivity_range")
+for i in SNIC_Connectivity_range:
+    print(i)
+    testModel(bandsToUse_Cluster=bandsToUse_Cluster,
+              bandsToUse_Pixel=bandsToUse_Pixel,
+              naip=naipEE,
+              rfCluster=rfCluster,
+              rfPixel=rfPixel,
+              SNIC_Compactness=SNIC_Compactness,
+              SNIC_Connectivity=i,
+              SNIC_SeedShape=SNIC_SeedShape,
+              SNIC_SuperPixelSize= SNIC_SuperPixelSize,
+              testParaName = "SNIC_Connectivity_range")
 
 # apply over a SNIC_Compactness_range
 for i in SNIC_Compactness_range:

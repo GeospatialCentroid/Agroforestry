@@ -7,4 +7,6 @@
 .RData
 .Rproj.user/
 .Rhistory
+*.pyc
+
 
