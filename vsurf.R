@@ -85,4 +85,4 @@ varaibleSelection <- function(data){
 vars <- varaibleSelection(data)
 
 
-vars[vars$includeInFinal == TRUE, ]
+noCor <- vars[vars$includeInFinal == TRUE, ]

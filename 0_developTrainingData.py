@@ -6,6 +6,10 @@ from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
 from agroforestry.snicProcessing import *
 
+
+# imp does not run in python 12.3 
+# look into https://docs.python.org/3.11/library/importlib.html#module-importlib if I want to solve this issue
+
 # establish connection with ee account. might require some additional configuration based on local machine 
 ee.Initialize()
 # if initialization, comment out the line above and go through the authentication process
