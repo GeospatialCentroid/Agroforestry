@@ -10,6 +10,8 @@ from agroforestry.randomForest import *
 from agroforestry.exportFunctions import *
 
 
+
+
 # establish connection with ee account. might require some additional configuration based on local machine 
 ee.Initialize()
 # if issues see 0_develop training data for suggestions 
@@ -159,16 +161,17 @@ geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ 
 ### slow ~ > 10m for export but it does seem to work.... 
 ### should probably try at 1m just to see what happens. 
 ### track progress at https://code.earthengine.google.com/tasks
-for i in range(len(downloadGrids)):
+for i in range(len(downloadGrids)):  #range(len(downloadGrids))
     print(i)
     subarea = downloadGrids.iloc[:i]
-    area2 = geemap.gdf_to_ee(subarea).geometry()
-    test2 = combinedModelsReclass.clip(area2)
+    area2 = geemap.gdf_to_ee(subarea)
+    test2 = combinedModelsReclass.clip(area2).select("remapped")
     task = ee.batch.Export.image.toDrive(
         image=test2,
         scale= 1,
-        description='testExport'+i,
+        description='testExport_0116'+str(i),
         folder='agroforestry',
         region= area2.geometry(),
+        maxPixels = 1e10
     )
-task.start()
+    task.start()
