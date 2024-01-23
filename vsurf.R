@@ -1,12 +1,34 @@
 pacman::p_load(VSURF, dplyr,sf)
 
 
+setwd("~/GitHub/Agroforestry")
 
-## run the vsurf classification to referen 
-data <- sf::st_read("~/GitHub/Agroforestry/data/processed/trainingdataset_withClasses.geojson") |> 
-  st_drop_geometry()
+# read in all gpd objects --- state the paths within the config file 
+grid <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+# ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
+# points = gpd.read_file(r"data\processed\testSamplingData.geojson")
+# subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
 
-varaibleSelection <- function(data){
+# usda tree reference layer 
+# usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
+# define year
+year <- 2016
+# define initial sub grid 
+initGridID <- "X12-601"
+
+
+
+
+
+varaibleSelection <- function(year, gridID){
+  
+  # define file path for inport and export 
+  filePath <- paste0("data/processed/", initGridID)
+  
+  data <- list.files(filePath, pattern = "agroforestrySamplingData.geojson", recursive = TRUE, full.names = TRUE) |>
+    st_read()|> 
+    st_drop_geometry()
+  
   # subset predictor data and presence column
   # remove all na from dataframe
   test2 <-complete.cases(data) 
@@ -20,8 +42,7 @@ varaibleSelection <- function(data){
   ### Considered altering the number of trees, 100 is somewhat low for the
   # number of predictors used. It was a time concern more then anything.
   # change for 30 arc second run 
-  vsurfThres <- VSURF_thres(x=predictorVar , y=as.factor(responseVar$presence) ,
-                            ntree = 100 )
+  vsurfThres <- VSURF_thres(x=predictorVar , y=as.factor(responseVar$presence))
   ###
   #correlation matrix
   ###
@@ -46,7 +67,7 @@ varaibleSelection <- function(data){
       # add variable to the test list
       varsTested <- c(varsTested, varNames[i])
       # Test for correlations with predictors
-      vars <- correlation[(i+1):nrow(correlation),i] > 0.7 | correlation[(i+1):nrow(correlation),i] < -0.7
+      vars <- correlation[(i+1):nrow(correlation),i] > 0.7 | correlation[(i+1):nrow(correlation),i] < -0.7 ## this is not getting filtered and that's ok really... 
       # Select correlated values names
       corVar <- names(which(vars == TRUE))
       #test is any correlated variables exist
@@ -77,12 +98,13 @@ varaibleSelection <- function(data){
   rankPredictors$includeInFinal <- colnames(correlation) %in% varNames
   rankPredictors <- rankPredictors[,4:6]
 
-    return(rankPredictors)
+  #export to a file location 
+  write.csv(x = rankPredictors, file = paste0(filePath,"/variableSelection.csv"))
+  
+  return(rankPredictors)
 }
 
 
 
-vars <- varaibleSelection(data)
+varaibleSelection(year = year, gridID = initGridID)
 
-
-noCor <- vars[vars$includeInFinal == TRUE, ]

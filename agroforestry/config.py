@@ -1,5 +1,6 @@
 # config.py
 import geopandas as gpd
+import pandas as pd
 import numpy as np
 import os
 
@@ -35,9 +36,10 @@ rawSampleData = rawData + "/agroforestrySamplingData.geojson"
 processSampleData = processedData + "/agroforestrySamplingData.geojson"
 if os.path.exists(processSampleData):
   #  Prioritize the processed data 
-   pointsWithClasses = gpd.read_file(processSampleData)
+  pointsWithClasses = gpd.read_file(processSampleData)
 else:
   pointsWithClasses = gpd.read_file(rawSampleData)
+
 
 # define constant variables. -- this will probably be moved into the config.py file
 # visualization layers 
@@ -50,6 +52,11 @@ threeBandsToDraw_Mean=['R_mean', 'G_mean','B_mean']
 # the value is a assigned randomly across a 0-1 distribution.  
 # ex. 0.4 would imply, 60% of records to train, 40% to test 
 test_train_ratio = 0.4
+
+## read in the variables selected
+variableSelection = processedData + "/variableSelection.csv" 
+if os.path.exists(variableSelection):
+  selectedVariables = pd.read_csv(variableSelection)
 
 # these are hard coded parameters come back to them if you start
 # altering the number of input bands to the SNIC function
@@ -64,9 +71,9 @@ bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast
 # vsurf select variables top 10 
 ## I want to read in this data as a file based on export from R 
 ## need a condition statement to make sure the file exists. 
-vsurfWithCor = ["entropy_n","contrast_n","contrast_n_mean","entropy_g","nd","entropy_n_mean","entropy_g_mean","nd_mean_neighborhood", "contrast_g","contrast_g_mean"]
+vsurfWithCor = selectedVariables. iloc[:10]["varNames"].tolist() 
 # vsurf select variables with removed correlations
-vsurfNoCor = ["entropy_n","nd","nd_mean_neighborhood", "R_mean","G_mean","B_mean","R","G","B","N","nd_sd_neighborhood","N_mean"]              
+vsurfNoCor = selectedVariables.query('includeInFinal == True')["varNames"].tolist()         
 
 # define neighborGrids 
 ## I want to read in this data as a file based on export from R 
