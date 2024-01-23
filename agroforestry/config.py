@@ -78,10 +78,11 @@ vsurfNoCor = selectedVariables.query('includeInFinal == True')["varNames"].tolis
 # define neighborGrids 
 ## I want to read in this data as a file based on export from R 
 ## need a condition statement to make sure the file exists. 
-grid8 = []
-grid16 = []
-grid24 = []
-
+neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
+grid8 = neighborGrid.query("poisition == 1")
+grid16 = neighborGrid.query("poisition == 2")
+grid24 = neighborGrid.query("poisition == 3")
+grid36 = neighborGrid.query("poisition == 4")
 
 
 

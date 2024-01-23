@@ -1,29 +1,9 @@
-pacman::p_load(VSURF, dplyr,sf)
 
 
-setwd("~/GitHub/Agroforestry")
-
-# read in all gpd objects --- state the paths within the config file 
-grid <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
-# ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
-# points = gpd.read_file(r"data\processed\testSamplingData.geojson")
-# subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
-
-# usda tree reference layer 
-# usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
-# define year
-year <- 2016
-# define initial sub grid 
-initGridID <- "X12-601"
-
-
-
-
-
-varaibleSelection <- function(year, gridID){
+variableSelection <- function(gridID,dataPath){
   
   # define file path for inport and export 
-  filePath <- paste0("data/processed/", initGridID)
+  filePath <- paste0(dataPath,"/processed/", gridID)
   
   data <- list.files(filePath, pattern = "agroforestrySamplingData.geojson", recursive = TRUE, full.names = TRUE) |>
     st_read()|> 
@@ -98,13 +78,9 @@ varaibleSelection <- function(year, gridID){
   rankPredictors$includeInFinal <- colnames(correlation) %in% varNames
   rankPredictors <- rankPredictors[,4:6]
 
-  #export to a file location 
-  write.csv(x = rankPredictors, file = paste0(filePath,"/variableSelection.csv"))
-  
+
   return(rankPredictors)
 }
 
 
-
-varaibleSelection(year = year, gridID = initGridID)
 

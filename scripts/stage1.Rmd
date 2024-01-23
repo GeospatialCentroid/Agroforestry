@@ -1,0 +1,33 @@
+```{r}
+# load libraries 
+pacman::p_load(sf,dplyr,VSURF)
+```
+
+
+```{r}
+# define grid ID 
+## this is the primary path related structure so it's im
+gridID <- "X12-601"
+```
+
+
+```{r}
+# source functions 
+source("~/GitHub/Agroforestry/agroforestry/0b_vsurf.R")
+source("~/GitHub/Agroforestry/agroforestry/0c_gettingNeighborGirds.R")
+
+# define data path 
+dataPath <- "~/GitHub/Agroforestry/data"
+exportPath <- paste0(dataPath, "/processed/", gridID)
+```
+
+run variable selection using vsurf
+```{r}
+rankPredictors <- variableSelection(gridID = gridID,dataPath = dataPath)
+#export to a file location 
+write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection.csv"))
+```
+
+
+generate the subgrid features 
+
