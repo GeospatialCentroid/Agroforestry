@@ -25,7 +25,7 @@ ee.Initialize()
 print("training data is being develop for the " + str(year)+ " time period")
      
 # convert the reference points to gee object 
-pointsEE = geemap.gdf_to_ee(subSamplePoints)
+pointsEE = geemap.gdf_to_ee(pointsWithClasses)
 #geePrint(pointsEE)
 
 # generate NAIP layer 
@@ -58,7 +58,7 @@ extractedReferenceData = snicData.sampleRegions(collection = pointsEE,
 
 # export data --- takes a long time, maybe 5 minutes
 refData = geemap.ee_to_geojson(ee_object=extractedReferenceData,
-                               filename="data/processed/trainingdataset_withClasses.geojson")
+                               filename= processedData + "/agroforestrySamplingData.geojson")
 # options to export to different file types
 # refData2 = geemap.ee_to_csv(ee_object=extractedReferenceData,
 #                             filename="data/processed/trainingdataset_withClasses.csv")

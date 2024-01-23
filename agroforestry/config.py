@@ -1,15 +1,14 @@
 # config.py
 import geopandas as gpd
 import numpy as np
-
+import os
 
 # read in all gpd objects --- state the paths within the config file 
-grid = gpd.read_file(r"data\processed\griddedFeatures\twelve_mi_grid_uid.gpkg")
-ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
-points = gpd.read_file(r"data\processed\testSamplingData.geojson")
-subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
-# once we establish a sampling method we should need points with classes. 
-pointsWithClasses = gpd.read_file(r"data\processed\agroforestrySamplingData.geojson")
+grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+# ne = gpd.read_file(r"data\processed\griddedFeatures\nebraska_counties.gpkg")
+# points = gpd.read_file(r"data\processed\testSamplingData.geojson")
+# subSamplePoints = gpd.read_file(r"data\processed\subGridSampling.geojson")
+
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
@@ -20,6 +19,25 @@ initGridID = "X12-601"
 # run version
 runVersion = "testing1"
 
+# folder storage structure
+processedData = 'data/processed/'+initGridID
+dataProducts = 'data/products/'+initGridID
+rawData = 'data/raw/'+initGridID
+if not os.path.isdir(processedData): 
+    os.makedirs(processedData)
+if not os.path.isdir(dataProducts): 
+    os.makedirs(dataProducts)
+if not os.path.isdir(rawData): 
+    os.makedirs(rawData)
+
+# data from GEE is place in name AOI folder in the raw data. . 
+rawSampleData = rawData + "/agroforestrySamplingData.geojson"
+processSampleData = processedData + "/agroforestrySamplingData.geojson"
+if os.path.exists(processSampleData):
+  #  Prioritize the processed data 
+   pointsWithClasses = gpd.read_file(processSampleData)
+else:
+  pointsWithClasses = gpd.read_file(rawSampleData)
 
 # define constant variables. -- this will probably be moved into the config.py file
 # visualization layers 
@@ -44,9 +62,19 @@ bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast
                        'corr_n_mean', 'entropy_n_mean']
 
 # vsurf select variables top 10 
+## I want to read in this data as a file based on export from R 
+## need a condition statement to make sure the file exists. 
 vsurfWithCor = ["entropy_n","contrast_n","contrast_n_mean","entropy_g","nd","entropy_n_mean","entropy_g_mean","nd_mean_neighborhood", "contrast_g","contrast_g_mean"]
 # vsurf select variables with removed correlations
 vsurfNoCor = ["entropy_n","nd","nd_mean_neighborhood", "R_mean","G_mean","B_mean","R","G","B","N","nd_sd_neighborhood","N_mean"]              
+
+# define neighborGrids 
+## I want to read in this data as a file based on export from R 
+## need a condition statement to make sure the file exists. 
+grid8 = []
+grid16 = []
+grid24 = []
+
 
 
 
@@ -55,6 +83,8 @@ bandMaxes=[255, 255, 255,255,1] #  represents 'R', 'G','B', "N", "nd"
 
 # set the scale of the input image
 nativeScaleOfImage = 4 # this should be one for production, using larger number for performance in the testing steps 
+
+## these could all be set based on a maximum value returned 
 
 # SNIC based parametes 
 ## Defining the Seed Grid
