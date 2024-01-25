@@ -3,6 +3,13 @@
 pacman::p_load(sf,dplyr,VSURF)
 ```
 
+Might want to include the develop training data script as a python call here... would need to work through setting the venv 
+
+```{python}
+
+```
+
+
 
 ```{r}
 # define grid ID 
@@ -14,7 +21,7 @@ gridID <- "X12-601"
 ```{r}
 # source functions 
 source("~/GitHub/Agroforestry/agroforestry/0b_vsurf.R")
-source("~/GitHub/Agroforestry/agroforestry/0c_gettingNeighborGirds.R")
+source("~/GitHub/Agroforestry/agroforestry/0c_gettingNeighborGrids.R")
 
 # define data path 
 dataPath <- "~/GitHub/Agroforestry/data"
@@ -30,4 +37,11 @@ write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection.csv"
 
 
 generate the subgrid features 
+
+```{r}
+nGrid <- defineNeighborGrid(gridID = gridID, dataPath = dataPath)
+write.csv(x = nGrid, file = paste0(exportPath, "/neighborGrids.csv"))
+```
+
+
 

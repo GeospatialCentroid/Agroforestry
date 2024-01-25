@@ -6,13 +6,15 @@
 # gridID <- "X12-601"
 
 
-defineNeighborGrid <- function(gridID){
-  
-  # read in full grid 
-  fullGrid <- sf::st_read("~/GitHub/Agroforestry/data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+defineNeighborGrid <- function(gridID, dataPath){
+  # set file path
+  filePath <- paste0(dataPath,"/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+
+    # read in full grid 
+  fullGrid <- sf::st_read(filePath)
   
   # define export location 
-  exportPath <- paste0("data/processed/", gridID)
+  # exportPath <- paste0(dataPath, "/processed/", gridID)s
   
   # sub set unique grid
   startGrid <- fullGrid |>
@@ -80,9 +82,9 @@ defineNeighborGrid <- function(gridID){
   
   
   # return a dataframe with grid id and the number of positions away from the center 
-  write.csv(df, file = paste0(exportPath, "/neighborGrids.csv") )
+  return(df)
+  # write.csv(df, file = paste0(exportPath, "/neighborGrids.csv") )
 }
 
 
-defineNeighborGrid(gridID = "X12-601")
 

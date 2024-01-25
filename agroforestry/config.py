@@ -71,9 +71,9 @@ bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast
 # vsurf select variables top 10 
 ## I want to read in this data as a file based on export from R 
 ## need a condition statement to make sure the file exists. 
-vsurfWithCor = selectedVariables. iloc[:10]["varNames"].tolist() 
+vsurfWithCor = selectedVariables.iloc[:10]["varNames"].tolist() 
 # vsurf select variables with removed correlations
-vsurfNoCor = selectedVariables.query('includeInFinal == True')["varNames"].tolist()         
+vsurfNoCor = selectedVariables.query('includeInFinal == True').iloc[:10]["varNames"].tolist()         
 
 # define neighborGrids 
 ## I want to read in this data as a file based on export from R 
