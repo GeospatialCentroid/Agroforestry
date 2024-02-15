@@ -13,9 +13,13 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
-year = 2016
+year = 2020
 # define initial sub grid 
-initGridID = "X12-601"
+initGridID = "X12-601" # primary grid = X12-601 - this need to reflect where the training data is held 
+# neighbor grid  600 
+# 16 level grid  510
+# 24 level grid  466
+# 36 level grid  731
 
 # run version
 runVersion = "testing1"
@@ -32,13 +36,13 @@ if not os.path.isdir(rawData):
     os.makedirs(rawData)
 
 # data from GEE is place in name AOI folder in the raw data. . 
-rawSampleData = rawData + "/agroforestrySamplingData.geojson"
-processSampleData = processedData + "/agroforestrySamplingData.geojson"
+rawSampleData = rawData + "/agroforestrySamplingData.geojson" ## will need this to pull from the 
+processSampleData = processedData + "/agroforestrySamplingData_" + str(year) + ".geojson"
 if os.path.exists(processSampleData):
   #  Prioritize the processed data 
   pointsWithClasses = gpd.read_file(processSampleData)
 else:
-  pointsWithClasses = gpd.read_file(rawSampleData)
+  pointsWithClasses = gpd.read_file(rawSampleData)[["presence","random","sampleStrat","geometry"]]
 
 
 # define constant variables. -- this will probably be moved into the config.py file
@@ -54,9 +58,17 @@ threeBandsToDraw_Mean=['R_mean', 'G_mean','B_mean']
 test_train_ratio = 0.4
 
 ## read in the variables selected
-variableSelection = processedData + "/variableSelection.csv" 
+variableSelection = processedData + "/variableSelection"+str(year)+".csv" 
+
 if os.path.exists(variableSelection):
   selectedVariables = pd.read_csv(variableSelection)
+  # vsurf select variables top 10 
+  ## I want to read in this data as a file based on export from R 
+  ## need a condition statement to make sure the file exists. 
+  vsurfWithCor = selectedVariables.iloc[:10]["varNames"].tolist() 
+  # vsurf select variables with removed correlations
+  vsurfNoCor = selectedVariables.query('includeInFinal == True').iloc[:10]["varNames"].tolist()       
+
 
 # these are hard coded parameters come back to them if you start
 # altering the number of input bands to the SNIC function
@@ -68,12 +80,7 @@ bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'contrast
 bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean', 'contrast_n_mean',
                        'corr_n_mean', 'entropy_n_mean']
 
-# vsurf select variables top 10 
-## I want to read in this data as a file based on export from R 
-## need a condition statement to make sure the file exists. 
-vsurfWithCor = selectedVariables.iloc[:10]["varNames"].tolist() 
-# vsurf select variables with removed correlations
-vsurfNoCor = selectedVariables.query('includeInFinal == True').iloc[:10]["varNames"].tolist()         
+  
 
 # define neighborGrids 
 ## I want to read in this data as a file based on export from R 
@@ -90,7 +97,7 @@ grid36 = neighborGrid.query("poisition == 4")
 bandMaxes=[255, 255, 255,255,1] #  represents 'R', 'G','B', "N", "nd"
 
 # set the scale of the input image
-nativeScaleOfImage = 4 # this should be one for production, using larger number for performance in the testing steps 
+nativeScaleOfImage = 1 # this should be one for production, using larger number for performance in the testing steps 
 
 ## these could all be set based on a maximum value returned 
 
@@ -122,7 +129,7 @@ nTrees_range = np.arange(2, 20, 2)
 setSeed = 5
 
 # window size for average NDVI and glcm 
-windowSize = 10
+windowSize = 5
 
 
 # Parameters to test 

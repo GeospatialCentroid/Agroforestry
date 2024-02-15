@@ -15,6 +15,7 @@ Might want to include the develop training data script as a python call here... 
 # define grid ID 
 ## this is the primary path related structure so it's im
 gridID <- "X12-601"
+year <- 2010
 ```
 
 
@@ -30,9 +31,9 @@ exportPath <- paste0(dataPath, "/processed/", gridID)
 
 run variable selection using vsurf
 ```{r}
-rankPredictors <- variableSelection(gridID = gridID,dataPath = dataPath)
+rankPredictors <- variableSelection(gridID = gridID,dataPath = dataPath, year = year)
 #export to a file location 
-write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection.csv"))
+write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection",year,".csv"))
 ```
 
 

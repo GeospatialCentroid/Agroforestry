@@ -71,14 +71,18 @@ modelExtractedVals = classifiedPixelsTrim.sampleRegions(
 # Generate a confusion matrix on the current classification 
 combinedAccuracy = modelExtractedVals.errorMatrix("presence", "remapped")
 
+
+
+
 # export imagery 
 exportImagery = True
-if exportImagery:
+if exportImagery == True:
     ### export to google drive
     ### slow ~ > 10m for export but it does seem to work.... 
     ### should probably try at 1m just to see what happens. 
     ### track progress at https://code.earthengine.google.com/tasks
     nGrids = downloadGrids.size()
+    scale = 4
     # this is still a GEE object so it wont work in python loops 
     for i in range(24):  #range(len(downloadGrids)) # defining the value manually 
         print(i)
@@ -86,13 +90,35 @@ if exportImagery:
         test2 = classifiedPixelsTrim.clip(clipArea)
         task = ee.batch.Export.image.toDrive(
             image=test2,
-            scale= 1,
-            description='testExport_0124'+str(i),
+            scale= scale,
+            description= initGridID+"_"+str(year)+"_"+str(scale)+"_"+str(i),
             folder='agroforestry',
             region= clipArea.geometry()
             # maxPixels = 1e10
         )
         task.start()
+
+# test the export process 
+# A Landsat 8 surface reflectance image.
+image = ee.Image(
+    'LANDSAT/LC08/C02/T1_L2/LC08_044034_20210508'
+).select(['SR_B.'])  # reflectance bands
+
+# A region of interest.
+region = ee.Geometry.BBox(-122.24, 37.13, -122.11, 37.20)
+
+# Set the export "scale" and "crs" parameters.
+task = ee.batch.Export.image.toDrive(
+    image=image,
+    description='image_export',
+    folder='agroforestry',
+    region=region,
+    scale=30,
+    crs='EPSG:5070'
+)
+task.start()
+
+
 
 
 ## add a condtional statement here to determine if the file should be downloaded or not. 

@@ -1,11 +1,17 @@
 
 
-variableSelection <- function(gridID,dataPath){
+variableSelection <- function(gridID,dataPath,year){
   
   # define file path for inport and export 
   filePath <- paste0(dataPath,"/processed/", gridID)
-  
-  data <- list.files(filePath, pattern = "agroforestrySamplingData.geojson", recursive = TRUE, full.names = TRUE) |>
+  # grab all options 
+  files <- list.files(filePath, pattern = "agroforestrySamplingData",
+                     recursive = TRUE,
+                     full.names = TRUE)
+  #select specific year 
+  file <- files[grepl(x = files, pattern = year)]
+  # read in feature
+  data <- file |>
     st_read()|> 
     st_drop_geometry()
   
