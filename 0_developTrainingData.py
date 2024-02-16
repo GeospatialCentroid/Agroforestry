@@ -11,8 +11,11 @@ from agroforestry.snicProcessing import *
 # look into https://docs.python.org/3.11/library/importlib.html#module-importlib if I want to solve this issue
 
 # establish connection with ee account. might require some additional configuration based on local machine 
-ee.Initialize()
-# if initialization, comment out the line above and go through the authentication process
+try:
+        ee.Initialize()
+except Exception as e:
+        ee.Authenticate()
+        ee.Initialize()# if initialization, comment out the line above and go through the authentication process
 ## don't expect this to go smoothly or quickly... 
 #try this first
 # ee.Authenticate() 
@@ -24,6 +27,8 @@ ee.Initialize()
 
 print("training data is being develop for the " + str(year)+ " time period")
      
+
+
 # convert the reference points to gee object 
 pointsEE = geemap.gdf_to_ee(pointsWithClasses)
 #geePrint(pointsEE)
@@ -45,7 +50,7 @@ snicData = snicOutputs(naip = naipEE,
                         SNIC_Connectivity = SNIC_Connectivity,
                         # nativeScaleOfImage = nativeScaleOfImage,
                         bandsToUse_Cluster = bandsToUse_Cluster)
-# geePrint(snicData.bandNames()) # this full list is what is used to create the pixel model 
+geePrint(snicData.bandNames()) # this full list is what is used to create the pixel model 
 
 # extract values for the training and testing datasets 
 extractedReferenceData = snicData.sampleRegions(collection = pointsEE, 
@@ -58,7 +63,7 @@ extractedReferenceData = snicData.sampleRegions(collection = pointsEE,
 
 # export data --- takes a long time, maybe 5 minutes
 refData = geemap.ee_to_geojson(ee_object=extractedReferenceData,
-                               filename= processedData + "/agroforestrySamplingData.geojson")
+                               filename= processedData + "/agroforestrySamplingData_" + str(year) +".geojson")
 # options to export to different file types
 # refData2 = geemap.ee_to_csv(ee_object=extractedReferenceData,
 #                             filename="data/processed/trainingdataset_withClasses.csv")

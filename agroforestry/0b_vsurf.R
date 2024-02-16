@@ -20,7 +20,14 @@ variableSelection <- function(gridID,dataPath,year){
   test2 <-complete.cases(data) 
   data <- data[test2,]
   
-  predictorVar <- data |> select(-presence, -sampleStrat, -random, -id)
+  data <- data |> 
+    dplyr::mutate(presence = case_when(
+      presence == 1 ~ 1,
+      TRUE ~ 0
+    ))
+  
+  
+  predictorVar <- data |> select(-presence,  -id)
   responseVar <-  data |> select(presence)
   # drop all column from bioValues set as well so the same data is used for maxnet modeling.
   

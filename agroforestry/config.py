@@ -13,9 +13,9 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
-year = 2020
+year = 2016
 # define initial sub grid 
-initGridID = "X12-601" # primary grid = X12-601 - this need to reflect where the training data is held 
+initGridID = "X12-150" # primary grid = X12-601 - this need to reflect where the training data is held 
 # neighbor grid  600 
 # 16 level grid  510
 # 24 level grid  466
@@ -36,13 +36,13 @@ if not os.path.isdir(rawData):
     os.makedirs(rawData)
 
 # data from GEE is place in name AOI folder in the raw data. . 
-rawSampleData = rawData + "/agroforestrySamplingData.geojson" ## will need this to pull from the 
+rawSampleData = rawData + "/agroforestrySampling_"+initGridID+".geojson" ## will need this to pull from the 
 processSampleData = processedData + "/agroforestrySamplingData_" + str(year) + ".geojson"
 if os.path.exists(processSampleData):
   #  Prioritize the processed data 
   pointsWithClasses = gpd.read_file(processSampleData)
 else:
-  pointsWithClasses = gpd.read_file(rawSampleData)[["presence","random","sampleStrat","geometry"]]
+  pointsWithClasses = gpd.read_file(rawSampleData)# [["presence","random","sampleStrat","geometry"]]
 
 
 # define constant variables. -- this will probably be moved into the config.py file
@@ -69,6 +69,15 @@ if os.path.exists(variableSelection):
   # vsurf select variables with removed correlations
   vsurfNoCor = selectedVariables.query('includeInFinal == True').iloc[:10]["varNames"].tolist()       
 
+    # define neighborGrids 
+  ## I want to read in this data as a file based on export from R 
+  ## need a condition statement to make sure the file exists. 
+  neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
+  grid8 = neighborGrid.query("poisition == 1")
+  grid16 = neighborGrid.query("poisition == 2")
+  grid24 = neighborGrid.query("poisition == 3")
+  grid36 = neighborGrid.query("poisition == 4")
+
 
 # these are hard coded parameters come back to them if you start
 # altering the number of input bands to the SNIC function
@@ -82,14 +91,6 @@ bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast
 
   
 
-# define neighborGrids 
-## I want to read in this data as a file based on export from R 
-## need a condition statement to make sure the file exists. 
-neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
-grid8 = neighborGrid.query("poisition == 1")
-grid16 = neighborGrid.query("poisition == 2")
-grid24 = neighborGrid.query("poisition == 3")
-grid36 = neighborGrid.query("poisition == 4")
 
 
 
@@ -129,7 +130,7 @@ nTrees_range = np.arange(2, 20, 2)
 setSeed = 5
 
 # window size for average NDVI and glcm 
-windowSize = 5
+windowSize = 8
 
 
 # Parameters to test 

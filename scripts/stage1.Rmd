@@ -14,9 +14,10 @@ Might want to include the develop training data script as a python call here... 
 ```{r}
 # define grid ID 
 ## this is the primary path related structure so it's im
-gridID <- "X12-601"
-year <- 2010
+gridID <- "X12-150"
+year <- 2016
 ```
+
 
 
 ```{r}
@@ -28,6 +29,33 @@ source("~/GitHub/Agroforestry/agroforestry/0c_gettingNeighborGrids.R")
 dataPath <- "~/GitHub/Agroforestry/data"
 exportPath <- paste0(dataPath, "/processed/", gridID)
 ```
+
+
+
+Edit the traing dataset 
+```{r}
+# define file path for inport and export 
+  filePath <- paste0(dataPath,"/processed/", gridID)
+  # grab all options 
+  files <- list.files(filePath, pattern = "agroforestrySamplingData",
+                     recursive = TRUE,
+                     full.names = TRUE)
+  #select specific year 
+  file <- files[grepl(x = files, pattern = year)]
+  # read in feature
+  data <- file |>
+    st_read()|> 
+    dplyr::mutate(presence = case_when(
+      presence == 1 ~ 1,
+      TRUE ~ 0
+    ))
+data$random <- runif(nrow(data))
+
+sf::write_sf(data, file, delete_dsn =TRUE)
+
+
+```
+
 
 run variable selection using vsurf
 ```{r}
