@@ -15,7 +15,7 @@ Might want to include the develop training data script as a python call here... 
 # define grid ID 
 ## this is the primary path related structure so it's im
 gridID <- "X12-150"
-year <- 2016
+year <- 2010
 ```
 
 

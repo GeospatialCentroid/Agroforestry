@@ -13,13 +13,9 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
-year = 2016
+year = 2020
 # define initial sub grid 
 initGridID = "X12-150" # primary grid = X12-601 - this need to reflect where the training data is held 
-# neighbor grid  600 
-# 16 level grid  510
-# 24 level grid  466
-# 36 level grid  731
 
 # run version
 runVersion = "testing1"
@@ -55,7 +51,7 @@ threeBandsToDraw_Mean=['R_mean', 'G_mean','B_mean']
 # all values less then or equal too will be in the testing data
 # the value is a assigned randomly across a 0-1 distribution.  
 # ex. 0.4 would imply, 60% of records to train, 40% to test 
-test_train_ratio = 0.4
+test_train_ratio = 0.2
 
 ## read in the variables selected
 variableSelection = processedData + "/variableSelection"+str(year)+".csv" 
@@ -73,24 +69,21 @@ if os.path.exists(variableSelection):
   ## I want to read in this data as a file based on export from R 
   ## need a condition statement to make sure the file exists. 
   neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
-  grid8 = neighborGrid.query("poisition == 1")
-  grid16 = neighborGrid.query("poisition == 2")
-  grid24 = neighborGrid.query("poisition == 3")
-  grid36 = neighborGrid.query("poisition == 4")
+  grid8 = neighborGrid[neighborGrid['poisition'].isin([1])]
+  grid16 = neighborGrid[neighborGrid['poisition'].isin([1,2])]
+  grid24 = neighborGrid[neighborGrid['poisition'].isin([1,2,3])]
+  grid36 = neighborGrid[neighborGrid['poisition'].isin([1,2,3,4])]
 
 
 # these are hard coded parameters come back to them if you start
 # altering the number of input bands to the SNIC function
 # selection layers to use in the pixel based and cluster based modeling process 
-bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean',
-                     'contrast_n_mean', 'corr_n_mean', 'entropy_n_mean', 'R', 'G', 'B', 'N', 'contrast_g', 'corr_g', 'entropy_g',
-                       'contrast_n', 'corr_n', 'entropy_n', 'nd', 'nd_sd_neighborhood', 'nd_mean_neighborhood']
+bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'savg_g_mean', 'contrast_g_mean', 'entropy_g_mean',
+                     'savg_n_mean', 'contrast_n_mean', 'entropy_n_mean', 'R', 'G', 'B', 'N', 'savg_g', 'contrast_g', 'entropy_g',
+                       'savg_n', 'contrast_n', 'entropy_n', 'nd', 'nd_sd_neighborhood', 'nd_mean_neighborhood']
 ## only bands that are based on mean area measures
-bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'contrast_g_mean', 'corr_g_mean', 'entropy_g_mean', 'contrast_n_mean',
-                       'corr_n_mean', 'entropy_n_mean']
-
-  
-
+bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'savg_g_mean', 'contrast_g_mean', 'entropy_g_mean', 'savg_n_mean',
+                       'contrast_n_mean', 'entropy_n_mean']
 
 
 
@@ -131,6 +124,7 @@ setSeed = 5
 
 # window size for average NDVI and glcm 
 windowSize = 8
+
 
 
 # Parameters to test 

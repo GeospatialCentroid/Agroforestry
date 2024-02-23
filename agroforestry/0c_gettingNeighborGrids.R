@@ -13,6 +13,9 @@ defineNeighborGrid <- function(gridID, dataPath){
     # read in full grid 
   fullGrid <- sf::st_read(filePath)
   
+  # buffer dist ~ 30m 
+  dist <-  0.0003818071172672307
+  
   # define export location 
   # exportPath <- paste0(dataPath, "/processed/", gridID)s
   
@@ -35,7 +38,8 @@ defineNeighborGrid <- function(gridID, dataPath){
   
   # 16 features 
   # st_union to create a  larger polygon of all features 
-  g8_disolveed <- st_union(x = g8)
+  g8_disolveed <- st_union(x = g8) |> 
+    st_buffer(dist = dist )
   # intersect with full grid feature 
   inter8 <- st_intersects(fullGrid,g8_disolveed, sparse = FALSE)
   g16 <- fullGrid[inter8[,1],]
@@ -51,7 +55,8 @@ defineNeighborGrid <- function(gridID, dataPath){
   
   # 24 features
   # st_union to create a  larger polygon of all features 
-  g16_disolveed <- st_union(x = g16)
+  g16_disolveed <- st_union(x = g16)|> 
+    st_buffer(dist = dist )
   # intersect with full grid feature 
   inter16 <- st_intersects(fullGrid,g16_disolveed, sparse = FALSE)
   g24 <- fullGrid[inter16[,1],]
@@ -67,7 +72,8 @@ defineNeighborGrid <- function(gridID, dataPath){
   
   # 32 features 
   # st_union to create a  larger polygon of all features 
-  g24_disolveed <- st_union(x = g24)
+  g24_disolveed <- st_union(x = g24)|> 
+    st_buffer(dist = dist )
   # intersect with full grid feature 
   inter24 <- st_intersects(fullGrid,g24_disolveed, sparse = FALSE)
   g32 <- fullGrid[inter24[,1],]
@@ -75,7 +81,7 @@ defineNeighborGrid <- function(gridID, dataPath){
   df4 <- g32 |>
     st_drop_geometry()|>
     dplyr::select(Unique_ID)|>
-    dplyr::mutate(poisition = 3)|>
+    dplyr::mutate(poisition = 4)|>
     dplyr::filter(!Unique_ID %in% df$Unique_ID)
   # bind data
   df <- dplyr::bind_rows(df,df4)

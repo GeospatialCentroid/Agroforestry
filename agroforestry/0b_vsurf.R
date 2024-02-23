@@ -91,6 +91,20 @@ variableSelection <- function(gridID,dataPath,year){
   rankPredictors$includeInFinal <- colnames(correlation) %in% varNames
   rankPredictors <- rankPredictors[,4:6]
 
+  # might want to exclude all but one entropy measure not 100% sure how to do this 
+  # the entropy predictor really forces the classification to caputing the edge element only 
+  # I'm exclude all but one entropy element as a result. 
+  n = 1
+  for(i in seq_along(rankPredictors$varNames)){
+    var1 <- rankPredictors$varNames[i]
+    if(grepl(pattern = "entropy", x = var1) & rankPredictors$includeInFinal[i] == TRUE){
+      if(n == 1){
+        n = n +1 
+      }else{
+        rankPredictors$includeInFinal[i] <- FALSE
+      }
+    }
+  }
 
   return(rankPredictors)
 }

@@ -35,7 +35,7 @@ pointsEE = geemap.gdf_to_ee(pointsWithClasses)
 
 # generate NAIP layer 
 naipEE = prepNAIP(aoi=pointsEE, year=year, windowSize= windowSize)
-
+geePrint(naipEE.bandNames())
 
 # normal the naip data -- skipping this step because it errors with the NDVI values. If I need to do 
 # i'll have to normalize within the prepNAIP function

@@ -12,8 +12,8 @@ def prepNAIP(year,aoi,windowSize):
     # Generate NDVI 
     ndvi = naip1.normalizedDifference(["N","R"])
     # generate GLCM
-    glcm_g = naip1.select('G').glcmTexture(size = windowSize).select(['G_contrast','G_corr','G_ent'], ["contrast_g","corr_g", "entropy_g"])
-    glcm_n = naip1.select('N').glcmTexture(size= windowSize).select(['N_contrast','N_corr','N_ent'], ["contrast_n","corr_n", "entropy_n"])
+    glcm_g = naip1.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
+    glcm_n = naip1.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
     # add to naip 
     naip2 = naip1.addBands(glcm_g).addBands(glcm_n)
 
