@@ -1,60 +1,89 @@
 ```{r}
 # load libraries 
 pacman::p_load(sf,dplyr,VSURF)
-```
-
-Might want to include the develop training data script as a python call here... would need to work through setting the venv 
-
-```{python}
-
+# source functions 
+source("agroforestry/0b_vsurf.R")
+source("agroforestry/0c_gettingNeighborGrids.R")
 ```
 
 
 
 ```{r}
+# grab the specific grid names 
+grids <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+
+# grab some processed data 
+files <- list.files(path = "data/processed",
+                    pattern = ".geojson",
+                    recursive = TRUE,
+                    full.names = TRUE)
 # define grid ID 
 ## this is the primary path related structure so it's im
-gridID <- "X12-150"
-year <- 2010
+gridIDs <- unique(grids$Unique_ID)
+# exclude 601 as the sample protocol does not match 
+gridIDs <- gridIDs[gridIDs != "X12-601"]
+
+years <- c(2010,2016,2020)
 ```
 
 
-
 ```{r}
-# source functions 
-source("~/GitHub/Agroforestry/agroforestry/0b_vsurf.R")
-source("~/GitHub/Agroforestry/agroforestry/0c_gettingNeighborGrids.R")
-
 # define data path 
-dataPath <- "~/GitHub/Agroforestry/data"
-exportPath <- paste0(dataPath, "/processed/", gridID)
+dataPath <- "data"
+
+# for each grid generate variable selection when possible 
+for(gridID in gridIDs){
+  print(gridID)
+  exportPath <- paste0(dataPath, "/processed/", gridID)
+  # test to see if data is present 
+  if(dir.exists(exportPath)){
+    # itorate over the years 
+    files <- list.files(exportPath, pattern = ".geojson")
+    if(length(files) > 0){
+      for(year in years){
+        print(year)
+        p1 <- files[grepl(pattern = year, x = files)]
+        file <- paste0(exportPath, "/", p1)
+        # test if input data is present 
+        if(file.exists(file)){
+          print(file)
+          # read in the file and ensure the 0 1 values are present within the presence column.
+          # read in feature
+          data <- file |>
+              st_read()|> 
+              dplyr::mutate(presence = case_when(
+                presence == 1 ~ 1,
+                TRUE ~ 0
+              ))
+          data$random <- runif(nrow(data))
+          
+          sf::write_sf(data, file, delete_dsn =TRUE)
+          
+          # test if output data already exists 
+          output <- paste0(exportPath, "/variableSelection",year,".csv")
+          if(!file.exists(output)){
+                              # run the variable selection 
+          try(rankPredictors <-  variableSelection(gridID = gridID,dataPath = dataPath, year = year))
+          #export to a file location  
+          try(write.csv(x = rankPredictors, file = output))
+          rm(rankPredictors)
+          }
+        }
+      }
+    }
+    # generate the grid
+    nGrid <- defineNeighborGrid(gridID = gridID, dataPath = dataPath)
+    write.csv(x = nGrid, file = paste0(exportPath, "/neighborGrids.csv"))
+  }
+
+}
+
+
 ```
 
 
 
-Edit the traing dataset 
-```{r}
-# define file path for inport and export 
-  filePath <- paste0(dataPath,"/processed/", gridID)
-  # grab all options 
-  files <- list.files(filePath, pattern = "agroforestrySamplingData",
-                     recursive = TRUE,
-                     full.names = TRUE)
-  #select specific year 
-  file <- files[grepl(x = files, pattern = year)]
-  # read in feature
-  data <- file |>
-    st_read()|> 
-    dplyr::mutate(presence = case_when(
-      presence == 1 ~ 1,
-      TRUE ~ 0
-    ))
-data$random <- runif(nrow(data))
 
-sf::write_sf(data, file, delete_dsn =TRUE)
-
-
-```
 
 
 run variable selection using vsurf

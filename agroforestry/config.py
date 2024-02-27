@@ -13,9 +13,9 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
-year = 2020
+year = 2010
 # define initial sub grid 
-initGridID = "X12-150" # primary grid = X12-601 - this need to reflect where the training data is held 
+initGridID = "X12-281" # primary grid = X12-601 - this need to reflect where the training data is held 
 
 # run version
 runVersion = "testing1"
@@ -47,11 +47,7 @@ threeBandsToDraw=['R', 'G','B']
 threeBandsToDraw_Mean=['R_mean', 'G_mean','B_mean']
 
 # Test train split ratio -- value between 0-1  
-# All values above this value will be part of the training data 
-# all values less then or equal too will be in the testing data
-# the value is a assigned randomly across a 0-1 distribution.  
-# ex. 0.4 would imply, 60% of records to train, 40% to test 
-test_train_ratio = 0.2
+test_train_ratio = 0.8
 
 ## read in the variables selected
 variableSelection = processedData + "/variableSelection"+str(year)+".csv" 
