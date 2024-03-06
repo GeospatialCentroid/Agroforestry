@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-02-01T18:53:46.105Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="VueBvitjUYtMWIBsIFqu" version="22.1.11" type="device" pages="3">
+<mxfile host="Electron" modified="2024-03-04T22:50:26.376Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="gkkZL4gARCJm-FRzHxUw" version="22.1.11" type="device" pages="4">
   <diagram name="simplified workflow 20240116" id="Ukv0JTuuzYyGzYlE5z8_">
-    <mxGraphModel dx="3178" dy="1188" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="834" dy="1684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="JFfCO8q_ADzKK6mXp7AL-0" />
         <mxCell id="JFfCO8q_ADzKK6mXp7AL-1" parent="JFfCO8q_ADzKK6mXp7AL-0" />
@@ -271,7 +271,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="original workflow" id="ru0vsOrcMmmFmGAPN0gL">
-    <mxGraphModel dx="3178" dy="1188" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1674" dy="964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -596,7 +596,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="6dryqRwC2GGNMoKSc7sm" name="High Level workflow summary ">
-    <mxGraphModel dx="3178" dy="1188" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1674" dy="964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -695,6 +695,95 @@
         </mxCell>
         <mxCell id="JT2_oABBjdUQ6phV4eAF-1" value="Might be able to run this through the reticulate library... because there are no visualizations at this point&lt;br&gt;For now just run by hand" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="20" y="210" width="450" height="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="dWP955fm1_1l-d7tG2ci" name="2024_03_01_workflowUpdate">
+    <mxGraphModel dx="1043" dy="2105" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-5" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="210" y="240" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#B5739D;strokeColor=#B5739D;align=center;" parent="1" vertex="1">
+          <mxGeometry x="40" y="200" width="140" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="2wYID1wgd9f6pzWASp3C-1" value="Sampling in GEE" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-1" value="Export as geojson" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="50" y="330" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-2" value="0_developTrainingData.py" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-6" value="&lt;h1&gt;1&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="95" y="200" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-7" value="&lt;h1&gt;2&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="280" y="240" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-8" value="&lt;h1&gt;1&lt;/h1&gt;&lt;div&gt;Sampling uses the google earth engine web interface. All sampling is completed within a specified grid. The grid_uniqueID becames the organizational element for the remained of the project.&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="70" y="520" width="460" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-9" value="&lt;h1&gt;2&lt;/h1&gt;&lt;div&gt;This Python script uses the primary data location that the geojsons from part one are store to iteratoritvely generate outputs. There are test inplace for existing files so as to not pass unnessary calls to the GEE platform.&amp;nbsp;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="70" y="640" width="365" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="425" y="240" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-11" value="stage1.rmd" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="435" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-12" value="&lt;h1&gt;3&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="495" y="240" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-13" value="&lt;h1&gt;3&lt;/h1&gt;&lt;div&gt;R workflows that does two primary tasks&amp;nbsp;&lt;/div&gt;&lt;div&gt;- conducts a variable selection using VSURF to define specific parameters&amp;nbsp;&lt;/div&gt;&lt;div&gt;- Generate the list of neighborhood grid cells to use in the modeling process&amp;nbsp;&lt;/div&gt;&lt;div&gt;This outputs are written can can be called when generating the model.&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="70" y="770" width="365" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-14" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="620" y="240" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-15" value="1_applyModel.ipynb" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="630" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-16" value="&lt;h1&gt;4&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="690" y="240" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-17" value="&lt;h1&gt;4&lt;/h1&gt;&lt;div&gt;Python workflows within the jupyter notebook.&amp;nbsp;&lt;/div&gt;&lt;div&gt;The reason for keeping this within the notebook environment is to have a visual check of the modeled outputs before sending them to export as export times are running about 12 hours.&amp;nbsp;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="615" y="490" width="365" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-18" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="820" y="240" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-19" value="export assets to drive" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="830" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-20" value="&lt;h1&gt;5&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="890" y="240" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-21" value="&lt;h1&gt;5&lt;/h1&gt;&lt;div&gt;Current this is done within the GEE interface. This allows for some specific evaluation of the datasets.&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Some care needs to be given to the naming convention of these features at export because they are note sent as a single features but rather as multiple images&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="620" y="630" width="365" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-22" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="240" width="170" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-23" value="compile data from drive" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1020" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-24" value="&lt;h1&gt;6&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="1080" y="240" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-25" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;R&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="160" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-26" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;GEE&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="70" y="30" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="EjlVGZFpF6OaVRSvY1sY-27" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Python&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="250" y="30" width="90" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

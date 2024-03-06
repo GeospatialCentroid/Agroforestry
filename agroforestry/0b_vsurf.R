@@ -13,18 +13,19 @@ variableSelection <- function(gridID,dataPath,year){
   # read in feature
   data <- file |>
     st_read()|> 
-    st_drop_geometry()
+    st_drop_geometry()|>
+    select(-gridID)
   
   # subset predictor data and presence column
   # remove all na from dataframe
   test2 <-complete.cases(data) 
   data <- data[test2,]
   
-  data <- data |> 
-    dplyr::mutate(presence = case_when(
-      presence == 1 ~ 1,
-      TRUE ~ 0
-    ))
+  # data <- data |> 
+  #   dplyr::mutate(presence = case_when(
+  #     presence == 1 ~ 1,
+  #     TRUE ~ 0
+  #   ))
   
   
   predictorVar <- data |> select(-presence,  -id)

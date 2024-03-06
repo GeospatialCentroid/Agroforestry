@@ -22,6 +22,12 @@ files <- list.files(path = "data/processed",
 gridIDs <- unique(grids$Unique_ID)
 # exclude 601 as the sample protocol does not match 
 gridIDs <- gridIDs[gridIDs != "X12-601"]
+# issue with 289 not having correct presence/absense 
+gridIDs <- gridIDs[gridIDs != "X12-289"] # no presence absence column. 
+gridIDs <- gridIDs[gridIDs != "X12-310"]
+gridIDs <- gridIDs[gridIDs != "X12-696"]
+gridIDs <- gridIDs[gridIDs != "X12-727"]
+
 
 years <- c(2010,2016,2020)
 ```
@@ -30,7 +36,8 @@ years <- c(2010,2016,2020)
 ```{r}
 # define data path 
 dataPath <- "data"
-
+# testing specific site
+gridID <- "X12-677"
 # for each grid generate variable selection when possible 
 for(gridID in gridIDs){
   print(gridID)
@@ -50,7 +57,7 @@ for(gridID in gridIDs){
           # read in the file and ensure the 0 1 values are present within the presence column.
           # read in feature
           data <- file |>
-              st_read()|> 
+              st_read() |> 
               dplyr::mutate(presence = case_when(
                 presence == 1 ~ 1,
                 TRUE ~ 0
