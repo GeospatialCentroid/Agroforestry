@@ -43,6 +43,8 @@ for subdir, dirs, files in os.walk(rootdir):
 # testing 
 # allOptions = allOptions[3:5]
 
+allOptions = ["X12-696"]
+
 for gridID in allOptions:
         # define initial sub grid 
         # initGridID = "X12-183" # primary grid = X12-601 - this need to reflect where the training data is held 
