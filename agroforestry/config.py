@@ -15,7 +15,7 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # define year
 year = 2020
 # define initial sub grid 
-initGridID = "X12-635" # primary grid = X12-601 - this need to reflect where the training data is held 
+initGridID = "X12-709" # primary grid = X12-601 - this need to reflect where the training data is held 
 
 # run version
 runVersion = "testing1"
