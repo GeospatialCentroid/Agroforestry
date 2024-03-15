@@ -37,7 +37,7 @@ years <- c(2010,2016,2020)
 # define data path 
 dataPath <- "data"
 # testing specific site
-gridID <- "X12-709"
+gridID <- "X12-99"
 # for each grid generate variable selection when possible 
 for(gridID in gridIDs){
   print(gridID)

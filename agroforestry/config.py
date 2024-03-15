@@ -13,9 +13,9 @@ grid = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # usda tree reference layer 
 # usdaRef = gpd.read_file(r"data\raw\referenceData\Antelope_ALL_metrics_LCC_edited.shp")
 # define year
-year = 2020
+year = 2010
 # define initial sub grid 
-initGridID = "X12-709" # primary grid = X12-601 - this need to reflect where the training data is held 
+initGridID = "X12-99" # primary grid = X12-601 - this need to reflect where the training data is held 
 
 # run version
 runVersion = "testing1"

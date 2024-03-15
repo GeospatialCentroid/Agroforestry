@@ -43,7 +43,7 @@ for subdir, dirs, files in os.walk(rootdir):
 # testing 
 # allOptions = allOptions[3:5]
 
-allOptions = ["X12-696"]
+allOptions = ["X12-115"]
 
 for gridID in allOptions:
         # define initial sub grid 
