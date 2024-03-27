@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-03-09T00:37:25.928Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="jNKXUFTsYXn6-LQCUJJA" version="22.1.11" type="device" pages="4">
+<mxfile host="Electron" modified="2024-03-27T21:29:57.721Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="-iTXJYrxo6aIbKZ-trSl" version="22.1.11" type="device" pages="4">
   <diagram name="simplified workflow 20240116" id="Ukv0JTuuzYyGzYlE5z8_">
-    <mxGraphModel dx="834" dy="948" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1674" dy="964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="JFfCO8q_ADzKK6mXp7AL-0" />
         <mxCell id="JFfCO8q_ADzKK6mXp7AL-1" parent="JFfCO8q_ADzKK6mXp7AL-0" />
@@ -700,7 +700,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="dWP955fm1_1l-d7tG2ci" name="2024_03_01_workflowUpdate">
-    <mxGraphModel dx="1253" dy="948" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1674" dy="964" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -748,6 +748,9 @@
         </mxCell>
         <mxCell id="EjlVGZFpF6OaVRSvY1sY-15" value="1_applyModel.ipynb" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="630" y="280" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hSRhgKjOFZjwq7JTKihc-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="EjlVGZFpF6OaVRSvY1sY-16" target="EjlVGZFpF6OaVRSvY1sY-15">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="EjlVGZFpF6OaVRSvY1sY-16" value="&lt;h1&gt;4&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="690" y="240" width="30" height="40" as="geometry" />
