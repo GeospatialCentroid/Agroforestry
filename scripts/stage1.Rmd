@@ -36,7 +36,7 @@ years <- c(2010,2016,2020)
 # define data path 
 dataPath <- "data"
 # testing specific site
-# gridID <- "X12-83"
+gridID <- "X12-633"
 # for each grid generate variable selection when possible 
 for(gridID in gridIDs){
   print(gridID)
@@ -106,6 +106,8 @@ generate the subgrid features
 ```{r}
 nGrid <- defineNeighborGrid(gridID = gridID, dataPath = dataPath)
 write.csv(x = nGrid, file = paste0(exportPath, "/neighborGrids.csv"))
+
+r1 <- st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/data/processed/X12-633/agroforestrySamplingData_2010.geojson")
 ```
 
 
