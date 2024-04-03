@@ -95,19 +95,19 @@ for(gridID in gridIDs){
 
 run variable selection using vsurf
 ```{r}
-rankPredictors <- variableSelection(gridID = gridID,dataPath = dataPath, year = year)
-#export to a file location 
-write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection",year,".csv"))
+# rankPredictors <- variableSelection(gridID = gridID,dataPath = dataPath, year = year)
+# #export to a file location 
+# write.csv(x = rankPredictors, file = paste0(exportPath, "/variableSelection",year,".csv"))
 ```
 
 
 generate the subgrid features 
 
 ```{r}
-nGrid <- defineNeighborGrid(gridID = gridID, dataPath = dataPath)
-write.csv(x = nGrid, file = paste0(exportPath, "/neighborGrids.csv"))
-
-r1 <- st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/data/processed/X12-633/agroforestrySamplingData_2010.geojson")
+# nGrid <- defineNeighborGrid(gridID = gridID, dataPath = dataPath)
+# write.csv(x = nGrid, file = paste0(exportPath, "/neighborGrids.csv"))
+# 
+# r1 <- st_read("C:/Users/carverd/Documents/GitHub/Agroforestry/data/processed/X12-633/agroforestrySamplingData_2010.geojson")
 ```
 
 
