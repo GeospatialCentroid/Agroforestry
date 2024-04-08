@@ -21,9 +21,19 @@ selectModels <- function(data, values){
     dplyr::select(`Sample Grid IDs`)|>
     pull()
 }
+
+fiveModels <- data2016 |>
+  dplyr::filter(`Score 2016 (Dan)` == 5) |>
+  dplyr::select(`Sample Grid IDs`)|>
+  pull()
 goodModels <- selectModels(data = data2016, values = c(4,4.5,5))
 okModels <- selectModels(data = data2016, values = c(3,3.5))
 badModels <- selectModels(data = data2016, values = c(1,1.5,2,2.5))
+oneModels <- data2016 |>
+  dplyr::filter(`Score 2016 (Dan)` == 1) |>
+  dplyr::select(`Sample Grid IDs`)|>
+  pull()
+
 
 gL <- length(goodModels)
 oL <- length(okModels)
@@ -50,9 +60,13 @@ summarizeData <- function(data, modelClass){
 }
 
 # summary the data
+fiveData <- purrr::map(fiveModels, gatherData) |>
+  dplyr::bind_rows()|>
+  # dplyr::filter(includedInFinal == FALSE)|>
+  summarizeData(modelClass = "4-5")
 goodData <- purrr::map(goodModels, gatherData) |>
   dplyr::bind_rows()|>
-  dplyr::filter(includedInFinal == TRUE)|>
+  # dplyr::filter(includedInFinal == FALSE)|>
   summarizeData(modelClass = "4-5")
 
 okData <- purrr::map(okModels, gatherData) |>
@@ -64,6 +78,11 @@ badData <- purrr::map(badModels, gatherData) |>
   dplyr::bind_rows()|>
   dplyr::filter(includedInFinal == TRUE)|>
   summarizeData(modelClass = "1-2")
+oneData <- purrr::map(oneModels, gatherData) |>
+  dplyr::bind_rows()|>
+  dplyr::filter(includedInFinal == TRUE)|>
+  summarizeData(modelClass = "1-2")
+
 
 allEvals <- dplyr::bind_rows(goodData, okData, badData)
 
@@ -81,10 +100,21 @@ makePlots <- function(data,color){
           color = ~modelClass,
           colors = c(color))
 }
- 
+
+# look at all the plots  --------------------------------------------------
 p1 <- makePlots(data = goodData,  color = "#7fff20")
 p2 <- makePlots(data = okData,color = "#20efff")
 p3 <- makePlots(data = badData,color = "#ffa020")
 
 allPlots <- plotly::subplot(p1,p2,p3,nrows = 3,shareX = TRUE)
 allPlots
+
+
+# look at the best and the worst 
+bestWorst <- dplyr::bind_rows(fiveData, oneData)
+write_csv(bestWorst, file = "data/processed/evaluation/bestWorstModels2016.csv")
+p4 <- makePlots(data = fiveData,  color = "#7fff20")
+p5 <- makePlots(data = oneData,color = "#ffa020")
+
+allPlots2 <- plotly::subplot(p4,p5,nrows = 2,shareX = TRUE)
+allPlots2

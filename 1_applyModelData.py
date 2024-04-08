@@ -9,133 +9,81 @@ from agroforestry.snicProcessing import *
 from agroforestry.randomForest import *
 from agroforestry.exportFunctions import *
 
+try:
+        ee.Initialize()
+except Exception as e:
+        ee.Authenticate()
+        ee.Initialize()
 
+# Set gridID and itorate over the years 
+# define initial sub grid 
 
+#2016 models to rerun 
+models = ["X12-278",'X12-318',"X12-602","X12-99","X12-207","X12-91","X12-32","X12-115","X12-281"]
 
-# establish connection with ee account. might require some additional configuration based on local machine 
-ee.Initialize()
-# if issues see 0_develop training data for suggestions 
+initGridID = "X12-115" 
+years = [2010,2016,2020]
+for i in years: 
+        # define file location 
+    processedData = 'data/processed/'+initGridID
+    neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
+    grid36 = neighborGrid[neighborGrid['poisition'].isin([1,2,3,4])]
+    # set aoi for the gee objects 
+    aoiID = initGridID
+    #Define bands to use -- setting manually 
+    bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n",
+                "entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
+    # select multiple grids level 
+    gridSelect =  grid.loc[grid.Unique_ID.isin(grid36.Unique_ID)].dissolve()
+    # convert to a gee object 
+    aoi1 = geemap.gdf_to_ee(gridSelect)
+    # import training dataset 
+    trainingData = gpd.read_file(filename="data/processed/" + str(initGridID) +"/"+ "agroforestrySamplingData_"+str(i)+".geojson") # initGridID defined int he config file
+    # divide the data into test train spilts 
+    trainingData = trainingData.sample(frac = 1)
+    # get rows 
+    total_rows = trainingData.shape[0]
+    # get train size 
+    train_size = int(total_rows*test_train_ratio)
 
-# import training dataset 
-trainingData = gpd.read_file(filename="data/processed/trainingdataset_withClasses.geojson")
-# select the training class of interest and drop unnecessary columns
-trainingSubset =  trainingData[trainingData.sampleStrat == "subgrid"]
-# convert to ee object
-pointsEE = geemap.gdf_to_ee(gdf=trainingSubset)
-# subset testing and training data 
-training = pointsEE.filter(ee.Filter.gt('random', test_train_ratio))
-testing = pointsEE.filter(ee.Filter.lte('random',test_train_ratio))
-# traing the rf model 
-rfPixelTrim = trainRFModel(bands=vsurfNoCor,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
-## run validation using the testing set 
-pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
+    # Split data into test and train
+    train = trainingData[0:train_size]
+    test = trainingData[train_size:]
+    # define the GEE objects
+    training = geemap.gdf_to_ee(gdf=train)
+    testing = geemap.gdf_to_ee(gdf=test)
+    # train model
+    rfPixelTrim = trainRFModel(bands=bandsToUse,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
+    ## run validation using the testing set 
+    pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
 
-
-
-# define the aoi
-aoiID = initGridID # something to itorate over for now is defined based on the input training dataset 
-# this becomes the AOI to used in the prepNAIP function. I'll need to edit it so that it converts the input data into a bbox 
-gridSelect = grid.loc[grid.Unique_ID == aoiID]
-
-# convert to a gee object 
-aoi1 = geemap.gdf_to_ee(gridSelect)
-# create a sub grid for downloading 
-downloadGrids = geemap.fishnet(aoi1.geometry(), rows=6, cols=4, delta=0)
-
-
-# generate the USDA reference object 
-# usda1 = processUSDARef(aoiGrid = gridSelect, usdaRef=usdaRef)
-## this is still a vector product
-
-
-# generate NAIP layer 
-naipEE = prepNAIP(aoi=aoi1, year=year,windowSize=windowSize)
-
-# produce the SNIC object 
-## filtering the image bands right away based on the single model output 
-snicData = snicOutputs(naip = naipEE,
-                       SNIC_SeedShape = SNIC_SeedShape, 
-                       SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
-                       SNIC_Compactness = SNIC_Compactness, 
-                       SNIC_Connectivity = SNIC_Connectivity,
-                       # nativeScaleOfImage = nativeScaleOfImage, 
-                       bandsToUse_Cluster = bandsToUse_Cluster).select(vsurfNoCor)
-# apply the model and clip to aoi and reclass to unsigned 8bit image 
-classifiedPixelsTrim = applyRFModel(imagery=snicData, bands=vsurfNoCor,classifier=rfPixelTrim).clip(aoi1).uint8()
-
-# test the model 
-modelExtractedVals = classifiedPixelsTrim.sampleRegions(
-    collection=testing, scale=1, geometries=False
-)
-
-# Generate a confusion matrix on the current classification 
-combinedAccuracy = modelExtractedVals.errorMatrix("presence", "remapped")
-
-
-
-
-# export imagery 
-exportImagery = True
-if exportImagery == True:
-    ### export to google drive
-    ### slow ~ > 10m for export but it does seem to work.... 
-    ### should probably try at 1m just to see what happens. 
-    ### track progress at https://code.earthengine.google.com/tasks
-    nGrids = downloadGrids.size()
-    scale = 4
-    # this is still a GEE object so it wont work in python loops 
-    for i in range(24):  #range(len(downloadGrids)) # defining the value manually 
-        print(i)
-        clipArea = ee.Feature(downloadGrids.toList(nGrids).get(i))
-        test2 = classifiedPixelsTrim.clip(clipArea)
-        task = ee.batch.Export.image.toDrive(
-            image=test2,
-            scale= scale,
-            description= initGridID+"_"+str(year)+"_"+str(scale)+"_"+str(i),
-            folder='agroforestry',
-            region= clipArea.geometry()
-            # maxPixels = 1e10
-        )
-        task.start()
-
-# test the export process 
-# A Landsat 8 surface reflectance image.
-image = ee.Image(
-    'LANDSAT/LC08/C02/T1_L2/LC08_044034_20210508'
-).select(['SR_B.'])  # reflectance bands
-
-# A region of interest.
-region = ee.Geometry.BBox(-122.24, 37.13, -122.11, 37.20)
-
-# Set the export "scale" and "crs" parameters.
-task = ee.batch.Export.image.toDrive(
-    image=image,
-    description='image_export',
-    folder='agroforestry',
-    region=region,
-    scale=30,
-    crs='EPSG:5070'
-)
-task.start()
-
-
-
-
-## add a condtional statement here to determine if the file should be downloaded or not. 
-exportDictionary = False
-if exportDictionary: 
-    # save model parameters to a spreadsheet 1
-    # create a dictionary so we can export information 
-    dic2 = ee.Dictionary({
-        "gridID" : initGridID,
-        "naipYear" : year,
-        "totalNumberTest" :  testing.size(),
-        "SNIC_SuperPixelSize" : SNIC_SuperPixelSize, 
-        "SNIC_Compactness" : SNIC_Compactness,
-        "SNIC_Connectivity": SNIC_Connectivity, 
-        "SNIC_SeedShape": SNIC_SeedShape,
-        "nTrees": nTrees,
-        'allValues' : combinedAccuracy.array(),
-        'overallAccuracy' : combinedAccuracy.accuracy()})
-    # write out the data
-    geemap.dict_to_csv(dic2, out_csv= "data/processed/appliedModels/" + initGridID+ "_" + str(year) + runVersion+  ".csv")
+    # Generate model based on year define in config 
+    # generate NAIP layer 
+    naipEE = prepNAIP(aoi=aoi1, year=i,windowSize=windowSize)
+    # geePrint(naipEE.bandNames())
+    # normal the naip data
+    # normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
+    # produce the SNIC object 
+    ## filtering the image bands right away based on the single model output 
+    snicData = snicOutputs(naip = naipEE,
+                        SNIC_SeedShape = SNIC_SeedShape, 
+                        SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
+                        SNIC_Compactness = SNIC_Compactness, 
+                        SNIC_Connectivity = SNIC_Connectivity,
+                        # nativeScaleOfImage = nativeScaleOfImage, 
+                        bandsToUse_Cluster = bandsToUse_Cluster).select(bandsToUse)
+    # apply the model and clip to aoi and reclass to unsigned 8bit image 
+    classifiedPixelsTrim = applyRFModel(imagery=snicData, bands=bandsToUse,classifier=rfPixelTrim).clip(aoi1).uint8()
+    demoImage = classifiedPixelsTrim #.clip(exportAOI)
+    print("projects/agroforestry2023/assets/"+ str(initGridID) + "_" + str(i) + "_36grid")
+    # export image to asset 
+    task = ee.batch.Export.image.toAsset(
+        image = demoImage,
+        description = str(initGridID) + "_" + str(i) + "_b_36grid",
+        assetId = "projects/agroforestry2023/assets/"+ str(initGridID) + "_b_" + str(i) + "_36grid",
+        region=aoi1.geometry(),
+        scale=1,
+        crs= demoImage.projection(),
+        maxPixels = 1e13
+    )
+    task.start()
