@@ -1,6 +1,7 @@
 import ee
 import geemap
 import geopandas as gpd
+import pandas as pd
 import numpy as np
 from agroforestry.config import * 
 from agroforestry.geeHelpers import *
@@ -19,9 +20,9 @@ except Exception as e:
 # define initial sub grid 
 
 #2016 models to rerun 
-models = ["X12-278",'X12-318',"X12-602","X12-99","X12-207","X12-91","X12-32","X12-115","X12-281"]
-
-initGridID = "X12-115" 
+models = ["X12-278",'X12-318',]
+ranGrid = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281"]
+initGridID = 'X12-318' # "X12-99" # "X12-207" 
 years = [2010,2016,2020]
 for i in years: 
         # define file location 
