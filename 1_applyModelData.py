@@ -20,9 +20,17 @@ except Exception as e:
 # define initial sub grid 
 
 #2016 models to rerun 
-models = ["X12-278",'X12-318',]
-ranGrid = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281"]
-initGridID = 'X12-318' # "X12-99" # "X12-207" 
+models = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
+completed2016Grids = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
+# 2010 models to rerun 
+models = ["X12-642","X12-519","X12-633"]
+ranGrid = []
+# 2020 models to rerun 
+models = ["X12-594","X12-183","X12-300","X12-150"]
+ranGrid = []
+
+
+initGridID = 'X12-642' # "X12-642" #     " 
 years = [2010,2016,2020]
 for i in years: 
         # define file location 
