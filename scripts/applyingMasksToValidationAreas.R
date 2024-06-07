@@ -11,7 +11,7 @@ urbanFiles <- list.files("data/raw/censusData/", pattern = "*\\.shp", full.names
 urbanFiles2 <- urbanFiles[str_ends(string = urbanFiles, pattern = ".shp")]
 
 # set year 
-year <- 2020
+year <- 2016
 # grab year of interest
 # tccVal <- terra::vect(tccs[grepl(pattern = year, x = tccs)])
 forestVal <- terra::vect(forests[grepl(pattern = year, x = forests)])

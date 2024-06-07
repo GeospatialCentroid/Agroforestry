@@ -15,6 +15,16 @@ pacman::p_load(dplyr,sf,googlesheets4,googledrive, purrr,leaflet)
 # main grid
 grid <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 
+# export sampled girds
+sampledgridIds <- c("X12-115","X12-131","X12-150","X12-183","X12-207",
+                   "X12-278","X12-281","X12-300","X12-307","X12-318",
+                   "X12-32","X12-356","X12-361","X12-388","X12-440",
+                   "X12-519","X12-594","X12-602","X12-615","X12-624",
+                   "X12-633","X12-635","X12-642","X12-661","X12-677",
+                   "X12-709","X12-83","X12-91","X12-99")
+
+
+
 grid2 <- grid |>
   dplyr::mutate(
     modelGrid = NA,
@@ -87,7 +97,6 @@ g0 <- compileModelAreas(scoreValue = 0,dataset = data2016, griddedFeature = g1)
 sf::st_write(g0,"data/products/modelGrids_2016.gpkg")
 
 
-
 ### 2020 
 # for the year itorate over all the score values 
 g5 <- compileModelAreas(scoreValue = 5,dataset = data2020, griddedFeature = grid2)
@@ -98,7 +107,27 @@ g1 <- compileModelAreas(scoreValue = 1,dataset = data2020, griddedFeature = g2)
 g0 <- compileModelAreas(scoreValue = 0,dataset = data2020, griddedFeature = g1)
 
 # export the spatial feature 
-sf::st_write(g0,"data/products/modelGrids_2020.gpkg")
+sf::st_write(g0,"data/products/modelGrids_2020.gpkg",delete_layer =TRUE)
+
+# 
+gridSampled2 <- gridSampled |>
+  dplyr::left_join(y = as.data.frame(st_drop_geometry(g0)), by = c("Unique_ID" = "modelGrid" ))|>
+  select(-"Unique_ID.y")|>
+  dplyr::distinct()
+# join is droppig some data so manueally assign values 
+gridSampled2 <- gridSampled2 |>
+  dplyr::mutate(score =
+    case_when(
+      Unique_ID =="X12-278" ~ 1,
+      Unique_ID =="X12-281" ~ 1,
+      Unique_ID =="X12-594"~ 0,
+      Unique_ID =="X12-635" ~ 3,
+      Unique_ID =="X12-661" ~ 3,
+      TRUE ~ score))
+
+               $
+st_write(gridSampled2,"data/products/sampledGrids.gpkg" )
+
 
 
 ### 2010 
