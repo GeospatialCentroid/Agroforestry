@@ -1,6 +1,6 @@
 # 
 
-pacman::p_load(terra, sf, dplyr, googledrive, stringr)
+pacman::p_load(terra, sf, dplyr, googledrive, stringr,purrr,furrr)
 
 # pull in the specific model grid elements 
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
@@ -53,9 +53,9 @@ downloadFromDrive <- function(year, images, modelGrids){
 
 # apply the download function  --------------------------------------------
 
-downloadFromDrive(year = "2020", images = images, modelGrids = modelGrids)
-downloadFromDrive(year = "2016", images = images, modelGrids = modelGrids)
-downloadFromDrive(year = "2010", images = images, modelGrids = modelGrids)
+# downloadFromDrive(year = "2020", images = images, modelGrids = modelGrids)
+# downloadFromDrive(year = "2016", images = images, modelGrids = modelGrids)
+# downloadFromDrive(year = "2010", images = images, modelGrids = modelGrids)
 
 
 # function for cropping models to grids 
@@ -103,73 +103,86 @@ processToGrids <- function(year, modelGrids){
 
 
 # Process all sub grid data  ----------------------------------------------
-for(i in c("2010","2016","2020")){
-  processToGrids(year = i, modelGrids = modelGrids)
-  
+# for(i in c("2010","2016","2020")){
+#   processToGrids(year = i, modelGrids = modelGrids)
+#}
+# didn't really test but I think it'll work 
+# set session info 
+# plan(multicore, workers = 12)
+# furrr::future_map(.x = c("2010","2016","2020"), .f = processToGrids, modelGrids = modelGrids)
+
+
+# Apply the masks and bind to full grid ------------------------------------
+# read in mask layers 
+
+nlcdMasks <- list.files("data/products/nlcd",pattern = ".gpkg", full.names = TRUE, recursive = TRUE)
+# tccs <- nlcdMasks[grepl(pattern = "tcc", nlcdMasks)]
+forests <- nlcdMasks[grepl(pattern = "forest", nlcdMasks)]
+# urban areas 
+urbanFiles <- list.files("data/products/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
+urbanFiles2 <- urbanFiles[str_ends(string = urbanFiles, pattern = ".shp")]
+# riparian zones 
+## need to get this cropped to nebraska and out of the GDB file structure 
+# rp <- sf::st_read("data/raw/Data/RiparianAreas.gdb")
+
+
+models2010 <- list.files("data/products/models2010/grids", full.names = TRUE)
+test <- terra::rast(models2010[1])
+grid2010 <- terra::vect(modelGrids[1])
+
+# Select the year 
+forest2010 <- terra::vect(forests[grepl(pattern = "2010", x = forests)]) |>
+  terra::project("+init=EPSG:4326")
+urban2010 <- terra::vect(urbanFiles2[grepl(pattern = "2010", x = urbanFiles2)])|>
+  terra::project("+init=EPSG:4326")
+
+# itorate over the gridid 
+ids <- grid2010$Unique_ID
+i <- "X12-101"
+# aggregate all images from a grid 
+allImages <- models2010[grepl(paste0("/",i,"_"), models2010)]
+
+# select all non b models 
+origImages <- allImages[!grepl(pattern = "_b_", allImages )]
+
+mergeClass <- function(listOfImages){
+  if(length(listOfImages) ==2){
+    # add the images 
+    r3 <- rast(listOfImages[1]) + rast(listOfImages[2])
+    r4 <- ifel(r3 <= 1, 0 , 1)
+  }else{
+    r4 <- rast(listOfImages[1])
+  }
+  return(r4)
+}
+
+## reclass binary maps when two images exist 
+## merge images if multiple grids exists 
+for(i in seq_along(origImages)){
+  n1 <- basename(origImages[i]) |>
+    str_split(pattern = "_") |> 
+    unlist()
+  n2 <- n1[3]
+  # select all paths with this image name 
+  r1 <- allImages[grepl(pattern = n2, x = allImages)]
+  # generate rast object 
+  r2 <- mergeClass(r1)
+  if(i == 1){
+    r3 <- r2
+  }else{
+    r3 <- merge(r3,r2)
+  }
 }
 
 
-  
-  for(j in downloadedFiles){
-    rast <- terra::rast(i)
-    for(k in modelGrid2){
-      g1 <- modelGrid[modelGrid$Unique_ID == j, ]
-      r1 <- NA
-      try(r1 <- terra::crop(x = rast, y = g1))
-      if(class(r1) == "SpatRaster"){
-        k2 <- stringr::str_split(i, pattern = "/")[[1]][4]
-        n1 <- paste0(productsPath, "/", j, "_",k2)
-        if(!file.exists(n1)){
-          try(terra::writeRaster(x = r1, filename = n1))
-        }
-      }
-    }
-  }
-  
-  }
+
+#  nlcd tree mask 
+## crop 
+f2 <-  forest2010 |>
+  crop(r3)
+# town mask 
+t2 <- urban2010 |> 
+  crop(r3)
+# riparian classification 
 
 
-# filter the google drive elemetns for features wint 
-for(i in modelGrids){
-  imageSelected <- imagesYear[grepl(pattern = i, x = imagesYear$name),]
-  gridSelect <- gridYear[gridYear$modelGrid == i, ]
-  downloadPath <- paste0("data/products/models",year)
-  for(j in seq_along(imageSelected$id)){
-    id <- imageSelected$id[j]
-    name <- imageSelected$name[j]
-    # try statement it to help with the overwrite conditions 
-    try(
-    image <- googledrive::drive_download(as_id(id),
-                                               path = paste0(downloadPath,"/",name))
-    )
-  }
-  downloadedFiles <- list.files(downloadPath, pattern = i,full.names = TRUE )
-  productsPath <- paste0(downloadPath, "/grids")
-  
-  for(k in downloadedFiles){
-    rast <- terra::rast(k)
-    for(l in gridSelect$Unique_ID){
-      g1 <- gridSelect[gridSelect$Unique_ID == l, ]
-      r1 <- NA
-      try(r1 <- terra::crop(x = rast, y = g1))
-      if(class(r1) == "SpatRaster"){
-        k2 <- stringr::str_split(k, pattern = "/")[[1]][4]
-        n1 <- paste0(productsPath, "/", l, "_",k2)
-        if(!file.exists(n1)){
-          try(terra::writeRaster(x = r1, filename = n1))
-        }
-      }
-    }
-  }
-}
-
-View(grids)
-index <- imagesYear[imagesYear$name ]
-imageSelected <- imagesYear |> dplyr::filter(grepl(modelGrids, name))
-
-# test to see a specific file intersects with the objects 
-
-
-# apply the masks 
-
-# 
