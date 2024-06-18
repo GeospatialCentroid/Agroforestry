@@ -14,9 +14,9 @@ images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
 # images2016 <- filteredImages |> dplyr::filter(!grepl('2016', name))
 # images2010 <- filteredImages |> dplyr::filter(!grepl('2010', name))
 
-year <- "2020"
-
-modelGrid <- grids[grepl(pattern = year, x = grids)] |> terra::vect()
+# year <- "2020"
+# 
+# modelGrid <- modelGrids[grepl(pattern = year, x = modelGrids)] |> terra::vect()
 # for each model grid test select all the included sub grid 
 
 
@@ -56,7 +56,6 @@ downloadFromDrive <- function(year, images, modelGrids){
 downloadFromDrive(year = "2020", images = images, modelGrids = modelGrids)
 downloadFromDrive(year = "2016", images = images, modelGrids = modelGrids)
 downloadFromDrive(year = "2010", images = images, modelGrids = modelGrids)
-
 
 
 # function for cropping models to grids 
@@ -104,7 +103,10 @@ processToGrids <- function(year, modelGrids){
 
 
 # Process all sub grid data  ----------------------------------------------
-processToGrids(year = "2020", modelGrids = modelGrids)
+for(i in c("2010","2016","2020")){
+  processToGrids(year = i, modelGrids = modelGrids)
+  
+}
 
 
   
