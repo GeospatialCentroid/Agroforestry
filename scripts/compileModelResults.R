@@ -1,6 +1,7 @@
 # 
 
-pacman::p_load(terra, sf, dplyr, googledrive, stringr,purrr,furrr, tigris)
+pacman::p_load(terra, sf, dplyr, googledrive,
+               stringr,purrr,furrr, tigris, tictoc)
 
 # pull in the specific model grid elements 
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
@@ -20,9 +21,11 @@ images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
 #   terra::project("+init=EPSG:4326")
 # terra::writeRaster(r30proj, filename = "data/products/riparian/nebraskaRiparian30.tif")
 # 
-# r10proj <- terra::rast("data/raw/riparian/riparianArea10.tif")|>
-#   terra::project("+init=EPSG:4326")
-# terra::writeRaster(riparianRast10 , filename = "data/products/riparian/nebraskaRiparian10.tif")
+r10proj <- terra::rast("data/raw/riparian/riparianArea10.tif")|>
+  terra::project("+init=EPSG:4326")
+terra::writeRaster(r10proj ,
+                   filename = "data/products/riparian/nebraskaRiparian10.tif", 
+                   overwrite = TRUE)
 
 # images2020 <- filteredImages |> dplyr::filter(!grepl('2020', name))
 # images2016 <- filteredImages |> dplyr::filter(!grepl('2016', name))
@@ -247,7 +250,7 @@ generateFinalGridImages(year = "2010",
 
 # applied the riparian area mask 
 year = "2010"
-riparianData = terra::rast("data/products/riparian/nebraskaRiparian30.tif")
+riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 
 applyRiparianMask <- function(year,riparianData){
   
@@ -260,8 +263,9 @@ applyRiparianMask <- function(year,riparianData){
     full.names = TRUE,
     pattern = ".tif"
   )
-  for(i in files[1:3]){
+  for(i in files){
     print(i)
+    tic()
     image <- terra::rast(i)
     # crop riparian layer 
     r30 <- terra::crop(x = riparianData,
@@ -273,8 +277,13 @@ applyRiparianMask <- function(year,riparianData){
     image2 <- ifel(image == 1, 1 , NA)
     c2 <- combined * image2
     #export the image 
-    writeRaster(x = c2, filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
+    writeRaster(x = c2, 
+                filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
                 overwrite = TRUE)
+    toc()
   }
 }
-  
+
+# apply the mask 
+applyRiparianMask(year = "2010",
+                  riparianData = riparianData )
