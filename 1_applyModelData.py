@@ -30,7 +30,7 @@ models = []
 ranGrid = ["X12-594","X12-183","X12-300"]
 
 
-initGridID =   # "X12-642" #     " 
+initGridID =   # "X12-642" #
 years = [2010,2016,2020]
 for i in years: 
         # define file location 
