@@ -57,7 +57,7 @@ for(i in 1:length(validationFiles)){
   r2 <- terra::rast(r1) |>
     terra::project(forestVal)
     # read in urban data and reproject 
-  u2 <- terra::vect(u1)|>
+  u2 <- terra::vect(u1) |>
     terra::project(forestVal)|>
     terra::crop(r2)
   if(nrow(u2)!=0){
@@ -72,6 +72,7 @@ for(i in 1:length(validationFiles)){
   # mask 
   r3 <- r2 |>
     terra::mask(forest2, inverse = TRUE,updatevalue=2)
+  # export mask object
   terra::writeRaster(r3, filename = fileName2,
                      overwrite = TRUE)
   # export 
