@@ -1,3 +1,8 @@
+
+
+#### work from centroid computer 
+
+
 library(terra)
 library(dplyr)
 library(stringr)
