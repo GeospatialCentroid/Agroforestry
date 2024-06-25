@@ -1,7 +1,9 @@
 # 
 
 pacman::p_load(terra, sf, dplyr, googledrive,
-               stringr,purrr,furrr, tigris, tictoc)
+               stringr,purrr,furrr, tigris, tictoc,
+               tmap)
+tmap::tmap_mode("view")
 
 # pull in the specific model grid elements 
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
@@ -11,29 +13,28 @@ images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
   dplyr::filter(!grepl('validationGrid', name))|>
   dplyr::filter(!grepl('naipGrid', name))
   
-#export the riparian image 
+
+# riparian data download and project --------------------------------------
 # riparian <- images[images$name == "nebraskaRiparian.tif", ]
 # googledrive::drive_download(as_id(riparian$id),
 #                             path = paste0("data/raw/riparian/riparianArea10.tif"))
+
+# r10proj <- terra::rast("data/raw/riparian/riparianArea10.tif")|>
+#   terra::project("+init=EPSG:4326")
+# terra::writeRaster(r10proj ,
+#                    filename = "data/products/riparian/nebraskaRiparian10.tif", 
+#                    overwrite = TRUE)
 # riparianRast30 <- terra::rast("data/raw/riparian/riparianArea30.tif")
 # 
 # r30proj <- riparianRast30 |>
 #   terra::project("+init=EPSG:4326")
 # terra::writeRaster(r30proj, filename = "data/products/riparian/nebraskaRiparian30.tif")
 # 
-r10proj <- terra::rast("data/raw/riparian/riparianArea10.tif")|>
-  terra::project("+init=EPSG:4326")
-terra::writeRaster(r10proj ,
-                   filename = "data/products/riparian/nebraskaRiparian10.tif", 
-                   overwrite = TRUE)
 
-# images2020 <- filteredImages |> dplyr::filter(!grepl('2020', name))
-# images2016 <- filteredImages |> dplyr::filter(!grepl('2016', name))
-# images2010 <- filteredImages |> dplyr::filter(!grepl('2010', name))
 
-year <- "2020"
+# year <- "2020"
 # 
-modelGrid <- modelGrids[grepl(pattern = year, x = modelGrids)] |> terra::vect()
+# modelGrid <- modelGrids[grepl(pattern = year, x = modelGrids)] |> terra::vect()
 # for each model grid test select all the included sub grid 
 
 
@@ -52,7 +53,7 @@ downloadFromDrive <- function(year, images, modelGrids){
   modelGrids <- modelGrids[!is.na(modelGrids)]
   
   # loop over each model grid 
-  for(i in modelGrids){
+  for(i in modelGrids[1:10]){
     imageSelected <- images2[grepl(pattern = i, x = images2$name),]
     gridSelect <- modelGrid[modelGrid$modelGrid == i, ]
     downloadPath <- paste0("data/products/models",year)
@@ -70,7 +71,7 @@ downloadFromDrive <- function(year, images, modelGrids){
 
 # apply the download function  --------------------------------------------
 
-# downloadFromDrive(year = "2020", images = images, modelGrids = modelGrids)
+# downloadFromDrive(year = "2020", images = images2020, modelGrids = modelGrids)
 # downloadFromDrive(year = "2016", images = images, modelGrids = modelGrids)
 # downloadFromDrive(year = "2010", images = images, modelGrids = modelGrids)
 
@@ -83,6 +84,7 @@ processToGrids <- function(year, modelGrids){
   modelGrid <- modelGrids[grepl(pattern = year, x = modelGrids)] |> terra::vect()
   
   uniqueGrid <- unique(modelGrid$modelGrid)
+  g12 <- as.data.frame(modelGrid)
   uniqueGrid <- uniqueGrid[!is.na(uniqueGrid)] 
   
   # set the file locations 
@@ -131,16 +133,18 @@ processToGrids <- function(year, modelGrids){
 
 
 # Apply the masks and bind to full grid ------------------------------------
-# read in mask layers 
+# read in mask layers
 
+# testing 692
+year <- "2020"
 nlcdMasks <- list.files("data/products/nlcd",pattern = ".gpkg", full.names = TRUE, recursive = TRUE)
 # tccs <- nlcdMasks[grepl(pattern = "tcc", nlcdMasks)]
 forests <- nlcdMasks[grepl(pattern = "forest", nlcdMasks)]
 # urban areas 
-urbanFiles <- list.files("data/products/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
+urbanFiles <- list.files("data/raw/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
 urbanFiles2 <- urbanFiles[stringr::str_ends(string = urbanFiles, pattern = ".shp")]
 # riparian zones 
-riparian <- terra::vect("data/raw/test.shp")
+# riparian <- terra::vect("data/raw/test.shp")
 ## need to get this cropped to nebraska and out of the GDB file structure 
 # st_layers("data/raw/Data/RiparianAreas.gdb")
 # rp <- sf::st_read("data/raw/Data/RiparianAreas.gdb", layer = "fras_blk_usfs_riparian_areas_1")
@@ -167,6 +171,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   # Select the forest and urban layers
   forest <- terra::vect(forests[grepl(pattern = year, x = forests)]) |>
     terra::project("+init=EPSG:4326")
+  # terra::writeVector(forest, filename ="data/products/foresttest.gpkg" )
   urban <- terra::vect(urbanFiles2[grepl(pattern = year, x = urbanFiles2)])|>
     terra::project("+init=EPSG:4326")
   ## add the riparian layer once that is created 
@@ -174,7 +179,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   # select all unique grids 
   ids <- grids$Unique_ID
   # itorate over grids to produce outputs 
-  for(i in ids){
+  for(i in ids[1:10]){
     allImages <- models[grepl(paste0("/",i,"_"), models)]
     gridName <- i 
     unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
@@ -204,7 +209,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
         rastName <-  paste0(gridName,"_",year)
         names(r3) <-rastName
         # export 
-          try(terra::writeRaster(x = r3, filename = unmaskedPath ))
+          try(terra::writeRaster(x = r3, filename = unmaskedPath, overwrite = TRUE ))
         }else{
       r3 <- terra::rast(unmaskedPath)
       }
@@ -213,13 +218,13 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
       if(!file.exists(maskedPath)){
         print("generating mask")
         #  nlcd tree mask 
-        ## crop 
+        ## something going on the with forest mask not getting applied 
         f2 <-  forest |>
-          crop(r3)
+          crop(r3) |>
+          rasterize(r3, values = 1) 
         
-        if(nrow(f2)){
-          r4 <- r3 |>
-            terra::mask(f2, inverse = TRUE,updatevalue=NA)
+        if(class(f2)=="SpatRaster"){
+          r4 <- terra::mask(x = r3, mask = f2, inverse = TRUE, updatevalue=NA)
         }else{
           r4 <- r3
         }
@@ -229,8 +234,9 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
           crop(r3)
         if(nrow(t2)!=0){
           print("removing town")
+          t3 <- t2 |> rasterize(r3, values = 1) 
           r4 <- r4 |>
-            terra::mask(t2, inverse = TRUE,updatevalue=NA)
+            terra::mask(t3, inverse = TRUE, updatevalue=NA)
         }
         # export the masked image 
         try(terra::writeRaster(x = r4, filename = maskedPath ))
@@ -243,13 +249,13 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
 
 
 
-generateFinalGridImages(year = "2010", 
+generateFinalGridImages(year = "2020", 
                           modelGrids = modelGrids,
                           forests = forests, 
                           urbanFiles2 = urbanFiles2)
 
 # applied the riparian area mask 
-year = "2010"
+year = "2020"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 
 applyRiparianMask <- function(year,riparianData){
@@ -267,23 +273,30 @@ applyRiparianMask <- function(year,riparianData){
     print(i)
     tic()
     image <- terra::rast(i)
-    # crop riparian layer 
-    r30 <- terra::crop(x = riparianData,
+    
+    fileName <- paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif")
+    if(!file.exists(fileName)){
+      image[image == 0] <- NA
+      # crop riparian layer 
+      r30 <- terra::crop(x = riparianData,
                        y = image) |>
-      terra::as.polygons()
-    # apply the mask 
-    combined <- terra::mask(image, r30, inverse = TRUE,updatevalue=2)
-    # mask to the origin image
-    image2 <- ifel(image == 1, 1 , NA)
-    c2 <- combined * image2
-    #export the image 
-    writeRaster(x = c2, 
-                filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
-                overwrite = TRUE)
+      terra::as.polygons()|>
+      rasterize(image, values = 1, background = 0) 
+    
+      # mask to the origin image
+      c2 <- r30 + image
+    
+      #export the image 
+      terra::writeRaster(x = c2, 
+                  filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
+                  overwrite = TRUE)
+    }else{
+      print("file already exists")
+    }
     toc()
   }
 }
 
 # apply the mask 
-applyRiparianMask(year = "2010",
+applyRiparianMask(year = "2020",
                   riparianData = riparianData )
