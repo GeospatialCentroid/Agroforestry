@@ -9,9 +9,9 @@ tmap::tmap_mode("view")
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
 
 # list files from from google drive
-images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
-  dplyr::filter(!grepl('validationGrid', name))|>
-  dplyr::filter(!grepl('naipGrid', name))
+# images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
+#   dplyr::filter(!grepl('validationGrid', name))|>
+#   dplyr::filter(!grepl('naipGrid', name))
   
 
 # riparian data download and project --------------------------------------
@@ -53,7 +53,7 @@ downloadFromDrive <- function(year, images, modelGrids){
   modelGrids <- modelGrids[!is.na(modelGrids)]
   
   # loop over each model grid 
-  for(i in modelGrids[1:10]){
+  for(i in modelGrids[8:10]){
     imageSelected <- images2[grepl(pattern = i, x = images2$name),]
     gridSelect <- modelGrid[modelGrid$modelGrid == i, ]
     downloadPath <- paste0("data/products/models",year)
@@ -70,10 +70,11 @@ downloadFromDrive <- function(year, images, modelGrids){
 } 
 
 # apply the download function  --------------------------------------------
-
-# downloadFromDrive(year = "2020", images = images2020, modelGrids = modelGrids)
-# downloadFromDrive(year = "2016", images = images, modelGrids = modelGrids)
-# downloadFromDrive(year = "2010", images = images, modelGrids = modelGrids)
+# downloads are done on the server  
+# furrr::future_map(.x = c("2010","2016","2020"), 
+#                   .f = downloadFromDrive,
+#                   mages = images, 
+#                   modelGrids = modelGrids)
 
 
 # function for cropping models to grids 
@@ -123,25 +124,25 @@ processToGrids <- function(year, modelGrids){
 
 
 # Process all sub grid data  ----------------------------------------------
-# for(i in c("2010","2016","2020")){
-#   processToGrids(year = i, modelGrids = modelGrids)
-#}
-# didn't really test but I think it'll work 
 # set session info 
-# plan(multicore, workers = 12)
-# furrr::future_map(.x = c("2010","2016","2020"), .f = processToGrids, modelGrids = modelGrids)
+plan(multicore, workers = 6)
+# # furrr::future_map(.x = c("2010","2016","2020"), 
+#                   .f = processToGrids, 
+#                   modelGrids = modelGrids)
 
 
 # Apply the masks and bind to full grid ------------------------------------
 # read in mask layers
 
 # testing 692
-year <- "2020"
+modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
+
+year <- "2016"
 nlcdMasks <- list.files("data/products/nlcd",pattern = ".gpkg", full.names = TRUE, recursive = TRUE)
 # tccs <- nlcdMasks[grepl(pattern = "tcc", nlcdMasks)]
 forests <- nlcdMasks[grepl(pattern = "forest", nlcdMasks)]
 # urban areas 
-urbanFiles <- list.files("data/raw/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
+urbanFiles <- list.files("data/products/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
 urbanFiles2 <- urbanFiles[stringr::str_ends(string = urbanFiles, pattern = ".shp")]
 # riparian zones 
 # riparian <- terra::vect("data/raw/test.shp")
@@ -179,7 +180,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   # select all unique grids 
   ids <- grids$Unique_ID
   # itorate over grids to produce outputs 
-  for(i in ids[1:10]){
+  for(i in ids[1:100]){
     allImages <- models[grepl(paste0("/",i,"_"), models)]
     gridName <- i 
     unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
@@ -246,10 +247,15 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
     }
   }
 }
-
-
-
-generateFinalGridImages(year = "2020", 
+# install.packages("furrr")
+plan(multisession, workers = 3)
+library(furrr)
+furrr::future_map(.x = c("2010","2016","2020"), 
+                  .f = generateFinalGridImages,
+                  modelGrids = modelGrids,
+                  forests = forests, 
+                  urbanFiles2 = urbanFiles2)
+generateFinalGridImages(year = "2016", 
                           modelGrids = modelGrids,
                           forests = forests, 
                           urbanFiles2 = urbanFiles2)
@@ -269,7 +275,7 @@ applyRiparianMask <- function(year,riparianData){
     full.names = TRUE,
     pattern = ".tif"
   )
-  for(i in files){
+  for(i in files[300:350]){
     print(i)
     tic()
     image <- terra::rast(i)
@@ -297,6 +303,10 @@ applyRiparianMask <- function(year,riparianData){
   }
 }
 
+furrr::future_map(.x = c("2010","2016","2020"), 
+                  .f = applyRiparianMask,
+                  riparianData = riparianData)
+
 # apply the mask 
-applyRiparianMask(year = "2020",
+applyRiparianMask(year = "2010",
                   riparianData = riparianData )
