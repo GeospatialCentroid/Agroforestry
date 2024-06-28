@@ -73,7 +73,7 @@ downloadFromDrive <- function(year, images, modelGrids){
 # downloads are done on the server  
 # furrr::future_map(.x = c("2010","2016","2020"), 
 #                   .f = downloadFromDrive,
-#                   mages = images, 
+#                   images = images, 
 #                   modelGrids = modelGrids)
 
 
@@ -125,10 +125,10 @@ processToGrids <- function(year, modelGrids){
 
 # Process all sub grid data  ----------------------------------------------
 # set session info 
-plan(multicore, workers = 6)
-# # furrr::future_map(.x = c("2010","2016","2020"), 
-#                   .f = processToGrids, 
-#                   modelGrids = modelGrids)
+plan(multisession, workers = 6)
+furrr::future_map(.x = c("2010","2016","2020"),
+                  .f = processToGrids,
+                  modelGrids = modelGrids)
 
 
 # Apply the masks and bind to full grid ------------------------------------
@@ -180,7 +180,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   # select all unique grids 
   ids <- grids$Unique_ID
   # itorate over grids to produce outputs 
-  for(i in ids[1:100]){
+  for(i in ids){
     allImages <- models[grepl(paste0("/",i,"_"), models)]
     gridName <- i 
     unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
@@ -255,13 +255,14 @@ furrr::future_map(.x = c("2010","2016","2020"),
                   modelGrids = modelGrids,
                   forests = forests, 
                   urbanFiles2 = urbanFiles2)
-generateFinalGridImages(year = "2016", 
-                          modelGrids = modelGrids,
-                          forests = forests, 
-                          urbanFiles2 = urbanFiles2)
+#  single year implementation 
+# generateFinalGridImages(year = "2016", 
+#                           modelGrids = modelGrids,
+#                           forests = forests, 
+#                           urbanFiles2 = urbanFiles2)
 
 # applied the riparian area mask 
-year = "2020"
+year = "2016"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 
 applyRiparianMask <- function(year,riparianData){
@@ -275,7 +276,7 @@ applyRiparianMask <- function(year,riparianData){
     full.names = TRUE,
     pattern = ".tif"
   )
-  for(i in files[300:350]){
+  for(i in files[c(225,335,443,553)]){
     print(i)
     tic()
     image <- terra::rast(i)
@@ -303,10 +304,10 @@ applyRiparianMask <- function(year,riparianData){
   }
 }
 
-furrr::future_map(.x = c("2010","2016","2020"), 
+furrr::future_map(.x = c("2016","2020"), 
                   .f = applyRiparianMask,
                   riparianData = riparianData)
 
 # apply the mask 
-applyRiparianMask(year = "2010",
+applyRiparianMask(year = "2020",
                   riparianData = riparianData )
