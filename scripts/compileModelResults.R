@@ -276,7 +276,7 @@ applyRiparianMask <- function(year,riparianData){
     full.names = TRUE,
     pattern = ".tif"
   )
-  for(i in files[c(225,335,443,553)]){
+  for(i in files){
     print(i)
     tic()
     image <- terra::rast(i)
@@ -309,5 +309,5 @@ furrr::future_map(.x = c("2016","2020"),
                   riparianData = riparianData)
 
 # apply the mask 
-applyRiparianMask(year = "2020",
+applyRiparianMask(year = "2016",
                   riparianData = riparianData )
