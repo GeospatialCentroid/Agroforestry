@@ -1,0 +1,233 @@
+<mxfile host="Electron" modified="2024-07-11T23:39:23.305Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="xbwbDTUZ_rtLByhvPEu3" version="22.1.11" type="device">
+  <diagram name="Page-1" id="XgXvrqbDAfxgzk8a_g16">
+    <mxGraphModel dx="824" dy="1403" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-2" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Methods from phase 1&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="40" y="250" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-3" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Changes to Methods&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="300" y="250" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-4" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;New Methods&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="590" y="250" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-5" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;Proposed Phase 2 methods&lt;br&gt;&lt;/font&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="900" y="250" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-6" value="1. Establish Sample Grid" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="105" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-9" value="Sampling Trainging Data" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
+          <mxGeometry x="50" y="330" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-7" value="3. Occular Sampling of Forest in GEE" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-9" vertex="1">
+          <mxGeometry x="55" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-8" value="2. Random Selection of Model areas" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-9" vertex="1">
+          <mxGeometry x="55" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-11" value="1. Generate indicators (bands, indicies, GLCM, SNIC, Summaries areas)" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="90" y="580" width="135" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-12" value="Develop Training Dataset" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#19FF5E;" parent="1" vertex="1">
+          <mxGeometry x="50" y="570" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-13" value="3. Unique predictor set per model area" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-12" vertex="1">
+          <mxGeometry x="40" y="150" width="135" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-14" value="2. Correlation testing and VSURF for variable selection" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-12" vertex="1">
+          <mxGeometry x="40" y="80" width="135" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-16" value="Masking the Map product" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="60" y="1200" width="200" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-17" value="2. US Census Places&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-16" vertex="1">
+          <mxGeometry x="55" y="110" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-18" value="1. NLCD Forest Mask&lt;br&gt;all three forest classes&lt;br&gt;converted to vector&amp;nbsp;&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-16" vertex="1">
+          <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-19" value="3. Riparian Area Classification&lt;br&gt;USFS layer&amp;nbsp;&lt;br&gt;If interests with forest reclassed as riparian" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-16" vertex="1">
+          <mxGeometry x="55" y="200" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-22" value="Applying the models" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="50" y="820" width="200" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-23" value="3. Poor performing models with ran a second time with new predictors. Ensemble model was created&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-22" vertex="1">
+          <mxGeometry x="55" y="150" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-24" value="2. Qualitatively evaluated by analyst" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-22" vertex="1">
+          <mxGeometry x="55" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-25" value="4. Qualitative model ranking was used to generate the order of which models contributed to the final map product" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-22" vertex="1">
+          <mxGeometry x="55" y="240" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-15" value="1. Apply models to AOI" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-22" vertex="1">
+          <mxGeometry x="55" y="10" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-27" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="60" y="1530" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-29" value="1. Point Based accessment based on test train data spilt" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-27" vertex="1">
+          <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-31" value="2. Analyst validation&amp;nbsp;&lt;br&gt;- individual area evaluation in photoshop" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-27" vertex="1">
+          <mxGeometry x="55" y="110" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-32" value="1. What&#39;s are area of interest size&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7DFFC7;" parent="1" vertex="1">
+          <mxGeometry x="355" y="340" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-33" value="Sampling Trainging Data" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
+          <mxGeometry x="300" y="330" width="250" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-35" value="2. how many? Does random selection work?&amp;nbsp; &amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7DFFC7;" parent="4vsMfz4z2Tz5D8rJ1TlB-33" vertex="1">
+          <mxGeometry x="55" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-56" value="3. Sample from each year of imagery&amp;nbsp;&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-33" vertex="1">
+          <mxGeometry x="55" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-37" value="Develop Training Dataset" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#19FF5E;" parent="1" vertex="1">
+          <mxGeometry x="300" y="570" width="250" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-38" value="3. Aim to try to have one or two models that can be applied to all areas.&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-37" vertex="1">
+          <mxGeometry x="40" y="150" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-41" value="Masking the Map product" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="310" y="1200" width="230" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-42" value="2. given this is sampling method this layer should be used to exclude potential sites at the begining&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-41" vertex="1">
+          <mxGeometry x="40" y="110" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-43" value="1. Re-evaluate forest class or cover. Ideally use the existing inventory layer" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-41" vertex="1">
+          <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="kP4h5NAxNEK3TfX8CT-P-1" value="4. Lidar/canopy height&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="4vsMfz4z2Tz5D8rJ1TlB-41">
+          <mxGeometry x="55" y="220" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-46" value="Applying the models" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="300" y="820" width="240" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-47" value="3. Aim to have two models for all areas.&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-46" vertex="1">
+          <mxGeometry x="55" y="150" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-49" value="4. Not needed as we are models samples not full areas&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-46" vertex="1">
+          <mxGeometry x="55" y="240" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-58" value="Sampling Trainging Data" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
+          <mxGeometry x="590" y="320" width="240" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-59" value="2. how many? Does random selection work?&amp;nbsp; &amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-58" vertex="1">
+          <mxGeometry x="60" y="85" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-60" value="3. Sample from each year of imagery&amp;nbsp;&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-58" vertex="1">
+          <mxGeometry x="60" y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-61" value="Develop Training Dataset" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#19FF5E;" parent="1" vertex="1">
+          <mxGeometry x="590" y="560" width="240" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-62" value="3. Aim to try to have one or two models that can be applied to all areas.&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-61" vertex="1">
+          <mxGeometry x="40" y="150" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="4vsMfz4z2Tz5D8rJ1TlB-68" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="710" y="1190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-68" value="Applying the models" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="590" y="810" width="240" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-69" value="5. Apply a second model algorythm to create the second model" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-68" vertex="1">
+          <mxGeometry x="60" y="160" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-79" value="6. Combined the two models for a ensamble model output&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-68" vertex="1">
+          <mxGeometry x="65" y="260" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-84" value="Masking the Map product" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="590" y="1200" width="240" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-88" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="310" y="1530" width="230" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-93" value="Sampling Trainging Data" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FF9933;" parent="1" vertex="1">
+          <mxGeometry x="900" y="320" width="240" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-94" value="2. Select total number of areas from within that GRID to model" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-93" vertex="1">
+          <mxGeometry x="55" y="80" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-96" value="1. Establish Sample Grid" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-93" vertex="1">
+          <mxGeometry x="55" y="10" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-97" value="3. Exclude any sampling grids that contain a Census Places area" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-93" vertex="1">
+          <mxGeometry x="55" y="150" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-98" value="4. Sample presence absence values from the AOIs for each year the model is being created" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-93" vertex="1">
+          <mxGeometry x="55" y="220" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-99" value="Develop Training Dataset" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#19FF5E;" parent="1" vertex="1">
+          <mxGeometry x="900" y="660" width="240" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-100" value="3. Aim to try to have one or two models that can be applied to all areas.&amp;nbsp;&lt;br&gt;&lt;br&gt;This requires applying and evaluating models&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-99" vertex="1">
+          <mxGeometry x="52.5" y="150" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-102" value="1. Generate indicators (bands, indicies, GLCM, SNIC, Summaries areas)" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-99" vertex="1">
+          <mxGeometry x="52.5" y="10" width="135" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-103" value="2. Correlation testing and VSURF for variable selection" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-99" vertex="1">
+          <mxGeometry x="52.5" y="80" width="135" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-104" value="4. based on evaluation in &quot;Applying Models&quot; Section confirm a predictor set(s) to use for each model.&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-99" vertex="1">
+          <mxGeometry x="52.5" y="260" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-105" value="Applying the models" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
+          <mxGeometry x="900" y="1050" width="280" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-108" value="2. Qualitatively evaluated by analyst" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" vertex="1">
+          <mxGeometry x="60" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-109" value="1. Apply models to AOI" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" vertex="1">
+          <mxGeometry x="60" y="10" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-114" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=default;shape=flexArrow;fillColor=#000000;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" source="4vsMfz4z2Tz5D8rJ1TlB-110" target="4vsMfz4z2Tz5D8rJ1TlB-109" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="230" y="180" />
+              <mxPoint x="230" y="40" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-110" value="3. Determine core predictor set and reapply to all areas" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" vertex="1">
+          <mxGeometry x="60" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-106" value="4. Apply the models using two algorithms" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" vertex="1">
+          <mxGeometry x="60" y="220" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-107" value="5. Combined the two models for a ensamble model output&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-105" vertex="1">
+          <mxGeometry x="60" y="310" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-115" value="Masking the Map product" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
+          <mxGeometry x="900" y="1495" width="280" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-116" value="1. NLCD Forest Mask&lt;br&gt;all three forest classes&lt;br&gt;converted to vector&amp;nbsp;&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-115" vertex="1">
+          <mxGeometry x="67.5" y="20" width="142.5" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-117" value="2. Riparian Area Classification&lt;br&gt;USFS layer&amp;nbsp;&lt;br&gt;If interests with forest reclassed as riparian" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-115" vertex="1">
+          <mxGeometry x="58.75" y="125" width="162.5" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-118" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="590" y="1530" width="220" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-119" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
+          <mxGeometry x="900" y="1830" width="280" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-120" value="1. Point Based accessment based on test train data spilt" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-119" vertex="1">
+          <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-121" value="2. Analyst validation&amp;nbsp;&lt;br&gt;- individual area evaluation in photoshop" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-119" vertex="1">
+          <mxGeometry x="55" y="110" width="120" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
