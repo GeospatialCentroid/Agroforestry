@@ -13,6 +13,7 @@ pacman::p_load(googlesheets4, dplyr, readr,googledrive, plotly)
 data2016 <- googlesheets4::read_sheet(
   as_id("https://docs.google.com/spreadsheets/d/1nYkAd_OQdJHV7ZXfOghho9lv9TQEOOvQtnA2lFfrX_Q/edit#gid=2128028285"),
   sheet = "Connor Evaluation2016")
+names(data2016)[1] <- "Sample Grid IDs"
 
 # select the models by rank  
 selectModels <- function(data, values){
