@@ -1,6 +1,6 @@
 ###
 
-pacman::p_load("sf", "dplyr", "purrr", "tmap")
+pacman::p_load("sf", "dplyr", "purrr", "tmap",stringr)
 tmap_mode("view")
 
 # gather all the test train data  -----------------------------------------
@@ -82,11 +82,62 @@ valData <- list.files(path = "data/processed/validationPoints",
                       full.names = TRUE)
 #list images within the function 
 
-### with a specific model grid.
-v1 <- st_read(valData[1])
-grids <- unique(v1$gridID)
-pathToImages <- paste0()
 
 
 
+extractVals <- function(grid, year, valData1){
+
+  # image paths 
+  pathToImages <- paste0("data/products/models",year,"/fullImages")
+  images <- list.files(
+    path = pathToImages,
+    pattern = ".tif",
+    full.names = TRUE
+  )
+  img <- images[grepl(pattern = paste0(grid,"_full"), x = images)] |>
+      terra::rast()
+  v2 <- valData1[valData1$gridID == grid, ]
+    
+    
+    # extract values 
+    v3 <- terra::extract(x = img,
+                         y = v2,
+                         bind = TRUE) |>
+      as.data.frame()
+    names(v3) <- c("gridID","presence","year","predictedValue")
+    
+  return(v3)
+}
+
+## issues with x12_310 so I'm droping here
+# set yread value 
+year <- 2010
+# select value data based on year
+valData1 <- valData[grepl(pattern = year, x = valData)] |> terra::vect()
+# select the grid 
+grids <- unique(valData1$gridID)
+grids <- grids[!grids %in% c("X12_310","X12_588", "X12_727") ]
+referenceData <- grids |>
+  purrr::map(.f = extractVals,
+             year = 2016, 
+             valData1 = valData1) |>
+  bind_rows()
+for(i in years){
+  year <- i
+  # select value data based on year
+  valData1 <- valData[grepl(pattern = year, x = valData)] |> terra::vect()
+  # select the grid 
+  grids <- unique(valData1$gridID)
+  # some year specific indexing maybe
+  grids <- grids[!grids %in% c("X12_310","X12_588", "X12_727") ]
+  # run test
+  referenceData <- grids |>
+    purrr::map(.f = extractVals,
+               year = year, 
+               valData1 = valData1) |>
+    bind_rows()
+  write.csv(x = referenceData,
+            file = paste0("data/processed/validationPoints/referenceValidation_",year,".csv")
+            )  
+}
 
