@@ -141,3 +141,59 @@ for(i in years){
             )  
 }
 
+
+# visualize the results  --------------------------------------------------
+library(caret)
+files <- list.files(path = "data/processed/validationPoints",
+                    pattern = ".csv",
+                    full.names = TRUE)
+r1 <- read.csv(files[1])
+
+r2 <- r1[r1$gridID == "X12-115", ]
+m1 <- caret::confusionMatrix(data = factor(r2$presence, levels = c(1,0)), reference = factor(r2$predictedValue,levels = c(1,0)))
+m1
+# m1
+class(m1)
+m1$positive
+m1$table
+m1$overall
+m1$byClass
+
+ids <- unique(r1$gridID)
+
+
+d1 <- data.frame(gridID = ids, year = 2010, Accuracy = NA,Kappa = NA, Sensitivity= NA, Specificity =NA)
+
+for(i in seq_along(ids)){
+  r2 <- r1[r1$gridID == ids[i],]
+  m1 <-  caret::confusionMatrix(data = factor(r2$presence, levels = c(1,0)), reference = factor(r2$predictedValue,levels = c(1,0)))
+  d1[i, 3:4] <- m1$overall[1:2]
+  d1[i, 5:6] <- m1$byClass[1:2] 
+}
+
+
+generateEvaluationStats <- function(year, files){
+  file <- files[grepl(pattern = year, x = files)]
+  # read in data
+  d1 <- read.csv(file)
+  ids <- unique(d1$gridID)
+  # generate a storage datframe 
+  d2 <- data.frame(gridID = ids, year = 2010, Accuracy = NA,Kappa = NA, Sensitivity= NA, Specificity =NA)
+  for(i in seq_along(ids)){
+    r2 <- d1[d1$gridID == ids[i],]
+    m1 <-  caret::confusionMatrix(data = factor(r2$presence, levels = c(1,0)), reference = factor(r2$predictedValue,levels = c(1,0)))
+    d2[i, 3:4] <- m1$overall[1:2]
+    d2[i, 5:6] <- m1$byClass[1:2] 
+  }
+  d2$year <- year
+  
+  return(d2 |> 
+           dplyr::select( "year","gridID","Accuracy","Kappa","Sensitivity", "Specificity"))
+}
+
+evaluationsSummary <- years |>
+  purrr::map(generateEvaluationStats, files = files)|>
+  dplyr::bind_rows()
+
+write.csv(evaluationsSummary,file =  paste0("data/processed/validationPoints/referenceValidation_summaryAllyears.csv") )
+
