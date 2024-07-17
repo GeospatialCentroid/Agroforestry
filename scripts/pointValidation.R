@@ -162,7 +162,7 @@ m1$byClass
 ids <- unique(r1$gridID)
 
 
-d1 <- data.frame(gridID = ids, year = 2010, Accuracy = NA,Kappa = NA, Sensitivity= NA, Specificity =NA)
+d1 <- data.frame(gridID = ids, year = 2010, totalPresence = NA, totalAbsense = NA,Accuracy = NA,Kappa = NA, Sensitivity= NA, Specificity =NA)
 
 for(i in seq_along(ids)){
   r2 <- r1[r1$gridID == ids[i],]
@@ -178,17 +178,28 @@ generateEvaluationStats <- function(year, files){
   d1 <- read.csv(file)
   ids <- unique(d1$gridID)
   # generate a storage datframe 
-  d2 <- data.frame(gridID = ids, year = 2010, Accuracy = NA,Kappa = NA, Sensitivity= NA, Specificity =NA)
+  d2 <- data.frame(year = year,
+                   gridID = ids,
+                   totalPresence = NA, 
+                   totalAbsense = NA,
+                   modelPresence = NA,
+                   modelAbsense = NA, 
+                   Accuracy = NA,
+                   Kappa = NA,
+                   Sensitivity= NA,
+                   Specificity =NA)
   for(i in seq_along(ids)){
     r2 <- d1[d1$gridID == ids[i],]
     m1 <-  caret::confusionMatrix(data = factor(r2$presence, levels = c(1,0)), reference = factor(r2$predictedValue,levels = c(1,0)))
-    d2[i, 3:4] <- m1$overall[1:2]
-    d2[i, 5:6] <- m1$byClass[1:2] 
+    d2[i, "totalPresence"] <- nrow(r2[r2$presence==1,])
+    d2[i, "totalAbsense"] <- nrow(r2[r2$presence==0,])
+    d2[i, "modelPresence"] <- nrow(r2[r2$predictedValue==1,])
+    d2[i, "modelAbsense"] <- nrow(r2[r2$predictedValue==0,])
+    
+    d2[i, 7:8] <- m1$overall[1:2]
+    d2[i, 9:10] <- m1$byClass[1:2] 
   }
-  d2$year <- year
-  
-  return(d2 |> 
-           dplyr::select( "year","gridID","Accuracy","Kappa","Sensitivity", "Specificity"))
+  return(d2)
 }
 
 evaluationsSummary <- years |>
