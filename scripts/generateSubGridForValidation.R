@@ -16,6 +16,61 @@ grid12 <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 grid2 <- st_read("data/processed/griddedFeatures/two_sq_grid.gpkg")
 
 
+# data of 2020 grided features 
+df2020 <- data.frame(
+  modelGrid = c(
+    "X12-115"
+    ,"X12-131"
+    ,"X12-150"
+    ,"X12-183"
+    ,"X12-300"
+    ,"X12-307"
+    ,"X12-318"
+    ,"X12-32"
+    ,"X12-356"
+    ,"X12-361"
+    ,"X12-388"
+    ,"X12-440"
+    ,"X12-519"
+    ,"X12-602"
+    ,"X12-615"
+    ,"X12-624"
+    ,"X12-633"
+    ,"X12-642"
+    ,"X12-677"
+    ,"X12-709"
+    ,"X12-83"
+    ,"X12-91"
+    ,"X12-99"
+  ),
+  subGrid = c("1203"
+              ,"2572"
+              ,"12632"
+              ,"12000"
+              ,"13638"
+              ,"5551"
+              ,"12877"
+              ,"8690"
+              ,"9472"
+              ,"19763"
+              ,"10880"
+              ,"23945"
+              ,"28032"
+              ,"16513"
+              ,"24161"
+              ,"23950"
+              ,"27938"
+              ,"23457"
+              ,"25518"
+              ,"23306"
+              ,"5238"
+              ,"1325"
+              ,"7729"
+              ,"7780"
+              ,"8384")
+)
+
+
 # select AOI 
 gridAOI <- grid12[grid12$Unique_ID == "X12-183",]
 # select all grids within the AOI 

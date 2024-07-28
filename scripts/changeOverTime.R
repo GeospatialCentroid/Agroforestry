@@ -142,14 +142,14 @@ plan(multicore, workers = 3)
 
 # # sequential 
 # tic()
-purrr::map(.x = grids[86:89],.f = furrApply, files = files)
+# purrr::map(.x = grids[86:89],.f = furrApply, files = files)
 # toc()
 # 685.112 sec elapsed
 
 
 ### some memory allocation issues with this at the moment. 
 # tic()
-furrr::future_map(.x = grids[87:93],.f = furrApply, files = files)
+furrr::future_map(.x = grids, .f = furrApply, files = files)
 # toc()
 # about 5 seconds for the set up of the multisession. maybe???
 # < 383.191 sec elapsed with and error Error: external pointer is not valid

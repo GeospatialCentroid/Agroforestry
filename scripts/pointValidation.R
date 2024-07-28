@@ -208,3 +208,18 @@ evaluationsSummary <- years |>
 
 write.csv(evaluationsSummary,file =  paste0("data/processed/validationPoints/referenceValidation_summaryAllyears.csv") )
 
+
+
+
+# visualize the results  --------------------------------------------------
+library(plotly)
+d1 <- read.csv(paste0("data/processed/validationPoints/referenceValidation_summaryAllyears.csv") )
+d1 <- d1[d1$totalAbsense > 0, ]
+d1 <- d1[d1$totalPresence > 0, ]
+
+fig <- plot_ly(data = d1, x = ~Sensitivity , y = ~Specificity, color = ~as.factor(year))|>
+  layout(title = 'Testing Point Validation ', 
+         xaxis = list(title = 'True Positive Rate', range=c(0,1.1)), 
+         yaxis = list(title = 'True Negitive Rate', range=c(0,1.1)),
+         legend = list(title=list(text='<b> Year of Model </b>')))
+fig
