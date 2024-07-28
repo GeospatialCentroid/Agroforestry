@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-07-11T23:39:23.305Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="xbwbDTUZ_rtLByhvPEu3" version="22.1.11" type="device">
+<mxfile host="Electron" modified="2024-07-22T23:56:07.264Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="0H4Jys9ej21rTZg5YmVw" version="22.1.11" type="device">
   <diagram name="Page-1" id="XgXvrqbDAfxgzk8a_g16">
-    <mxGraphModel dx="824" dy="1403" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="834" dy="1684" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -47,7 +47,7 @@
           <mxGeometry x="55" y="110" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-18" value="1. NLCD Forest Mask&lt;br&gt;all three forest classes&lt;br&gt;converted to vector&amp;nbsp;&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-16" vertex="1">
-          <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
+          <mxGeometry x="40" y="10" width="135" height="90" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-19" value="3. Riparian Area Classification&lt;br&gt;USFS layer&amp;nbsp;&lt;br&gt;If interests with forest reclassed as riparian" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-16" vertex="1">
           <mxGeometry x="55" y="200" width="120" height="100" as="geometry" />
@@ -103,7 +103,7 @@
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-43" value="1. Re-evaluate forest class or cover. Ideally use the existing inventory layer" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-41" vertex="1">
           <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
         </mxCell>
-        <mxCell id="kP4h5NAxNEK3TfX8CT-P-1" value="4. Lidar/canopy height&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="4vsMfz4z2Tz5D8rJ1TlB-41">
+        <mxCell id="kP4h5NAxNEK3TfX8CT-P-1" value="4. Lidar/canopy height&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-41" vertex="1">
           <mxGeometry x="55" y="220" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-46" value="Applying the models" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#7EA6E0;" parent="1" vertex="1">
@@ -207,19 +207,25 @@
           <mxGeometry x="60" y="310" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-115" value="Masking the Map product" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#FFD966;" parent="1" vertex="1">
-          <mxGeometry x="900" y="1495" width="280" height="310" as="geometry" />
-        </mxCell>
-        <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-116" value="1. NLCD Forest Mask&lt;br&gt;all three forest classes&lt;br&gt;converted to vector&amp;nbsp;&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-115" vertex="1">
-          <mxGeometry x="67.5" y="20" width="142.5" height="90" as="geometry" />
+          <mxGeometry x="900" y="1495" width="280" height="415" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-117" value="2. Riparian Area Classification&lt;br&gt;USFS layer&amp;nbsp;&lt;br&gt;If interests with forest reclassed as riparian" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-115" vertex="1">
           <mxGeometry x="58.75" y="125" width="162.5" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="fnbxOvl0mA-q8cjOQI9j-3" value="1. Re-evaluate forest class or cover. Ideally use the existing inventory layer" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="4vsMfz4z2Tz5D8rJ1TlB-115">
+          <mxGeometry x="58.75" y="15" width="161.25" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="fnbxOvl0mA-q8cjOQI9j-4" value="4. Lidar/canopy height&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="4vsMfz4z2Tz5D8rJ1TlB-115">
+          <mxGeometry x="56.25" y="325" width="183.75" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fnbxOvl0mA-q8cjOQI9j-5" value="3. US Census Places&lt;br&gt;- excluded from forest counts&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="4vsMfz4z2Tz5D8rJ1TlB-115">
+          <mxGeometry x="56.25" y="235" width="173.75" height="80" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-118" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
           <mxGeometry x="590" y="1530" width="220" height="230" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-119" value="Model Validation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#B5739D;" parent="1" vertex="1">
-          <mxGeometry x="900" y="1830" width="280" height="250" as="geometry" />
+          <mxGeometry x="910" y="1970" width="280" height="250" as="geometry" />
         </mxCell>
         <mxCell id="4vsMfz4z2Tz5D8rJ1TlB-120" value="1. Point Based accessment based on test train data spilt" style="rounded=1;whiteSpace=wrap;html=1;" parent="4vsMfz4z2Tz5D8rJ1TlB-119" vertex="1">
           <mxGeometry x="55" y="10" width="120" height="90" as="geometry" />
