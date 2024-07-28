@@ -2,10 +2,18 @@ pacman::p_load(sf,dplyr,terra,tmap)
 tmap_mode("view")
 
 
-# gridded features 
-grid12 <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
-grid2 <- st_read("data/processed/griddedFeatures/two_sq_grid.gpkg")
+# model grids -- these are the real sub grid areas for a specific model 
+g2010 <- st_read("data/products/modelGrids_2010.gpkg")
+g2016 <- st_read("data/products/modelGrids_2016.gpkg")
+g2020 <- st_read("data/products/modelGrids_2020.gpkg")
+# 2 mile gird 
+mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
+  dplyr::select(gridID = FID_two_grid)
 
+# gridded features 
+# grid12 <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+# grid2 <- st_read("data/processed/griddedFeatures/two_sq_grid.gpkg")
+# 
 
 # data of 2020 grided features 
 df2020 <- data.frame(
@@ -13,11 +21,38 @@ df2020 <- data.frame(
     ,"X12-318","X12-32","X12-356","X12-361","X12-388","X12-440","X12-519","X12-602"
     ,"X12-615","X12-624","X12-633","X12-642","X12-677","X12-709","X12-83","X12-91"
     ,"X12-99"),
-  subGrid = c("1203","2572","12632","12000","13638","5551","12877","8690","9472",
+  subGrid2020 = c("1203","2572","12632","12000","13638","5551","12877","8690","9472",
               "19763","10880","23945","28032","16513","24161","23950","27938",
               "23457","25518","23306","5238","1325","7729") #"7780","8384"
 )
-df2020
+df2020$match2010 <- NA
+df2020$match2016 <- NA
+# if the unique grid is assigned by the model grid assign true for each year 
+
+for(i in 1:nrow(df2020)){
+  m1 <- df2020$modelGrid[i]
+
+  m2 <- g2016[g2016$Unique_ID == m1,]
+  m3 <- g2010[g2010$Unique_ID == m1,]
+  df2020$match2016[i] <- m2$Unique_ID == m2$modelGrid
+  df2020$match2010[i] <- m3$Unique_ID == m3$modelGrid
+}
+
+# from here 
+## pull in the final compost models 
+## reclass to get a 2016 and 2020 value 
+## if the match is TRUE us the 2020 sub grid value 
+## else skip -- will assign this later 
+## extract the subgrid and export 
+
+
+# from GEE 
+## export all NAIP subgrid. 
+
+
+
+
+
 
 # select AOI
 gridAOI <- grid12[grid12$Unique_ID == "X12-183",]
