@@ -25,6 +25,31 @@ df2020 <- data.frame(
               "19763","10880","23945","28032","16513","24161","23950","27938",
               "23457","25518","23306","5238","1325","7729") #"7780","8384"
 )
+# add columns for the cause in which there is no 2020 match 
+df2016 <- data.frame(
+  modelGrid = c("X12-115","X12-131","X12-150","X12-183","X12-278",
+                "X12-300","X12-307","X12-318","X12-356","X12-361","X12-388",
+                "X12-519","X12-594","X12-602","X12-624","X12-642","X12-661","X12-677",
+                "X12-709","X12-83","X12-91","X12-99"),
+  subGrid2016 = c("594","456","12659","11710","18037","5822","6165","8345","12781",
+                  "11319","22986","24110","17395","20451","30590","27975","30823","24297","30850","2828","1328",
+                  "4121") 
+)
+
+df2010 <- data.frame(
+  modelGrid = c("X12-115","X12-131","X12-150","X12-183","X12-207","X12-278","X12-281","X12-300","X12-307",
+                "X12-318","X12-32","X12-356","X12-361","X12-388","X12-440","X12-519","X12-594","X12-602",
+                "X12-615","X12-624","X12-642","X12-677","X12-83","X12-91","X12-99"),
+  subGrid2010 = c("1200","1661","12963","9286","4330","19547","14758","15787","11577","8341","1473","22744",
+                  "18876","17530","23005","28330","27935","22584","27785","29389","27083","30605","402",
+                  "2233","4428") 
+)
+
+#combined datasets
+df2020 <- df2020|>
+  dplyr::full_join(df2016,by = "modelGrid")|>
+  dplyr::full_join(df2010,by = "modelGrid")
+
 df2020$match2010 <- NA
 df2020$match2016 <- NA
 # if the unique grid is assigned by the model grid assign true for each year 
@@ -38,32 +63,128 @@ for(i in 1:nrow(df2020)){
   df2020$match2010[i] <- m3$Unique_ID == m3$modelGrid
 }
 
+
+# no models in 2020
+df2020a <- df2020[!is.na(df2020$subGrid2020),]
+# this is going to require a bit more specific of a workflow so just pulling out for now. 
+df2020b <- df2020[is.na(df2020$subGrid2020),]
+
+  
 # from here 
 ## pull in the final compost models 
 changeOverTime <- list.files("data/products/changeOverTime", full.names = TRUE, pattern = ".tif")
+
+
 r1 <- terra::rast(changeOverTime[1])
 ## reclass to get a 2016 and 2020 value 
-get2016 <- function(raster, year){
+getYearMap <- function(raster, year){
   if(year == 2010){
-    m <- c(0, 1, 0,
-           1, 1, 1,
-           2, 9, 0)
-    
-    r2 <- r1 |> 
-      
-
-      rclmat <- matrix(m, ncol=3, byrow=TRUE)
-      rc1 <- classify(r, rclmat, include.lowest=TRUE)
-      
-
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 1),
+               c(3, 0),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
   }
-  
+  if(year == 2016){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 1),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  if(year == 2020){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 0),
+               c(4, 0),
+               c(5, 1),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  return(r2)
 }
 
 
+
+for(i in 1:nrow(df2020a)){
+  # select specific row   
+  df <- df2020a[i,]
+  # extract the subgrid  
+  subGrid <- mile2[mile2$gridID == df$subGrid2020, ]
+  # the model grid is not the same of the grid that was applied. Use an intersection to select the specific area. 
+  uniqueGrid <- g2020$Unique_ID[sf::st_intersects(g2020, y = subGrid, sparse = FALSE)]
+  # read in object from list of change over time rasters 
+  r1 <- terra::rast(changeOverTime[grepl(pattern = paste0(uniqueGrid,"_"), x = changeOverTime)])
+  #2010
+  if(df$match2010 == TRUE){
+    try(r2010 <- getYearMap(raster = r1, year = 2010)|>
+      terra::crop(subGrid),
+    terra::writeRaster(x = r2010, 
+                       filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",df$subGrid2020,"_2010.tif")))
+  }else{
+    # if(!is.na(df$subGrid2010)){
+    #   subGridb <- mile2[mile2$gridID == df$subGrid2010, ]
+    #   uniqueGridb <- g2010$Unique_ID[sf::st_intersects(g2010, y = subGridb, sparse = FALSE)][2]
+    #   r1b <- terra::rast(changeOverTime[grepl(pattern = paste0(uniqueGridb,"_"), x = changeOverTime)])
+    #   r2010 <- getYearMap(raster = r1b, year = 2010)|>
+    #     terra::crop(subGridb)
+    #   terra::writeRaster(x = r2010, 
+    #                      filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",subGridb,"_2010.tif"))
+    # }
+  }
+  #2016
+  if(df$match2016 == TRUE){
+    try(r2016 <- getYearMap(raster = r1, year = 2016)|>
+      terra::crop(subGrid),
+    terra::writeRaster(x = r2016, 
+                       filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",df$subGrid2020,"_2016.tif")))
+  }else{
+    # if(!is.na(df$subGrid2016)){
+    #   subGridb <- mile2[mile2$gridID == df$subGrid2016, ]
+    #   uniqueGridb <- g2016$Unique_ID[sf::st_intersects(g2016, y = subGridb, sparse = FALSE)]
+    #   r1b <- terra::rast(changeOverTime[grepl(pattern = paste0(uniqueGridb,"_"), x = changeOverTime)])
+    #   r2016 <- getYearMap(raster = r1b, year = 2016)|>
+    #     terra::crop(subGridb)
+    #   terra::writeRaster(x = r2016, 
+    #                      filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",subGridb,"_2016.tif"))
+    # }
+  }
+  #2020
+  try(r2020 <- getYearMap(raster = r1, year = 2020)|>
+    terra::crop(subGrid),
+  terra::writeRaster(x = r2020, 
+                     filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",df$subGrid2020,"_2020.tif")))
+}
 ## if the match is TRUE us the 2020 sub grid value 
 ## else skip -- will assign this later 
-## extract the subgrid and export 
+
+
+
+
+
+
+
+#2020
+r2020 <- getYearMap(raster = r1, year = 2020)|>
+  terra::crop(subGrid)
+terra::writeRaster(x = r2020, 
+                     filename = paste0("data/products/subGridAreaEvaluations/subGrid_", df$modelGrid, "_",df$subGrid2020,"_2020.tif"))
 
 
 # from GEE 
@@ -71,7 +192,7 @@ get2016 <- function(raster, year){
 
 
 
-
+tmap::tm_polygons()
 
 
 # select AOI
