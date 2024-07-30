@@ -40,7 +40,27 @@ for(i in 1:nrow(df2020)){
 
 # from here 
 ## pull in the final compost models 
+changeOverTime <- list.files("data/products/changeOverTime", full.names = TRUE, pattern = ".tif")
+r1 <- terra::rast(changeOverTime[1])
 ## reclass to get a 2016 and 2020 value 
+get2016 <- function(raster, year){
+  if(year == 2010){
+    m <- c(0, 1, 0,
+           1, 1, 1,
+           2, 9, 0)
+    
+    r2 <- r1 |> 
+      
+
+      rclmat <- matrix(m, ncol=3, byrow=TRUE)
+      rc1 <- classify(r, rclmat, include.lowest=TRUE)
+      
+
+  }
+  
+}
+
+
 ## if the match is TRUE us the 2020 sub grid value 
 ## else skip -- will assign this later 
 ## extract the subgrid and export 
