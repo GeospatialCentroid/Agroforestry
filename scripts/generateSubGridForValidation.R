@@ -69,6 +69,10 @@ df2020a <- df2020[!is.na(df2020$subGrid2020),]
 # this is going to require a bit more specific of a workflow so just pulling out for now. 
 df2020b <- df2020[is.na(df2020$subGrid2020),]
 
+
+# match on all three years 
+dfall <- df2020a |>
+  dplyr::filter(match2010 == TRUE & match2016 == TRUE)
   
 # from here 
 ## pull in the final compost models 
