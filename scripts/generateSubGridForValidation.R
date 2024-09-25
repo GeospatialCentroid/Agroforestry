@@ -2,6 +2,16 @@ pacman::p_load(sf,dplyr,terra,tmap)
 tmap_mode("view")
 
 
+
+
+files <- list.files()
+
+
+
+
+# this works... just can't get naip imagery with this method  -------------
+
+
 # model grids -- these are the real sub grid areas for a specific model 
 g2010 <- st_read("data/products/modelGrids_2010.gpkg")
 g2016 <- st_read("data/products/modelGrids_2016.gpkg")
@@ -10,6 +20,146 @@ g2020 <- st_read("data/products/modelGrids_2020.gpkg")
 mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
   dplyr::select(gridID = FID_two_grid)
 
+# randomly select new grids  ----------------------------------------------
+resample2020 <- c("X12-131", "X12-356", "X12-602", "X12-615")
+resample2016 <- c("X12-150", "X12-356", "X12-278", "X12-594","X12-624")
+resample2010 <- c("X12-642", "X12-677", "X12-361", "X12-300","X12-183")
+
+# subgrid selection 
+subGrid2020 <- c("6188","14308","24675","26298")
+subGrid2016 <- c("6603","12004","14308","24628","26650")
+
+
+randomlySelectSubgrid <-function(gridID, gridSpatailLayer, subGridLayer){
+  set.seed(1234) # this doesn't seem to do anything... 
+  #select sub grid
+  g1 <- gridSpatailLayer |> dplyr::filter(Unique_ID == gridID)
+  # crop the two mile
+  s1 <- sf::st_crop(x = subGridLayer, y = g1)
+  # random position 
+  random <- sample(1:nrow(s1), 1)
+  # pull sub grid ID 
+  subGridID <- s1$gridID[random]
+  print(paste0(gridID," : ", subGridID ))
+  return(subGridID)
+}
+
+# pull sub grids
+sub2020 <- purrr::map(.x = resample2020, .f = randomlySelectSubgrid,  
+                      gridSpatailLayer = g2020, subGridLayer = mile2) |> unlist()
+sub2016 <- purrr::map(.x = resample2016, .f = randomlySelectSubgrid,  
+                     gridSpatailLayer = g2016, subGridLayer = mile2)|> unlist()
+sub2010 <- purrr::map(.x = resample2010, .f = randomlySelectSubgrid,  
+                      gridSpatailLayer = g2010, subGridLayer = mile2)|> unlist()
+
+produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year){
+  # get the sub grid name
+  subGridID <- data
+  print(subGridID)
+  # select the spatial object 
+  subGrid <- subGridLayer[subGridLayer$gridID == subGridID, ]
+  # get model grid id 
+  uniqueGrid <- modelGrid$Unique_ID[sf::st_intersects(modelGrid, y = subGrid, sparse = FALSE)]
+  if(length(uniqueGrid)==1){
+    # select the raster if interest 
+    r1 <- terra::rast(changeOverTime[grepl(pattern = paste0(uniqueGrid,"_"), x = changeOverTime)])
+    # export 
+    fileName <- paste0("data/products/subGridAreaEvaluations/subGrid_", uniqueGrid, "_",subGridID,"_",year,".tif")
+    if(!file.exists(fileName)){
+      r2 <- "test"
+      try(r2 <- getYearMap(raster = r1, year = year) |>
+        terra::crop(subGrid))
+      if(class(r2)!="character"){
+        terra::writeRaster(x = r2, 
+                           filename = fileName)
+      }
+    }
+  }else{
+    for(i in uniqueGrid){
+      # select the raster if interest 
+      r1 <- terra::rast(changeOverTime[grepl(pattern = paste0(i,"_"), x = changeOverTime)])
+      # export 
+      fileName <- paste0("data/products/subGridAreaEvaluations/subGrid_", i, "_",subGridID,"_",year,".tif")
+      if(!file.exists(fileName)){
+        r2 <- "test"
+        try(r2 <- getYearMap(raster = r1, year = year) |>
+              terra::crop(subGrid))
+        if(class(r2)!="character"){
+          terra::writeRaster(x = r2, 
+                             filename = fileName)
+        }
+      }
+    }
+  }
+}
+getYearMap <- function(raster, year){
+  if(year == 2010){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 1),
+               c(3, 0),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  if(year == 2016){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 1),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  if(year == 2020){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 0),
+               c(4, 0),
+               c(5, 1),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  return(r2)
+}
+# 2020
+purrr::map(.x = subGrid2020, .f = produceSubGrids, 
+           subGridLayer = mile2,
+           modelGrid = g2020,
+           changeOverTime = changeOverTime,
+           year = "2020")
+# 2016
+purrr::map(.x = subGrid2016[1], .f = produceSubGrids, 
+           subGridLayer = mile2,
+           modelGrid = g2016,
+           changeOverTime = changeOverTime,
+           year = "2016")
+#2010 
+purrr::map(.x = sub2010, .f = produceSubGrids, 
+           subGridLayer = mile2,
+           modelGrid = g2010,
+           changeOverTime = changeOverTime,
+           year = "2010")
+
+
+
+
+
+
+
+
 # gridded features 
 # grid12 <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 # grid2 <- st_read("data/processed/griddedFeatures/two_sq_grid.gpkg")
@@ -17,13 +167,8 @@ mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
 
 # data of 2020 grided features 
 df2020 <- data.frame(
-  modelGrid = c(    "X12-115","X12-131","X12-150","X12-183","X12-300","X12-307"
-    ,"X12-318","X12-32","X12-356","X12-361","X12-388","X12-440","X12-519","X12-602"
-    ,"X12-615","X12-624","X12-633","X12-642","X12-677","X12-709","X12-83","X12-91"
-    ,"X12-99"),
-  subGrid2020 = c("1203","2572","12632","12000","13638","5551","12877","8690","9472",
-              "19763","10880","23945","28032","16513","24161","23950","27938",
-              "23457","25518","23306","5238","1325","7729") #"7780","8384"
+  modelGrid = c(    "X12-131","X12-356","X12-602","X12-615"),
+  subGrid2020 = c("6188","14308", "24675","26298") #"7780","8384"
 )
 # add columns for the cause in which there is no 2020 match 
 df2016 <- data.frame(
@@ -124,8 +269,23 @@ getYearMap <- function(raster, year){
   return(r2)
 }
 
+index <- 1:nrow(df2020)
+produceSubGrids <- function(index, data, subGridLayer, modelGrid, changeOverTime, year){
+  df <- data[index, ]
+  subGrid <- subGridLayer[subGridLayer$gridID == df[,2], ]
+  
+  uniqueGrid <- modelGrid$Unique_ID[sf::st_intersects(modelGrid, y = subGrid, sparse = FALSE)]
+  r1 <- terra::rast(changeOverTime[grepl(pattern = paste0(uniqueGrid,"_"), x = changeOverTime)])
+  
+  try(r2 <- getYearMap(raster = r1, year = year)|>
+        terra::crop(subGrid),
+      terra::writeRaster(x = r2, 
+                         filename = paste0("data/products/subGridAreaEvaluations/subGrid_", uniqueGrid, "_",subGrid,"_",year,".tif")))
+}
 
 
+
+# original ----------------------------------------------------------------
 for(i in 1:nrow(df2020a)){
   # select specific row   
   df <- df2020a[i,]
