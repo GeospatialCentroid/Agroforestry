@@ -39,7 +39,7 @@
 ###
 
 #load libraries 
-pacman::p_load(dplyr,sf, terra)
+pacman::p_load(dplyr,sf, terra, tictoc, purrr)
 
 
 # sources some existing functions 
@@ -79,7 +79,9 @@ cot <- list.files(path = "data/products/changeOverTime",
 
 gridIndex <- grids2010$Unique_ID[10]
 cotFiles <- cot
-processingEffort <- function(grids, gridIndex, cotFiles){
+
+## probably wrap the whole workflow into a function,but I don't think were there yet.... 
+# processingEffort <- function(grids, gridIndex, cotFiles){
   
   # seperate out grid 
   selectGrids <- grids[grids$Unique_ID == gridIndex,]
@@ -93,19 +95,28 @@ processingEffort <- function(grids, gridIndex, cotFiles){
   raster <- cotFiles[grepl(pattern = paste0(gridIndex,"_changeOverTime"), x = cotFiles)] |>
     terra::rast()
   # pull out the years 
-  r2010 <- raster |> getYearMap(year = "2010")
-  r2016 <- raster |> getYearMap(year = "2016")
+  ## ~10 sec
+  r2010 <- raster |> getYearMap(year = "2010") 
+  tic()
+  r2016 <- raster |> getYearMap(year = "2016") 
+  toc()
   r2020 <- raster |> getYearMap(year = "2020")
   
   # gain and loss 2016 
+  ## ~10 secs
+  tic()
   values2016 <- r2016 - r2010 
+  toc()
   ## 0 : both predicted forest 
   ## 1 : forest in 2016 but not in 2010 
   ## -1 : forest in 2010 but not in 2016
   
   # using pixel counts 
   ## returns a data frame with false match in row 1 and true in row 2 
+  ## ~13 seconds 
+  tic()
   same2016 <- freq(values2016 == 0)$count[2]
+  toc()
   gain2016 <- freq(values2016 == 1)$count[2]
   loss2016 <- freq(values2016 == -1)$count[2]
   # or reclassify 
@@ -114,20 +125,85 @@ processingEffort <- function(grids, gridIndex, cotFiles){
   rGain <- rbind(c(-1,NA), c(0,NA)) # don't need the thrid because values are 1
   rLoss <- rbind(c(1,NA), c(0,NA), c(-1,1))
   ## run the reclass 
+  ## ~ 8 secs total 24
+  tic()
   same2016 <- classify(x = values2016,rSame)
+  toc()
   gain2016 <- classify(x = values2016,rGain)
   loss2016 <- classify(x = values2016,rLoss)
   ## if the spatial component is still needed 
   
-  
-  ### this preps things for the calculatation measures, but I'm not 100% what those would be. 
-  
-  
-  
-  ## montecarlo 
+  ## without the spatial element 
+  totalPixels <- nrow(r2010) * ncol(r2010)
+  val2010 <- sum(values(r2010),na.rm = TRUE)
+  vect2010 <- c(rep(x = 1, val2010), rep(x = 0, totalPixels-val2010))
   
   
-}
+  
+  
+  ### this preps things for the calculation measures, but I'm not 100% what those would be. 
+  testAndFlip <- function(orignalVect, flip_probability){
+    # values from the original data will be replaced if the flip probability is meet. 
+    
+    # recording where the condition is applied 
+    state_change_indices <- c()
+    # orginal sum 
+    originalSum <- sum(originalVect)
+    
+    
+    flip <- function(index, state_change_indices ){
+      if (runif(1) <= flip_probability) {
+        state_change_indices <- c(state_change_indices, index)
+      }
+      return(state_change_indices)
+    }
+    
+    vals <- purrr::map(.x = 1:length(originalVect[1:1000]), 
+                       .f = flip,
+                       state_change_indices = state_change_indices) |> unlist()
+    
+    
+    ## monte carlo
+    # for (i in 1:length(originalVect)) {
+    #   print(i)
+    #   # generate a random number and test it it's lower the the flip probability 
+    #   if (runif(1) <= flip_probability) {
+    #     state_change_indices <- c(state_change_indices, i)
+    #   }
+    # }
+    
+    # # parse out changed values 
+    same <- sum(originalVect[-vals])
+    changes <- sum(abs(originalVect[vals] - 1))
+    # add together for final result 
+    result <- sum(same,changes)
+    
+    # there's more that can be returned but I'm just going to keep to the sum for the moment. 
+    return(result) 
+  }
+  
+
+  
+  
+  # run x number of times. Total area is returned 
+  totalArea <- c()
+  for(run in 1:10){
+    tic()
+    change <- testAndFlip(orignalVect = vect2010, flip_probability = 0.25)
+    toc()
+    totalArea <- c(totalArea,change)
+  }
+  
+  # from here we can generate any summary statistics on the specific model year 
+  
+  # this would need to be done for each model year and doesn't tell us about the comparitive results 
+  
+  # 
+  
+  
+  
+  
+# }
 
 
 
