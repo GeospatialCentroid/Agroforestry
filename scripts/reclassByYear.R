@@ -39,5 +39,6 @@ getYearMap <- function(raster, year){
     r2 <- raster$ChangeOverTime |> 
       terra::classify(m,others=NA)
   }
+
   return(r2)
 }
