@@ -4,12 +4,15 @@ tmap_mode("view")
 
 
 
-files <- list.files()
-
 
 
 
 # this works... just can't get naip imagery with this method  -------------
+## change over time files 
+files <-  list.files(path = "data/products/changeOverTime",
+                           full.names = TRUE,
+                           pattern = ".tif")
+
 
 
 # model grids -- these are the real sub grid areas for a specific model 
@@ -21,13 +24,13 @@ mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
   dplyr::select(gridID = FID_two_grid)
 
 # randomly select new grids  ----------------------------------------------
-resample2020 <- c("X12-131", "X12-356", "X12-602", "X12-615")
-resample2016 <- c("X12-150", "X12-356", "X12-278", "X12-594","X12-624")
-resample2010 <- c("X12-642", "X12-677", "X12-361", "X12-300","X12-183")
+resample2020 <- c("X12-183","X12-32","X12-388","X12-519","X12-642","X12-677","X12-83","X12-99")
+resample2016 <- c("X12-661", "X12-83")
+resample2010 <- c("X12-131","X12-32","X12-440","X12-615","X12-624")
 
 # subgrid selection 
-subGrid2020 <- c("6188","14308","24675","26298")
-subGrid2016 <- c("6603","12004","14308","24628","26650")
+# subGrid2020 <- c("6188","14308","24675","26298")
+# subGrid2016 <- c("6603","12004","14308","24628","26650")
 
 
 randomlySelectSubgrid <-function(gridID, gridSpatailLayer, subGridLayer){
@@ -135,13 +138,13 @@ getYearMap <- function(raster, year){
   return(r2)
 }
 # 2020
-purrr::map(.x = subGrid2020, .f = produceSubGrids, 
+purrr::map(.x = sub2020, .f = produceSubGrids, 
            subGridLayer = mile2,
            modelGrid = g2020,
-           changeOverTime = changeOverTime,
+           changeOverTime = files,
            year = "2020")
 # 2016
-purrr::map(.x = subGrid2016[1], .f = produceSubGrids, 
+purrr::map(.x = sub2016, .f = produceSubGrids, 
            subGridLayer = mile2,
            modelGrid = g2016,
            changeOverTime = changeOverTime,
