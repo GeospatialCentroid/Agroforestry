@@ -94,3 +94,76 @@ reclassCOT <- function(raster){
   ))
 }
 
+
+
+
+
+
+# calArea -----------------------------------------------------------------
+
+calArea <- function(df, type, stableRast, changeRast){
+  # grab the positional index 
+  index <- grep(pattern = type, x = df$type)
+  # calculate counts
+  ## stable 
+  s1 <- freq(stableRast)
+  if(1 %in% s1$value){
+    df[index,"stable"] <- s1$count[s1$value == 1]/10000
+  }else{
+    df[index,"stable"] <- 0 
+  }
+
+  ## change 
+  c1 <- freq(changeRast)
+  # conditional to capture when change is not present 
+  if(1 %in% c1$value){
+    df[index,"gains"] <- c1$count[c1$value == 1]/10000
+  }else{
+    df[index,"gains"] <- 0 
+  }
+  # loss (present in 2010 but not 2016)
+  if(-1 %in% c1$value){
+    df[index,"loss"] <- c1$count[c1$value == -1]/10000
+  }else{
+    df[index,"loss"] <- 0 
+  }
+  #export data 
+  return(df)
+}
+
+
+#   processCropLayer ------------------------------------------------------
+# testing 
+# grid <- g1
+# dstable 
+# crops <- crops
+# year <- "2016"
+processCropLayer <- function(grid, crops, stable, change, year, riparian){
+  # read and crop crop layer 
+  crop1 <- terra::vect(crops[grepl(pattern = paste0(year,".gpkg"), x = crops)])|>
+    terra::mask(mask = grid )
+  # use as a mask for the stable and change files 
+  stableCrop <- terra::mask(x = stable, mask = riparian, inverse = TRUE)|>
+    terra::mask(mask = crop1)
+  # change raster 
+  changeCrop <- terra::mask(x = change, mask = riparian, inverse = TRUE) |> 
+    terra::mask(mask = crop1)
+  return(list(
+    stable = stableCrop,
+    change = changeCrop))
+}
+
+
+
+
+# calGrass ----------------------------------------------------------------
+calGrass <- function(df){
+  df[4, "stable"] <- df$stable[1] - sum(df$stable[2:3])
+  df[4, "gains"] <- df$gains[1] - sum(df$gains[2:3])
+  df[4, "loss"] <- df$loss[1] - sum(df$loss[2:3])
+  
+  return(df)
+}
+
+
+
