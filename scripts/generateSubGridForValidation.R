@@ -25,13 +25,12 @@ mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
 
 # randomly select new grids  ----------------------------------------------
 resample2020 <- c("X12-183","X12-32","X12-388","X12-519","X12-642","X12-677","X12-83","X12-99")
-resample2016 <- c("X12-661", "X12-83")
+resample2016 <- c("X12-356")
 resample2010 <- c("X12-131","X12-32","X12-440","X12-615","X12-624")
 
 # subgrid selection 
-# subGrid2020 <- c("6188","14308","24675","26298")
-# subGrid2016 <- c("6603","12004","14308","24628","26650")
-
+subGrid2020 <- c("14308")
+subGrid2016 <- c("14308")
 
 randomlySelectSubgrid <-function(gridID, gridSpatailLayer, subGridLayer){
   set.seed(1234) # this doesn't seem to do anything... 
@@ -46,6 +45,12 @@ randomlySelectSubgrid <-function(gridID, gridSpatailLayer, subGridLayer){
   print(paste0(gridID," : ", subGridID ))
   return(subGridID)
 }
+
+# single call 
+randomlySelectSubgrid(gridID =resample2016,
+                      gridSpatailLayer =g2016,
+                      subGridLayer= mile2 )
+
 
 # pull sub grids
 sub2020 <- purrr::map(.x = resample2020, .f = randomlySelectSubgrid,  
@@ -95,6 +100,13 @@ produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year)
     }
   }
 }
+## single call 
+produceSubGrids(data = "16121", 
+                subGridLayer = mile2,
+                modelGrid = g2016,
+                changeOverTime = files,
+                year = "2016")
+
 getYearMap <- function(raster, year){
   if(year == 2010){
     # define the replacement values 

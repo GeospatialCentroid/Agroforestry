@@ -44,7 +44,7 @@ crops <- list.files("data/processed/csb",
 gridNames <- paste0("X12-",1:773)
 
 
-testGrid <- gridNames[200]
+testGrid <- gridNames[378]
 
 
 # testing 
@@ -258,20 +258,13 @@ calculateCarbonAreas <- function(grid, cotFiles, grids, crops){
 
  return(df) 
 }
-#200 
-t1 <- calculateCarbonAreas(grid = "X12-200",
-                           cotFiles = cot,
-                           grids = grids,
-                           crops =  crops
-                           )
 
-#600
-t2 <- calculateCarbonAreas(grid = "X12-600",
-                           cotFiles = cot,
-                           grids = grids,
-                           crops =  crops, 
-                           year = "2016")
+vals <- c(paste0("X12-", c("100","200", "300", "400", "500", "600", "700")))
 
-
-
-
+tic()
+results <- purrr::map(.x = vals,.f = calculateCarbonAreas, 
+                      cotFiles = cot,
+                      grids = grids,
+                      crops =  crops)
+toc()
+#
