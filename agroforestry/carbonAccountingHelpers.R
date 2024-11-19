@@ -17,6 +17,47 @@ assignScore <- function(data){
 
 
 # reclass rasters  --------------------------------------------------------
+reclass1016 <- function(raster){
+  # 2010 only 
+  m <- rbind(c(0, 0),
+             c(1, 1),
+             c(3, 0),
+             c(4, 1),
+             c(5, 0),
+             c(6, 1),
+             c(8, 0),
+             c(9, 1))
+  r10 <- raster |> terra::classify(m, others=NA)
+  
+  # 2016 only 
+  m <- rbind(c(0, 0),
+             c(1, 0),
+             c(3, 1),
+             c(4, 1),
+             c(5, 0),
+             c(6, 0),
+             c(8, 1),
+             c(9, 1))
+  r16 <- raster |> terra::classify(m,others=NA)
+  
+  # 2010 and 2016 
+  m <- rbind(c(0, 0),
+             c(1, 0),
+             c(3, 0),
+             c(4, 1),
+             c(5, 0),
+             c(6, 0),
+             c(8, 0),
+             c(9, 1))
+  r1016 <- raster |> terra::classify(m,others=NA)
+  return(list(
+    r10 = r10,
+    r16 = r16,
+    r1016 = r1016
+  ))
+}
+
+
 
 ## reclass to get a 2016 and 2020 value 
 reclassCOT <- function(raster){
