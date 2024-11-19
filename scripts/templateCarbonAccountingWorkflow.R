@@ -9,7 +9,7 @@
 
 
 # libraries 
-pacman::p_load(dplyr,sf, terra, tictoc, purrr)
+pacman::p_load(dplyr,sf, terra, tictoc, purrr, furrr, readr)
 
 # source functions 
 source("agroforestry/carbonAccountingHelpers.R")
@@ -171,27 +171,22 @@ change1016 <- function(grid, cotFiles, grids, crops, future = FALSE){
 }
 
 # run the 10-2016 measures 
-runGrids <- gridNames[21:28]
-tic()
-results1 <- purrr::map(.x = runGrids,
-                       .f = change1016,
-                       cotFiles = cot,
-                       grids = grids,
-                       crops = crops)
-toc()
+runGrids <- gridNames[10:length(gridNames)]
+###
+# seems to be an issues with 
+# [1] "Starting process for X12-336"
+
+
+
+# tic()
+# results1 <- purrr::map(.x = runGrids,
+#                        .f = change1016,
+#                        cotFiles = cot,
+#                        grids = grids,
+#                        crops = crops)
+# toc()
 # three sites 580.412 sec elapsed
 # 6 sites al
-# furrr approahc 
-library(furrr)
-library(readr)
-plan(multicore, workers = 8) # only seeing 6g used... 
-tic()
-results2 <- furrr::future_map(runGrids,
-                  .f = change1016,
-                  cotFiles = cot,
-                  grids = grids,
-                  crops = crops)
-toc()
 # 3 grids 626.298 sec elapsed multicore 
 # 7 grids 1702.728 sec elapsed multicore 
 # evaluate the multisession 
@@ -208,10 +203,7 @@ results2 <- furrr::future_map(runGrids,
 toc()
 # 7 grids multisession 329.803 sec elapsed
 
-tic()
-nothingness <- future_map(c(2, 2, 2), ~Sys.sleep(.x))
-toc()
-#> 2.212 sec elapsed
+
 
 
 
