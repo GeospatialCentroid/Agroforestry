@@ -170,26 +170,13 @@ change1016 <- function(grid, cotFiles, grids, crops, future = FALSE){
 
 }
 
-# run the 10-2016 measures 
+
+# run the 10-2016 measures  ---------------------------------------------
 runGrids <- gridNames[10:length(gridNames)]
 ###
 # seems to be an issues with 
 # [1] "Starting process for X12-336"
 
-
-
-# tic()
-# results1 <- purrr::map(.x = runGrids,
-#                        .f = change1016,
-#                        cotFiles = cot,
-#                        grids = grids,
-#                        crops = crops)
-# toc()
-# three sites 580.412 sec elapsed
-# 6 sites al
-# 3 grids 626.298 sec elapsed multicore 
-# 7 grids 1702.728 sec elapsed multicore 
-# evaluate the multisession 
 plan(multisession, workers = 8)
 # need to wrap the terra object 
 gridsWrap <- terra::wrap(grids)
@@ -204,6 +191,49 @@ toc()
 # 7 grids multisession 329.803 sec elapsed
 
 
+
+# Assing the carbon measures  ---------------------------------------------
+# 
+# Here are the carbon multiplication factors:
+# Annual growth (C gain) of existing (mature) stands: 1.8463 tC/ha
+# Annual growth of new (young) stands: 3.4963 tC/ha
+# C loss of mature stands*: 81.8757 tC/ha
+# C loss of young stands* (absent in 2020, but present in 2016 and not present in 2010): 13.9852 tC/ha
+# The losses need to be annualized, so basically divided by 6 in 2010-2016 period or by 4 in the 2016-2020 period. 
+# This would the loss of young stands in 2020 to the same annual accumulation rate of 3.49 tC/ha.
+
+
+## applying the measures 
+# 1. all stands that were present in 2010 and 2016 get a growth rate of 1.8462 
+# 2. stands not present in 2010 but present in 2016 get a growth rate of 3.4963
+# 3. stands present in 2010 but not present in 2016 get a loss of 81.8757 
+# 4. new stands in 2016, and loss in 2020 get low 13.9852 
+### need to understand how the annual numbers are provided. 
+
+
+changes1016 <- list.files(path = "data/products/areaMeasures",
+                          pattern = "_1016.csv",
+                          recursive = TRUE,
+                          full.names = TRUE)
+
+path <- changes1016[10]
+
+applyMeasures <- function(path){
+  # read in data 
+  d1 <- read_csv(path) |>
+    dplyr::mutate(
+      existingMature = stable * 1.8463,
+      newGrowth = gains * 3.4963,
+      matureLoss = loss * 81.8757
+    )
+  # grab name 
+  name <- tools::file_path_sans_ext(basename(path))
+  # export 
+  write_csv(x = d1, file = paste0("data/products/carbonMeasures/",name,".csv"))
+}
+
+# render the measures 
+purrr::map(.x = changes1016, applyMeasures)
 
 
 
