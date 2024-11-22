@@ -58,13 +58,9 @@ crops <- crops
 ## right around Scribner
 ## make the map of this 
 ## Potentally show the data aggregated mlra 
-s1 <- cot[grepl(pattern = "X12-426", x = cot)] |> rast()
-terra::plot(s1$ChangeOverTime)
-
-library(tmap)
-tmap_mode("view")
-qtm(s1)
+# s1 <- cot[grepl(pattern = "X12-426", x = cot)] |> rast()
 # 2010-16 change measure for AGU  ---------------------------------------
+
 
 change1016 <- function(grid, cotFiles, grids, crops, future = FALSE){
   # grid :: character grid id 
@@ -181,16 +177,22 @@ change1016 <- function(grid, cotFiles, grids, crops, future = FALSE){
 
 
 # run the 10-2016 measures  ---------------------------------------------
-runGrids <- gridNames[416:length(gridNames)]
+runGrids <- gridNames # [416:length(gridNames)]
 ###
 # seems to be an issues with 
-# [1] "Starting process for X12-336"  , maybe "X12-358" ,"X12-361","X12-413" 414
+# X12-1"   "X12-2"   "X12-3"   "X12-4"   "X12-5"   "X12-6"   "X12-7"   "X12-8"   "X12-9"   "X12-336" "X12-413" "X12-414"
+# "X12-415" "X12-592"
+knowErrors <- c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6","X12-7","X12-8","X12-9","X12-63",
+                "X12-336", "X12-413", "X12-414","X12-415", "X12-592","X12-615")
+subGrids <- runGrids[!c(runGrids %in% knowErrors)]
+# 600 on 
+subGrid600 <- subGrids[585:length(subGrids)]
 
 plan(multisession, workers = 8)
 # need to wrap the terra object 
 gridsWrap <- terra::wrap(grids)
 tic()
-results2 <- furrr::future_map(runGrids,
+results2 <- furrr::future_map(subGrid600,
                               .f = change1016,
                               cotFiles = cot,
                               grids = gridsWrap,
@@ -199,20 +201,18 @@ results2 <- furrr::future_map(runGrids,
 
 #sequential for troubleshooting 
 errors <- c()
-for(i in seq_along(runGrids)){
+for(i in seq_along(subGrid600)){
   d1 <- FALSE 
   d1 <- try(change1016(
-    grid = runGrids[i],
+    grid = subGrid600[i],
     cotFiles = cotFiles,
     grids = grids,
     crops = crops,
     future = FALSE
   ))
-  if(class(d1)[1] == "logical"){
+  if(class(d1)[1] == "try-error"){
     errors <- append(errors, values = runGrids[i])
   }
-    
-  
 }
 purrr::map(runGrids,
            .f = change1016,
@@ -268,7 +268,7 @@ applyMeasures <- function(path){
 }
 
 # render the measures 
-purrr::map(.x = path, applyMeasures)
+purrr::map(.x = changes1016, applyMeasures)
 
 ### so could be able to run all 
 
