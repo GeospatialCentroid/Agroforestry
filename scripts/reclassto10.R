@@ -55,7 +55,8 @@ aggregateAndExport <- function(id, paths){
 }
 
 # itorate through the process 
-for(i in ids[10:773]){
+### errors 336 "X12-413""X12-414""X12-415", "X12-592"
+for(i in ids[638:773]){
   id <- i 
   f2 <- files[grepl(pattern = paste0(id,"_"), x = files)] 
   aggregateAndExport(id = id, paths = f2)
