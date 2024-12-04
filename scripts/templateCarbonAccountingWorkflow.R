@@ -48,7 +48,7 @@ testGrid <- gridNames[378]
 
 
 # testing 
-grid <- testGrid
+grid <- "X12-615"
 cotFiles <- cot
 grids <- grids
 crops <- crops
@@ -184,6 +184,12 @@ runGrids <- gridNames # [416:length(gridNames)]
 # "X12-415" "X12-592"
 knowErrors <- c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6","X12-7","X12-8","X12-9","X12-63",
                 "X12-336", "X12-413", "X12-414","X12-415", "X12-592","X12-615")
+# no models from GEE 
+gee <-  c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6","X12-7","X12-8","X12-9")
+# no models from mask process 
+maskMissing <- c("X12-63")
+missingImage<-c("X12-336", "X12-413", "X12-414","X12-415", "X12-592")
+
 subGrids <- runGrids[!c(runGrids %in% knowErrors)]
 # 600 on 
 subGrid600 <- subGrids[585:length(subGrids)]

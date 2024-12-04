@@ -109,6 +109,7 @@ files <- list.files(path = "data/products",
 
 grids <- paste0("X12-", 1:773)
 
+
 furrApply <- function(grid,files){
   exportfile <- paste0("data/products/changeOverTime/",grid,"_changeOverTime.tif")
   

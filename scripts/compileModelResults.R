@@ -136,12 +136,12 @@ processToGrids <- function(year, modelGrids){
 # read in mask layers
 
 # testing 692
-year <- "2020"
+year <- "2010"
 nlcdMasks <- list.files("data/products/nlcd",pattern = ".gpkg", full.names = TRUE, recursive = TRUE)
 # tccs <- nlcdMasks[grepl(pattern = "tcc", nlcdMasks)]
 forests <- nlcdMasks[grepl(pattern = "forest", nlcdMasks)]
 # urban areas 
-urbanFiles <- list.files("data/raw/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
+urbanFiles <- list.files("data/products/censusData/", pattern = "*\\.shp", full.names = TRUE, recursive = TRUE )
 urbanFiles2 <- urbanFiles[stringr::str_ends(string = urbanFiles, pattern = ".shp")]
 # riparian zones 
 # riparian <- terra::vect("data/raw/test.shp")
@@ -178,8 +178,12 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   
   # select all unique grids 
   ids <- grids$Unique_ID
+  # troubleshooting
+  ids <- c("X12-63","X12-336", "X12-413", "X12-414","X12-415", "X12-592")
+  
+  
   # itorate over grids to produce outputs 
-  for(i in ids[1:10]){
+  for(i in ids){
     allImages <- models[grepl(paste0("/",i,"_"), models)]
     gridName <- i 
     unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
@@ -255,7 +259,7 @@ generateFinalGridImages(year = "2020",
                           urbanFiles2 = urbanFiles2)
 
 # applied the riparian area mask 
-year = "2020"
+year = "2010"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 
 applyRiparianMask <- function(year,riparianData){
@@ -298,5 +302,5 @@ applyRiparianMask <- function(year,riparianData){
 }
 
 # apply the mask 
-applyRiparianMask(year = "2020",
+applyRiparianMask(year = "2010",
                   riparianData = riparianData )
