@@ -179,7 +179,7 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   # select all unique grids 
   ids <- grids$Unique_ID
   # troubleshooting
-  ids <- c("X12-63","X12-336", "X12-413", "X12-414","X12-415", "X12-592")
+  # ids <- c("X12-63","X12-336", "X12-413", "X12-414","X12-415", "X12-592")
   
   
   # itorate over grids to produce outputs 

@@ -27,9 +27,10 @@ pullFullRiparianMask <- function(rasterStack){
   for(i in seq_along(names(rasterStack))){
     print(i)
     # select
-    r1 <- rasterStack[[i]]|>
-      subst(NA, 0)|>
-      subst(1, 0)
+    r1 <- rasterStack[[i]]
+    # this reclass made it so only areas where all three years were present were included #|>
+    #   subst(NA, 0)|>
+    #   subst(1, 0)
     # test for postion in the processing 
     if(i == 1){
       rMask <- r1
@@ -37,7 +38,7 @@ pullFullRiparianMask <- function(rasterStack){
       rMask <- rMask + r1
     }
     # reclassy the final object
-    rMask <- ifel(rMask < 2, NA , 1)
+    rMask <- ifel(rMask < 1, NA , 1)
   }
   names(rMask) <- "RiparianMask"
   return(rMask)
@@ -94,10 +95,10 @@ produceCombination <- function(rasterStack){
   return(r1)
 }
 # 
-# library(tictoc)
-# tic()
-# x12_115 <- produceCombination(rasterStack = rasters)
-# toc()
+library(tictoc)
+tic()
+x12_115 <- produceCombination(rasterStack = rasters)
+toc()
 # 248 seconds to render. 
 
 
@@ -113,7 +114,9 @@ grids <- paste0("X12-", 1:773)
 furrApply <- function(grid,files){
   exportfile <- paste0("data/products/changeOverTime/",grid,"_changeOverTime.tif")
   
-  if(!file.exists(exportfile)){
+  # forcing rewrite. 
+  !file.exists(exportfile)
+  if(TRUE){
     # set parameters
     files2 <- files[grepl(pattern = paste0(grid,"_"), x = files)]
     years <-  c("2010", "2016", "2020")
