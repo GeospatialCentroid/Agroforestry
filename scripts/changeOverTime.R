@@ -6,6 +6,15 @@
 
 pacman::p_load(dplyr, terra, purrr, furrr, stringr)
 
+files <- list.files(path = "data/products", 
+                    pattern = "_riparianClass.tif",
+                    full.names = TRUE,
+                    recursive = TRUE)
+
+grids <- paste0("X12-", 1:773)
+
+
+
 readAndName<- function(year, name, files){
   f1 <- files[grepl(pattern = year, 
                     x = files)]
@@ -14,39 +23,120 @@ readAndName<- function(year, name, files){
   return(r1)
 }
 
-
+# # 
 # rasters <- purrr::map2(.x = years, .y = names, .f = readAndName, files = files) |>
 #   terra::rast()
 
 # for processing 
 ## end up with 6 layers 3 riparian mask, 3 new value class 
 
-pullFullRiparianMask <- function(rasterStack){
+renderFullRiparianMask <- function(grid, files){
   
-  # loop over each layer 
-  for(i in seq_along(names(rasterStack))){
-    print(i)
-    # select
-    r1 <- rasterStack[[i]]
-    # this reclass made it so only areas where all three years were present were included #|>
-    #   subst(NA, 0)|>
-    #   subst(1, 0)
-    # test for postion in the processing 
-    if(i == 1){
-      rMask <- r1
-    }else{
-      rMask <- rMask + r1
+  exportPath <- paste0("data/products/riparian/allYears/riparianMask_",grid,".tif")
+  print(grid)
+  if(!file.exists(exportPath)){
+    # filter and read in images 
+    f1 <- files[grepl(pattern = paste0(grid,"_"), x = files)]
+    if(length(f1) > 0){
+      
+      # reclass function 1 
+      reclas <- function(raster){
+        ifel(raster == 2, 1 , 0)
+      }
+      # gather and reclass layers 
+      r1 <- lapply(X = f1, FUN = terra::rast) |>
+        purrr::map(.f = reclas)
+      # add them all together
+      r2 <- terra::app(x = terra::rast(r1), fun = sum, na.rm = TRUE)
+      # reclass and export
+      r3 <- terra::ifel(r2 >0, 1 , NA)
+      terra::writeRaster(x = r3, filename = exportPath)
     }
-    # reclassy the final object
-    rMask <- ifel(rMask < 1, NA , 1)
   }
-  names(rMask) <- "RiparianMask"
-  return(rMask)
+  gc()
 }
 
 
+
+
+# render riparian  --------------------------------------------------------
+print("generating Riparain Mask")
+tic()
+purrr::map(.x = grids[4], .f = renderFullRiparianMask, files = files)
+toc()
+
+future::availableCores()
+plan(multicore)
+tic()
+furrr::future_map(.x = grids, .f = renderFullRiparianMask, files = files)
+toc()
+
+
+# 12-2024 update, add riparian data back to models ------------------------
+## I had to regenerate the riparian layer so that is capture all areas predicted 
+## as trees for each individual model year. This is me appending them to the COT rasters 
+models <- list.files(path = "data/products/changeOverTime", 
+                     pattern = ".tif",
+                     full.names = TRUE)
+newRip <- list.files(path = "data/products/riparian/allYears", 
+                     pattern = ".tif",
+                     full.names = TRUE)
+grids <- paste0("X12-", 1:773)
+
+
+appendRiparian <- function(grid, models, newRip){
+  print(grid)
+  
+  newFile <- paste0("data/products/changeOverTime/",grid,"_changeOverTime_2.tif")
+  if(!file.exists(newFile)){
+    # define some placeholder variables 
+    model <- NA
+    riparian <- NA
+    # test for model presence 
+    f1 <- models[grepl(pattern = paste0(grid,"_"), x = models)]
+    if(length(f1) != 0){
+      # read in data 
+      model <- terra::rast(f1)
+    }
+    # test for riparian layer 
+    f2 <- newRip[grepl(pattern = paste0(grid,".tif"), x = newRip)]
+    if(length(f2) != 0){
+      # read in data 
+      riparian <- terra::rast(f2)
+    }
+    # if both are present combine 
+    if(class(model) == "SpatRaster" & class(riparian) == "SpatRaster"){
+      # assign value
+      model$RiparianMask <- riparian
+      # export
+      terra::writeRaster(x = model,
+                         filename = newFile,
+                         overwrite= TRUE )
+    }else{
+      print("no output created")
+    }
+  }else{
+    print("File exists")
+  }
+}
+
+for(i in grids){
+  appendRiparian(grid = i, models = models, newRip = newRip)
+}
+
+# trying furrr implimentation 
+plan(multicore, workers = 4)
+
+### some memory allocation issues with this at the moment. 
+tic()
+furrr::future_map(.x = grids[11:15], .f = appendRiparian, models = models,
+                  newRip = newRip)
+toc()
+
+### need to change this to reading in dataset then exporting 
+
+
 changeOvertimeReclass <- function(rasterStack){
-  rasterStack
   #2010 
   ## 0-1 
   print("2010")
@@ -83,10 +173,6 @@ changeOvertimeReclass <- function(rasterStack){
 }
 
 produceCombination <- function(rasterStack){
-  print("generating Riparain Mask")
-  riparianMask <- NA
-  try(riparianMask <- pullFullRiparianMask(rasterStack))
-  
   print("generating Change over time layer")
   changeOverTime <- NA
   try(changeOverTime <-changeOvertimeReclass(rasterStack))
@@ -109,6 +195,7 @@ files <- list.files(path = "data/products",
                     recursive = TRUE)
 
 grids <- paste0("X12-", 1:773)
+
 
 
 furrApply <- function(grid,files){
@@ -142,13 +229,16 @@ furrApply <- function(grid,files){
 }
 
 
-plan(multicore, workers = 3)
+plan(multicore, workers = 2)
 
 # # sequential 
 # tic()
-# purrr::map(.x = grids[86:89],.f = furrApply, files = files)
+purrr::map(.x = grids,.f = furrApply, files = files)
 # toc()
 # 685.112 sec elapsed
+
+
+
 
 
 ### some memory allocation issues with this at the moment. 

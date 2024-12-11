@@ -261,46 +261,51 @@ generateFinalGridImages(year = "2020",
 # applied the riparian area mask 
 year = "2010"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
-
-applyRiparianMask <- function(year,riparianData){
-  
-  # set the based path for images 
-  base <- paste0("data/products/models",year)
-  
-  # pull all masked images 
-  files <- list.files(
-    path = paste0(base, "/maskedImages"),
-    full.names = TRUE,
-    pattern = ".tif"
-  )
-  for(i in files){
-    print(i)
-    tic()
-    image <- terra::rast(i)
-    
-    fileName <- paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif")
-    if(!file.exists(fileName)){
-      image[image == 0] <- NA
-      # crop riparian layer 
-      r30 <- terra::crop(x = riparianData,
-                       y = image) |>
-      terra::as.polygons()|>
-      rasterize(image, values = 1, background = 0) 
-    
-      # mask to the origin image
-      c2 <- r30 + image
-    
-      #export the image 
-      terra::writeRaster(x = c2, 
-                  filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
-                  overwrite = TRUE)
-    }else{
-      print("file already exists")
-    }
-    toc()
-  }
-}
+# 
+# applyRiparianMask <- function(year,riparianData){
+#   
+#   # set the based path for images 
+#   base <- paste0("data/products/models",year)
+#   
+#   # pull all masked images 
+#   files <- list.files(
+#     path = paste0(base, "/maskedImages"),
+#     full.names = TRUE,
+#     pattern = ".tif"
+#   )
+#   for(i in files){
+#     print(i)
+#     tic()
+#     image <- terra::rast(i)
+#     
+#     fileName <- paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif")
+#     if(!file.exists(fileName)){
+#       image[image == 0] <- NA
+#       # crop riparian layer 
+#       r30 <- terra::crop(x = riparianData,
+#                        y = image) |>
+#       terra::as.polygons()|>
+#       rasterize(image, values = 1, background = 0) 
+#     
+#       # mask to the origin image
+#       c2 <- r30 + image
+#     
+#       #export the image 
+#       terra::writeRaster(x = c2, 
+#                   filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
+#                   overwrite = TRUE)
+#     }else{
+#       print("file already exists")
+#     }
+#     toc()
+#   }
+# }
 
 # apply the mask 
 applyRiparianMask(year = "2010",
                   riparianData = riparianData )
+
+
+
+
+
