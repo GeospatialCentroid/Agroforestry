@@ -14,7 +14,7 @@ cat_and_export <- function(imagePath){
   r1 <- rast(imagePath)
   # # reclass to catagorical
   levels(r1) <- data.frame(id=0:1, ChangeOverTime=c("0", "1"))
-  export
+  # export 
   writeRaster(x = r1, filename = paste0("data/products/testingSubGridFactors/factor_", name))
 }
 

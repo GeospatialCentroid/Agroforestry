@@ -2,11 +2,6 @@ pacman::p_load(sf,dplyr,terra,tmap)
 tmap_mode("view")
 
 
-
-
-
-
-
 # this works... just can't get naip imagery with this method  -------------
 ## change over time files 
 files <-  list.files(path = "data/products/changeOverTime",
@@ -22,6 +17,10 @@ g2020 <- st_read("data/products/modelGrids_2020.gpkg")
 # 2 mile gird 
 mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
   dplyr::select(gridID = FID_two_grid)
+
+qtm(mile2[mile2$gridID == "25518",])
+qtm(g2010[g2010$Unique_ID == "X12-636",])
+
 
 # randomly select new grids  ----------------------------------------------
 resample2020 <- c("X12-183","X12-32","X12-388","X12-519","X12-642","X12-677","X12-83","X12-99")
@@ -75,11 +74,14 @@ produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year)
     fileName <- paste0("data/products/subGridAreaEvaluations/subGrid_", uniqueGrid, "_",subGridID,"_",year,".tif")
     if(!file.exists(fileName)){
       r2 <- "test"
-      try(r2 <- getYearMap(raster = r1, year = year) |>
-        terra::crop(subGrid))
+      try(
+        r2 <- getYearMap(raster = r1, year = year) |>
+        terra::crop(subGrid)
+        )
       if(class(r2)!="character"){
         terra::writeRaster(x = r2, 
-                           filename = fileName)
+                           filename = fileName,
+                           overwrite = TRUE)
       }
     }
   }else{
@@ -94,18 +96,19 @@ produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year)
               terra::crop(subGrid))
         if(class(r2)!="character"){
           terra::writeRaster(x = r2, 
-                             filename = fileName)
+                             filename = fileName,
+                              overwrite = TRUE)
         }
       }
     }
   }
 }
 ## single call 
-produceSubGrids(data = "16121", 
+produceSubGrids(data = "26457", 
                 subGridLayer = mile2,
                 modelGrid = g2016,
                 changeOverTime = files,
-                year = "2016")
+                year = "2010")
 
 getYearMap <- function(raster, year){
   if(year == 2010){
@@ -118,7 +121,7 @@ getYearMap <- function(raster, year){
                c(6, 0),
                c(8, 0),
                c(9, 0))
-    r2 <- r1$ChangeOverTime |> 
+    r2 <- raster$ChangeOverTime |> 
       terra::classify(m,others=NA)
   }
   if(year == 2016){
