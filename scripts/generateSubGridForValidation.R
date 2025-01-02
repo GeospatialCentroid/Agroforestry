@@ -59,6 +59,50 @@ sub2016 <- purrr::map(.x = resample2016, .f = randomlySelectSubgrid,
 sub2010 <- purrr::map(.x = resample2010, .f = randomlySelectSubgrid,  
                       gridSpatailLayer = g2010, subGridLayer = mile2)|> unlist()
 
+getYearMap <- function(raster, year){
+  if(year == 2010){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 1),
+               c(3, 0),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- raster$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  if(year == 2016){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 1),
+               c(4, 0),
+               c(5, 0),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  if(year == 2020){
+    # define the replacement values 
+    m <- rbind(c(0, 0),
+               c(1, 0),
+               c(3, 0),
+               c(4, 0),
+               c(5, 1),
+               c(6, 0),
+               c(8, 0),
+               c(9, 0))
+    r2 <- r1$ChangeOverTime |> 
+      terra::classify(m,others=NA)
+  }
+  return(r2)
+}
+
+
 produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year){
   # get the sub grid name
   subGridID <- data
@@ -104,54 +148,13 @@ produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year)
   }
 }
 ## single call 
-produceSubGrids(data = "26457", 
+produceSubGrids(data = "20332", 
                 subGridLayer = mile2,
-                modelGrid = g2016,
+                modelGrid = g2020,
                 changeOverTime = files,
-                year = "2010")
+                year = "2020")
 
-getYearMap <- function(raster, year){
-  if(year == 2010){
-    # define the replacement values 
-    m <- rbind(c(0, 0),
-               c(1, 1),
-               c(3, 0),
-               c(4, 0),
-               c(5, 0),
-               c(6, 0),
-               c(8, 0),
-               c(9, 0))
-    r2 <- raster$ChangeOverTime |> 
-      terra::classify(m,others=NA)
-  }
-  if(year == 2016){
-    # define the replacement values 
-    m <- rbind(c(0, 0),
-               c(1, 0),
-               c(3, 1),
-               c(4, 0),
-               c(5, 0),
-               c(6, 0),
-               c(8, 0),
-               c(9, 0))
-    r2 <- r1$ChangeOverTime |> 
-      terra::classify(m,others=NA)
-  }
-  if(year == 2020){
-    # define the replacement values 
-    m <- rbind(c(0, 0),
-               c(1, 0),
-               c(3, 0),
-               c(4, 0),
-               c(5, 1),
-               c(6, 0),
-               c(8, 0),
-               c(9, 0))
-    r2 <- r1$ChangeOverTime |> 
-      terra::classify(m,others=NA)
-  }
-  return(r2)
-}
+
 # 2020
 purrr::map(.x = sub2020, .f = produceSubGrids, 
            subGridLayer = mile2,
