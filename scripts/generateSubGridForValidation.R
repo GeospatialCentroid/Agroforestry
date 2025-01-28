@@ -15,7 +15,8 @@ g2010 <- st_read("data/products/modelGrids_2010.gpkg")
 g2016 <- st_read("data/products/modelGrids_2016.gpkg")
 g2020 <- st_read("data/products/modelGrids_2020.gpkg")
 # 2 mile gird 
-mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
+mile2 <- st_read("data/products/two_sq_grid.gpkg")
+# |>
   dplyr::select(gridID = FID_two_grid)
 
 qtm(mile2[mile2$gridID == "25518",])
@@ -148,11 +149,11 @@ produceSubGrids <- function(data, subGridLayer, modelGrid, changeOverTime, year)
   }
 }
 ## single call 
-produceSubGrids(data = "20332", 
+produceSubGrids(data = "13659", 
                 subGridLayer = mile2,
-                modelGrid = g2020,
+                modelGrid = g2010,
                 changeOverTime = files,
-                year = "2020")
+                year = "2010")
 
 
 # 2020

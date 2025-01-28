@@ -36,7 +36,7 @@ variableSelection <- function(gridID,dataPath,year){
   ### Considered altering the number of trees, 100 is somewhat low for the
   # number of predictors used. It was a time concern more then anything.
   # change for 30 arc second run 
-  vsurfThres <- VSURF_thres(x=predictorVar , y=as.factor(responseVar$presence))
+  vsurfThres <- VSURF_thres(x=predictorVar, y=as.factor(responseVar$presence))
   ###
   #correlation matrix
   ###
