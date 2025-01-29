@@ -43,7 +43,7 @@ for subdir, dirs, files in os.walk(rootdir):
 # testing 
 # allOptions = allOptions[3:5]
 
-allOptions = ["X12-633"]
+allOptions = ["X12-32"]
 
 for gridID in allOptions:
         # define initial sub grid 
@@ -73,6 +73,57 @@ for gridID in allOptions:
                 # convert the reference points to gee object 
         pointsEE = geemap.gdf_to_ee(pointsWithClasses)
         # geePrint(pointsEE)
+
+        # these are hard coded parameters come back to them if you start
+        # altering the number of input bands to the SNIC function
+        # selection layers to use in the pixel based and cluster based modeling process 
+        bandsToUse_Pixel = ['R_mean', 'G_mean', 'B_mean', 'N_mean', 'nd_mean', 'savg_g_mean', 'contrast_g_mean', 'entropy_g_mean',
+                        'savg_n_mean', 'contrast_n_mean', 'entropy_n_mean', 'R', 'G', 'B', 'N', 'savg_g', 'contrast_g', 'entropy_g',
+                        'savg_n', 'contrast_n', 'entropy_n', 'nd', 'nd_sd_neighborhood', 'nd_mean_neighborhood']
+        ## only bands that are based on mean area measures
+        bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'savg_g_mean', 'contrast_g_mean', 'entropy_g_mean', 'savg_n_mean',
+                        'contrast_n_mean', 'entropy_n_mean']
+
+
+
+        # define the max value of the individuals to normalize elemenst 
+        bandMaxes=[255, 255, 255,255,1] #  represents 'R', 'G','B', "N", "nd"
+
+        # set the scale of the input image
+        nativeScaleOfImage = 1 # this should be one for production, using larger number for performance in the testing steps 
+
+        ## these could all be set based on a maximum value returned 
+
+        # SNIC based parametes 
+        ## Defining the Seed Grid
+        # The superpixel seed location spacing, in pixels. Has a big effect on the total number of clusters generated
+        SNIC_SuperPixelSize= 30
+        SNIC_SuperPixelSize_range = np.arange(3, 100, 5)# this is the parameter with the most number of options   
+        # Either 'square' or 'hex'. hex has a more variable position set across the landscape
+        SNIC_SeedShape='square'
+        SNIC_SeedShape_range = ["hex","square"]
+
+        ## snic algorythem changes directly
+        # Larger values cause clusters to be more compact (square/hexagonal). Anything over 1 seems to cause this. 
+        # Setting this to 0 disables spatial distance weighting.
+        SNIC_Compactness=0.75
+        SNIC_Compactness_range = np.arange(0.0, 1.4, 0.2)
+        # Connectivity. Either 4 or 8. Did not seem to effect to much... 
+        SNIC_Connectivity=4
+        SNIC_Connectivity_range = [4,8]
+
+        # Tile neighborhood size (to avoid tile boundary artifacts). Defaults to 2 * size.
+        #  SNIC_NeighborhoodSize=2 * SNIC_SuperPixelSize -- dependent on SuperPixelSize so will not redefine in testing 
+
+        # RandomForest parameters
+        ### need to do a little reading to understand what is really worth testing here. 0
+        nTrees = 10
+        nTrees_range = np.arange(2, 20, 2)
+        setSeed = 5
+
+        # window size for average NDVI and glcm 
+        windowSize = 8
+
         # loop over the years to produce the unique datasets for each aoi 
         for year in years:
                 print(year)

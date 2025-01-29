@@ -14,6 +14,7 @@ try:
         ee.Initialize()
 except Exception as e:
         ee.Authenticate()
+        # might need >> ee.Authenticate(auth_mode = 'notebook') to force browser popup. Unsucessful with gcloud cmd based authentications. 
         ee.Initialize()
 
 # Set gridID and itorate over the years 
@@ -28,6 +29,7 @@ ranGrid = ["X12-642","X12-519","X12-633"]
 # 2020 models to rerun 
 models = []
 ranGrid = ["X12-594","X12-183","X12-300"]
+
 
 
 initGridID =   # "X12-642" #

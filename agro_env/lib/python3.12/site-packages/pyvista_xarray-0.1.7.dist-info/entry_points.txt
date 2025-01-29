@@ -1,0 +1,3 @@
+[xarray.backends]
+pyvista = pvxarray.io:PyVistaBackendEntrypoint
+
