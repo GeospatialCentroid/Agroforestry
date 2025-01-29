@@ -9,5 +9,6 @@
 .Rhistory
 *.pyc
 /qgis
+agro_env/
 
 
