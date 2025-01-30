@@ -20,19 +20,19 @@ except Exception as e:
 # Set gridID and itorate over the years 
 # define initial sub grid 
 
-#2016 models to rerun 
-models = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
-completed2016Grids = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
-# 2010 models to rerun 
-models = []
-ranGrid = ["X12-642","X12-519","X12-633"]
-# 2020 models to rerun 
-models = []
-ranGrid = ["X12-594","X12-183","X12-300"]
+# #2016 models to rerun 
+# models = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
+# completed2016Grids = ["X12-602","X12-99","X12-32","X12-91", "X12-115","X12-281","X12-318","X12-278"]
+# # 2010 models to rerun 
+# models = []
+# ranGrid = ["X12-642","X12-519","X12-633"]
+# # 2020 models to rerun 
+# models = []
+# ranGrid = ["X12-594","X12-183","X12-300"]
 
 
 
-initGridID =   # "X12-642" #
+initGridID =  "X12-32" 
 years = [2010,2016,2020]
 for i in years: 
         # define file location 
@@ -42,8 +42,7 @@ for i in years:
     # set aoi for the gee objects 
     aoiID = initGridID
     #Define bands to use -- setting manually 
-    bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n",
-                "entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
+    bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
     # select multiple grids level 
     gridSelect =  grid.loc[grid.Unique_ID.isin(grid36.Unique_ID)].dissolve()
     # convert to a gee object 
