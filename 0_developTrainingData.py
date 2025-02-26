@@ -2,6 +2,7 @@ import ee
 import geemap
 import geopandas as gpd
 import os
+import numpy as np
 from agroforestry.config import *  # moving away from defining variable from here so I can itorate over them within the script  
 from agroforestry.geeHelpers import *
 from agroforestry.naipProcessing import *
@@ -43,8 +44,9 @@ for subdir, dirs, files in os.walk(rootdir):
 # testing 
 # allOptions = allOptions[3:5]
 
-allOptions = ["X12-32"]
-
+allOptions = ["X12-519", "X12-602"]
+# testing 
+gridID = "X12-519"
 for gridID in allOptions:
         # define initial sub grid 
         # initGridID = "X12-183" # primary grid = X12-601 - this need to reflect where the training data is held 
@@ -64,12 +66,12 @@ for gridID in allOptions:
                 os.makedirs(rawData)    
         # data from GEE is place in name AOI folder in the raw data. . 
         rawSampleData = rawData + "/agroforestrySampling_"+gridID+".geojson" ## will need this to pull from the 
-        processSampleData = processedData + "/agroforestrySamplingData_" + str(year) + ".geojson"
-        if os.path.exists(processSampleData):
-                #  Prioritize the processed data 
-                pointsWithClasses = gpd.read_file(processSampleData)
-        else:
-                pointsWithClasses = gpd.read_file(rawSampleData)# [["presence","random","sampleStrat","geometry"]]      
+        # processSampleData
+        # if os.path.exists(processSampleData):
+        #         #  Prioritize the processed data 
+        #         pointsWithClasses = gpd.read_file(processSampleData)
+        # else:
+        pointsWithClasses = gpd.read_file(rawSampleData)# [["presence","random","sampleStrat","geometry"]]      
                 # convert the reference points to gee object 
         pointsEE = geemap.gdf_to_ee(pointsWithClasses)
         # geePrint(pointsEE)
@@ -127,6 +129,8 @@ for gridID in allOptions:
         # loop over the years to produce the unique datasets for each aoi 
         for year in years:
                 print(year)
+                processSampleData = processedData + "/agroforestrySamplingData_" + str(year) + ".geojson"
+
                 if not os.path.exists(processedData + "/agroforestrySamplingData_" + str(year) +".geojson"):
                         # generate NAIP layer 
                         naipEE = prepNAIP(aoi=pointsEE, year=year, windowSize= windowSize)

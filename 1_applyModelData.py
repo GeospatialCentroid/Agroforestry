@@ -42,7 +42,9 @@ for i in years:
     # set aoi for the gee objects 
     aoiID = initGridID
     #Define bands to use -- setting manually 
-    bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
+    bandsToUse = vsurfNoCor
+    ### this was used to generate the _b versions of the models 
+    # bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
     # select multiple grids level 
     gridSelect =  grid.loc[grid.Unique_ID.isin(grid36.Unique_ID)].dissolve()
     # convert to a gee object 
@@ -70,6 +72,9 @@ for i in years:
     # Generate model based on year define in config 
     # generate NAIP layer 
     naipEE = prepNAIP(aoi=aoi1, year=i,windowSize=windowSize)
+    ##
+
+
     # geePrint(naipEE.bandNames())
     # normal the naip data
     # normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)

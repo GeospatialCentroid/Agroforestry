@@ -27,7 +27,7 @@ gridIDs <- gridIDs[!gridIDs %in% errors]
 # define data path 
 dataPath <- "data"
 # testing specific site
-gridID <- "X12-727"
+gridID <- "X12-602"
 # for each grid generate variable selection when possible 
 for(gridID in gridIDs){
   print(gridID)
