@@ -47,13 +47,14 @@ mAOI = geemap.gdf_to_ee(mGrid)
 aAOI = geemap.gdf_to_ee(aGrid)
 
 # define training data
-trainingData = gpd.read_file(filename="data/processed/" + str(initGridID) +"/"+ "agroforestrySamplingData_"+str(year)+".geojson") # initGridID defined int he config file
+trainingData = gpd.read_file(filename="data/processed/" + str(modelGrid) +"/"+ "agroforestrySamplingData_"+str(year)+".geojson") # initGridID defined int he config file
 
-# divide the data into test train spilts 
+# divide the data into test train spilts
 trainingData = trainingData.sample(frac = 1)
 # get rows 
 total_rows = trainingData.shape[0]
 # get train size 
+test_train_ratio = 0.8
 train_size = int(total_rows*test_train_ratio)
 
 # Split data into test and train
@@ -64,6 +65,12 @@ training = geemap.gdf_to_ee(gdf=train)
 testing = geemap.gdf_to_ee(gdf=test)
 
 # train model
+nTrees = 10
+nTrees_range = np.arange(2, 20, 2)
+setSeed = 5
+
+# window size for average NDVI and glcm 
+windowSize = 8
 rfPixelTrim = trainRFModel(bands=bandsToUse,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
 ## run validation using the testing set 
 pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
@@ -71,7 +78,7 @@ pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= test
 
 # naip processing for model grid --- no normalization at this point 
 # grab naip for the year of interest, filter, mask, mosaic to a single image
-naip1 = geemap.get_annual_NAIP(year).filterBounds(aoi).mosaic() 
+naip1 = geemap.get_annual_NAIP(year).filterBounds(mAOI).mosaic() 
 # Generate NDVI 
 ndvi = naip1.normalizedDifference(["N","R"])
 # generate GLCM
@@ -90,7 +97,7 @@ naip = naip2.addBands(ndvi).addBands(ndvi_sd_neighborhood).addBands(ndvi_mean_ne
 #####
 # gather NAIP data required for apply model area 
 # grab naip for the year of interest, filter, mask, mosaic to a single image
-naip1a = geemap.get_annual_NAIP(year).filterBounds(aoi).mosaic() 
+naip1a = geemap.get_annual_NAIP(year).filterBounds(aAOI).mosaic() 
 
 #
 # integrate Gavins histogram matching work. Start byt 
