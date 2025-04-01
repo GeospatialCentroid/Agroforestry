@@ -117,7 +117,7 @@ naipa = naip1.addBands(ndvia).addBands(ndvi_sd_neighborhooda).addBands(ndvi_mean
 # apply the model 
 classifiedPixelsTrim = applyRFModel(imagery=naipa, bands=bandsToUse,classifier=rfPixelTrim).clip(aAOI).uint8()
 
-?    # export image to asset 
+# export image to asset 
 task = ee.batch.Export.image.toAsset(
         image = classifiedPixelsTrim,
         description = str(applyGrid) + "_histNorm_self",

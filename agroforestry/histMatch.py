@@ -64,6 +64,9 @@ def matchBand(sourceImage, referenceImage, bandName):
     """Matches the histogram of a single band."""
     sourceGeom = sourceImage.geometry().bounds()
     refGeom = referenceImage.geometry().bounds()
+    # two things 
+    ## 1. try reduce the bins slightly 
+    ## 2. get the range of values from the image metadata and use the small range that covers both.  
 
     sourceHist = sourceImage.reduceRegion(
         reducer=ee.Reducer.fixedHistogram(0, 255, 256),
@@ -99,6 +102,8 @@ def matchBand(sourceImage, referenceImage, bandName):
         return matchedIndex
 
     lookupTable = ee.List.sequence(0, 255).map(create_lookup)
+    ## potential error here 
+    ## set the value range to value range of the original imagery. 
     return sourceImage.select(bandName).remap(ee.List.sequence(0, 255), lookupTable).rename(bandName)
 
 def matchAllBands(sourceImage, referenceImage, bandNames):
@@ -129,6 +134,7 @@ def sampleImage(image, samplePoints, fileDesc):
 # Assuming getGridArea, getNAIP, rectanglify, sliceNAIP, matchAllBands, and sampleImage
 # are already defined in your Python script (as in the previous response).
 
+## mention to shahriar, consider setting sample to true 
 def matchSelf(gridArea, year, verbose=False, sample=False):
     """Processes grids by matching each grid's histogram to itself."""
     mosaics = []
