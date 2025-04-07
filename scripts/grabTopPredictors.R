@@ -44,11 +44,14 @@ bL <- length(badModels)
 gatherData <- function(id){
   # construct path 
   path <- paste0("data/processed/", id ,"/variableSelection2016.csv")
-  # read in data 
-  values <- readr::read_csv(path) 
-  names(values) <- c("rank", "varNames", "importance", "includedInFinal")
+  if(file.exists(path)){
+    # read in data 
+    values <- readr::read_csv(path) 
+    names(values) <- c("rank", "varNames", "importance", "includedInFinal")
     
-  return(values)
+    return(values)
+  }
+
 }
 
 
@@ -60,15 +63,16 @@ summarizeData <- function(data, modelClass){
     dplyr::mutate(modelClass = modelClass)
 }
 
+
 # summary the data
 fiveData <- purrr::map(fiveModels, gatherData) |>
   dplyr::bind_rows()|>
   # dplyr::filter(includedInFinal == FALSE)|>
-  summarizeData(modelClass = "4-5")
+  summarizeData(modelClass = "5")
 goodData <- purrr::map(goodModels, gatherData) |>
   dplyr::bind_rows()|>
   # dplyr::filter(includedInFinal == FALSE)|>
-  summarizeData(modelClass = "4-5")
+  summarizeData(modelClass = "4")
 
 okData <- purrr::map(okModels, gatherData) |>
   dplyr::bind_rows()|>
@@ -79,11 +83,6 @@ badData <- purrr::map(badModels, gatherData) |>
   dplyr::bind_rows()|>
   dplyr::filter(includedInFinal == TRUE)|>
   summarizeData(modelClass = "1-2")
-oneData <- purrr::map(oneModels, gatherData) |>
-  dplyr::bind_rows()|>
-  dplyr::filter(includedInFinal == TRUE)|>
-  summarizeData(modelClass = "1-2")
-
 
 allEvals <- dplyr::bind_rows(goodData, okData, badData)
 

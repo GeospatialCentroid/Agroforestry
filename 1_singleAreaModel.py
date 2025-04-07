@@ -17,9 +17,6 @@ from agroforestry.randomForest import *
 from agroforestry.exportFunctions import *
 from agroforestry.histMatch import *
 
-# ee.Authenticate()        
-
-
 # try:
 #         ee.Initialize(project='agroforestry2023')
 # except Exception as e:
@@ -33,13 +30,14 @@ Grids = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 modelGrid =  "X12-519" 
 
 # define gird to apply the mode 
-applyGrid = "X12-608"
+applyGrid = "X12-698"
 
 # define year 
 year = 2010
 
 # define standard variable set 
-bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
+bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n",
+"entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
 
 # define file location 
 processedData = 'data/processed/'+modelGrid
@@ -85,8 +83,32 @@ pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= test
 # naip processing for model grid --- no normalization at this point so we can call from the existing function 
 # grab naip for the year of interest, filter, mask, mosaic to a single image
 naipTrain = prepNAIP(aoi=mAOI,windowSize=windowSize, year=year)
+
 geePrint(naipTrain)
 #####
+
+
+ndvia = naipTrain.normalizedDifference(["N","R"])
+
+# generate GLCM
+glcm_ga = naipTrain.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
+glcm_na = naipTrain.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
+# add to naip 
+naip2a = naipTrain.addBands(glcm_ga).addBands(glcm_na)
+
+# average and standard deviation NDVI
+ndvi_sd_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize)).rename(["nd_sd_neighborhood"])
+ndvi_mean_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize)).rename(["nd_mean_neighborhood"])
+
+# Bind ndvi after the glcm processall the bands together 
+naipa = naipTrain.addBands(ndvia).addBands(ndvi_sd_neighborhooda).addBands(ndvi_mean_neighborhooda)
+
+
+
+
+
+
+
 
 # getNAIP(year=year, gridArea=mAOI)
 
@@ -95,6 +117,7 @@ geePrint(naipTrain)
 # integrate Gavins histogram matching work. Start byt 
 naip1 = matchSelf(gridArea= aAOI, 
                   year = year)
+
 geePrint(naip1)
 
 
@@ -102,7 +125,7 @@ geePrint(naip1)
 ndvia = naip1.normalizedDifference(["N","R"])
 
 # generate GLCM
-glcm_ga = naip1.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
+glcm_ga = naipTrain.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
 glcm_na = naip1.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
 # add to naip 
 naip2a = naip1.addBands(glcm_ga).addBands(glcm_na)

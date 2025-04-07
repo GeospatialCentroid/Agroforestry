@@ -32,7 +32,7 @@ except Exception as e:
 
 
 
-initGridID =  "X12-32" 
+initGridID =  "X12-635" 
 years = [2010,2016,2020]
 for i in years: 
         # define file location 
@@ -42,9 +42,9 @@ for i in years:
     # set aoi for the gee objects 
     aoiID = initGridID
     #Define bands to use -- setting manually 
-    bandsToUse = vsurfNoCor
+#     bandsToUse = vsurfNoCor
     ### this was used to generate the _b versions of the models 
-    # bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
+    bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
     # select multiple grids level 
     gridSelect =  grid.loc[grid.Unique_ID.isin(grid36.Unique_ID)].dissolve()
     # convert to a gee object 
@@ -88,7 +88,7 @@ for i in years:
                         # nativeScaleOfImage = nativeScaleOfImage, 
                         bandsToUse_Cluster = bandsToUse_Cluster).select(bandsToUse)
     # apply the model and clip to aoi and reclass to unsigned 8bit image 
-    classifiedPixelsTrim = applyRFModel(imagery=snicData, bands=bandsToUse,classifier=rfPixelTrim).clip(aoi1).uint8()
+    classifiedPixelsTrim = applyRFModel(imagery=snicData, bands=bandsToUse, classifier=rfPixelTrim).clip(aoi1).uint8()
     demoImage = classifiedPixelsTrim #.clip(exportAOI)
     print("projects/agroforestry2023/assets/"+ str(initGridID) + "_" + str(i) + "_36grid")
     # export image to asset 

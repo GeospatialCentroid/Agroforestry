@@ -1,14 +1,15 @@
-# Assuming 'Grids' is a FeatureCollection in your Earth Engine assets
-# Grids = ee.FeatureCollection('YOUR_GRIDS_FEATURE_COLLECTION_PATH')  # Replace with your actual path
-
-# changing so that you can pass in the EE grid objects 
-import geemap
 import ee
+import geemap
+
+Grids = ee.FeatureCollection("projects/agroforestry2023/assets/twelve_mi_shp")
+def getGridArea(gridID):
+    Grid = ee.Feature(Grids.filter(ee.Filter.eq('Unique_ID', gridID)).first())
+    return Grid
 
 def getNAIP(gridArea, year):
     # """Input: A feature object. Output: An ee.Image (NAIP imagery mosaic cropped to the bounds of the input feature)."""
     region = gridArea.geometry()
-    naip = geemap.get_annual_NAIP(year).filterBounds(gridArea).mosaic().clip(region).select(['R', 'G', 'B', 'N'])
+    naip = geemap.get_annual_NAIP(year).filterBounds(region).mosaic().clip(region).select(['R', 'G', 'B', 'N'])
     return naip
 
 
@@ -65,9 +66,6 @@ def matchBand(sourceImage, referenceImage, bandName):
     """Matches the histogram of a single band."""
     sourceGeom = sourceImage.geometry().bounds()
     refGeom = referenceImage.geometry().bounds()
-    # two things 
-    ## 1. try reduce the bins slightly 
-    ## 2. get the range of values from the image metadata and use the small range that covers both.  
 
     sourceHist = sourceImage.reduceRegion(
         reducer=ee.Reducer.fixedHistogram(0, 255, 256),
@@ -103,9 +101,7 @@ def matchBand(sourceImage, referenceImage, bandName):
         return matchedIndex
 
     lookupTable = ee.List.sequence(0, 255).map(create_lookup)
-    ## potential error here 
-    ## set the value range to value range of the original imagery. 
-    return sourceImage.select(bandName).remap(ee.List.sequence(0, 255), lookupTable).rename(bandName)
+    return sourceImage.select(bandName).remap(ee.List.sequence(0, 255), lookupTable).rename(bandName).toUint8()
 
 def matchAllBands(sourceImage, referenceImage, bandNames):
     """Matches histograms for all specified bands."""
@@ -127,15 +123,6 @@ def sampleImage(image, samplePoints, fileDesc):
     task.start()
     print(f'Export task {fileDesc} started.')
 
-
-# import ee
-
-# ee.Initialize()
-
-# Assuming getGridArea, getNAIP, rectanglify, sliceNAIP, matchAllBands, and sampleImage
-# are already defined in your Python script (as in the previous response).
-
-## mention to shahriar, consider setting sample to true 
 def matchSelf(gridArea, year, verbose=False, sample=False):
     """Processes grids by matching each grid's histogram to itself."""
     mosaics = []
@@ -164,7 +151,6 @@ def matchSelf(gridArea, year, verbose=False, sample=False):
         print(f'Map.addLayer(gridSamplePoints, {{color: "green"}}, "{id} Grid Sample Points")') #replace with desired python mapping library
         print(gridSamplePoints, f"{id} Grid Sample Points")
     origSlicesList = slicesCollection.toList(slicesCollection.size())
-
     numSlices = slicesCollection.size().getInfo()
     sliceSamples = []
     for i in range(numSlices):
@@ -188,10 +174,17 @@ def matchSelf(gridArea, year, verbose=False, sample=False):
     if sample:
         sampleImage(correctedMosaic, gridSamplePoints, f"{id}HistogramMatchSampling")
     mosaics.append(correctedMosaic)
-    unionGeom = ee.FeatureCollection(gridFeatures).geometry()
+    ########################################
+    # The below line does not work in GEE python and throws an error saying:
+    # unionGeom = ee.FeatureCollection(gridFeatures).geometry()
+    # Unable to use a collection in an algorithm that requires a feature or image. This may happen when trying to use
+    # a collection of collections where a collection of features is expected; use flatten, or map a function to convert
+    # inner collections to features. Use clipToCollection (instead of clip) to clip an image to a collection.
+    # Added flatten() and worked.
+    ########################################
+    unionGeom = ee.FeatureCollection(gridFeatures).flatten().geometry()
     mosaicImage = ee.ImageCollection(mosaics).mosaic().clip(unionGeom)
     return mosaicImage
-
 
 
 def matchGrid(gridIDs, referenceImage, year, verbose=False, sample=False):
@@ -260,7 +253,14 @@ def matchGrid(gridIDs, referenceImage, year, verbose=False, sample=False):
             sampleImage(correctedMosaic, gridSamplePoints, f"{id}HistogramMatchSampling")
 
         mosaics.append(correctedMosaic)
-
+    ########################################
+    # The below line does not work in GEE python and throws an error saying:
+    # unionGeom = ee.FeatureCollection(gridFeatures).geometry()
+    # Unable to use a collection in an algorithm that requires a feature or image. This may happen when trying to use
+    # a collection of collections where a collection of features is expected; use flatten, or map a function to convert
+    # inner collections to features. Use clipToCollection (instead of clip) to clip an image to a collection.
+    # Added flatten() and worked.
+    ########################################
     unionGeom = ee.FeatureCollection(gridFeatures).geometry()
     mosaicImage = ee.ImageCollection(mosaics).mosaic().clip(unionGeom)
-    return mosaicImages
+    return mosaicImage
