@@ -5,13 +5,13 @@
 
 pacman::p_load(googledrive, terra, dplyr)
 # establish connection
-drive_auth()
+# drive_auth()
 
 # this is the top level folder 
 folder_id <- "https://drive.google.com/drive/u/0/folders/1QP6xpwwQSP1paTnsxjdWThy1qFqfuXvg" # url to the folder
-drive_folder <- drive_get(id = folder_id, )
+drive_folder <- drive_get(id = folder_id)
 
-folder_contents <- drive_ls(drive_folder)
+folder_contents <- drive_ls(drive_folder) # just the high level folder handing the recursive elements in the loop 
 
 # split into specific features 
 for(i in 1:nrow(folder_contents)){

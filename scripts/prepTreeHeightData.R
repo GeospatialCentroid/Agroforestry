@@ -1,7 +1,8 @@
 pacman::p_load(terra)
 
 # remove the water and ice from forest features 
-r1 <- terra::rast("data/processed/canopyHeight/Forest_height_2019_neb.tif")
+r1 <- terra::rast("data/processed/canopyHeight/Forest_height_2019_neb_treesOnly.tif")
+
 # reclass 
 # You can also use a data frame for the reclassification rules
 reclass_df_range <- data.frame(
@@ -28,3 +29,8 @@ r3_resampled <- resample(r3, d2, method="bilinear")
 d3 <- d2 * r3_resampled
 # export 
 terra::writeRaster(x = d3, filename = "data/processed/canopyHeight/X12-356_canopyheight2016.tif")
+
+# 
+trees <- terra::rast("data/processed/canopyHeight/X12-356_canopyheight2016.tif")
+
+
