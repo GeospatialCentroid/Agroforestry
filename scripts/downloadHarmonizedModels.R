@@ -64,9 +64,14 @@ gridID5 <- lapply(basenames, function(feature) {
   }
 }) |> unlist() |> unique()
 
+# second method for selection locations 
+vals <- unique(basenames |> unlist())
+vals <- vals[!vals %in% c("b","using", "ref", "combined", "map", "2020.tif", "2016.tif", "2010.tif",
+                          "harmonized", "self")]
+
 # combine and select unique combinations 
 l1 <- c(gridID4, gridID5)|> unique()
 l1 <- l1[!l1 %in% c("b","using")]
 
-df <- data.frame(gridsToRework = l1)
+df <- data.frame(gridsToRework = vals)
 write.csv(df, file = "data/processed/harmonizedImages/gridsToRework.csv" )

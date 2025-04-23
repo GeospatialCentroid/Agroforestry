@@ -7,7 +7,9 @@ import geemap
 import geopandas as gpd
 import pandas as pd
 import numpy as np
+import random
 
+# ee.Authenticate(auth_mode = 'notebook')
 ee.Initialize(project='agroforestry2023')
 # from agroforestry.config import * 
 from agroforestry.geeHelpers import *
@@ -22,202 +24,176 @@ from agroforestry.histMatch import *
 # except Exception as e:
 #         ee.Authenticate(auth_mode='notebook')        
 #         ee.Initialize()
+# SNIC based parametes 
+## Defining the Seed Grid
+# The superpixel seed location spacing, in pixels. Has a big effect on the total number of clusters generated
+SNIC_SuperPixelSize= 30
+SNIC_SuperPixelSize_range = np.arange(3, 100, 5)# this is the parameter with the most number of options   
+# Either 'square' or 'hex'. hex has a more variable position set across the landscape
+SNIC_SeedShape='square'
+SNIC_SeedShape_range = ["hex","square"]
+
+## snic algorythem changes directly
+# Larger values cause clusters to be more compact (square/hexagonal). Anything over 1 seems to cause this. 
+# Setting this to 0 disables spatial distance weighting.
+SNIC_Compactness=0.75
+SNIC_Compactness_range = np.arange(0.0, 1.4, 0.2)
+# Connectivity. Either 4 or 8. Did not seem to effect to much... 
+SNIC_Connectivity=4
+SNIC_Connectivity_range = [4,8]
+
+
 
 # read in grid object 
 Grids = gpd.read_file("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 
-# define model grid 
-modelGrid =  "X12-519" 
+# # 2010 models to rerun 
+models10 = ["X12-83", "X12-83", "X12-83", "X12-83", "X12-83", "X12-83", "X12-83", "X12-150",
+ "X12-594", "X12-594", "X12-594", "X12-594", "X12-594", "X12-594",  "X12-615",
+ "X12-594"]
+ranGrid10 = [ "X12-1","X12-2","X12-3","X12-4","X12-5","X12-6", 
+"X12-7","X12-336", "X12-414", "X12-415", "X12-592", "X12-637",
+"X12-682","X12-725","X12-740","X12-766"]
+# # 2016 models to rerun 
+models16 = ["X12-150", "X12-594", "X12-594", "X12-594","X12-594",
+ "X12-594","X12-594", "X12-615","X12-615"  ]
+ranGrid16 = ["X12-336","X12-414","X12-415","X12-592","X12-637",
+"X12-682","X12-725", "X12-740", "X12-766"]
+# # 2020 models to rerun 
+models20 = ["X12-150", "X12-615"]
+ranGrid20 = ["X12-336","X12-740"]
 
-# define gird to apply the mode 
-applyGrid = "X12-698"
 
-# define year 
-year = 2010
 
 # define standard variable set 
-bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n",
+bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", 
+"entropy_g_mean","nd_mean_neighborhood","contrast_n",
 "entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
 
-# define file location 
-processedData = 'data/processed/'+modelGrid
+# Set the seed value
+random.seed(42)
+# set unique parameters 
+year = 2016
+models = models16
+ranGrid = ranGrid16
+for i in range(len(ranGrid)):
+        # model grid
+        modelGrid =  models[i]  
+        # define gird to apply the mode 
+        applyGrid = ranGrid[i]
+        # define file location 
+        processedData = 'data/processed/'+modelGrid
+        # select grids to generate spatial object 
+        mGrid =  Grids[Grids['Unique_ID'] == modelGrid]
+        aGrid =  Grids[Grids['Unique_ID'] == applyGrid]
+        # convert to a gee object 
+        mAOI = geemap.gdf_to_ee(mGrid)
+        aAOI = geemap.gdf_to_ee(aGrid)
 
-# select grids to generate spatial object 
-mGrid =  Grids[Grids['Unique_ID'] == modelGrid]
-aGrid =  Grids[Grids['Unique_ID'] == applyGrid]
+        # define training data
+        trainingData = gpd.read_file(filename="data/processed/" +
+        str(modelGrid) +"/"+ "agroforestrySamplingData_"+str(year)+".geojson") # initGridID defined int he config file
 
-# convert to a gee object 
-mAOI = geemap.gdf_to_ee(mGrid)
-aAOI = geemap.gdf_to_ee(aGrid)
+        # divide the data into test train spilts
+        trainingData = trainingData.sample(frac = 1)
+        # get rows 
+        total_rows = trainingData.shape[0]
+        # get train size 
+        test_train_ratio = 0.8
+        train_size = int(total_rows*test_train_ratio)
 
-# define training data
-trainingData = gpd.read_file(filename="data/processed/" + str(modelGrid) +"/"+ "agroforestrySamplingData_"+str(year)+".geojson") # initGridID defined int he config file
+        # Split data into test and train
+        train = trainingData[0:train_size]
+        test = trainingData[train_size:]
+        # define the GEE objects
+        training = geemap.gdf_to_ee(gdf=train)
+        testing = geemap.gdf_to_ee(gdf=test)
 
-# divide the data into test train spilts
-trainingData = trainingData.sample(frac = 1)
-# get rows 
-total_rows = trainingData.shape[0]
-# get train size 
-test_train_ratio = 0.8
-train_size = int(total_rows*test_train_ratio)
+        # train model
+        nTrees = 10
+        nTrees_range = np.arange(2, 20, 2)
+        setSeed = 5
 
-# Split data into test and train
-train = trainingData[0:train_size]
-test = trainingData[train_size:]
-# define the GEE objects
-training = geemap.gdf_to_ee(gdf=train)
-testing = geemap.gdf_to_ee(gdf=test)
-
-# train model
-nTrees = 10
-nTrees_range = np.arange(2, 20, 2)
-setSeed = 5
-
-# window size for average NDVI and glcm 
-windowSize = 8
-rfPixelTrim = trainRFModel(bands=bandsToUse,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
-## run validation using the testing set 
-pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
-
-
-# naip processing for model grid --- no normalization at this point so we can call from the existing function 
-# grab naip for the year of interest, filter, mask, mosaic to a single image
-naipTrain = prepNAIP(aoi=mAOI,windowSize=windowSize, year=year)
-
-geePrint(naipTrain)
-#####
-
-
-ndvia = naipTrain.normalizedDifference(["N","R"])
-
-# generate GLCM
-glcm_ga = naipTrain.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
-glcm_na = naipTrain.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
-# add to naip 
-naip2a = naipTrain.addBands(glcm_ga).addBands(glcm_na)
-
-# average and standard deviation NDVI
-ndvi_sd_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize)).rename(["nd_sd_neighborhood"])
-ndvi_mean_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize)).rename(["nd_mean_neighborhood"])
-
-# Bind ndvi after the glcm processall the bands together 
-naipa = naipTrain.addBands(ndvia).addBands(ndvi_sd_neighborhooda).addBands(ndvi_mean_neighborhooda)
+        # window size for average NDVI and glcm 
+        windowSize = 8
+        rfPixelTrim = trainRFModel(bands=bandsToUse,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
+        ## run validation using the testing set 
+        pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
 
 
+        # naip processing for model grid --- no normalization at this point so we can call from the existing function 
+        # grab naip for the year of interest, filter, mask, mosaic to a single image
+        naipTrain = prepNAIP(aoi=mAOI,windowSize=windowSize, year=year)
+
+        geePrint(naipTrain)
+        #####
 
 
+        ndvia = naipTrain.normalizedDifference(["N","R"])
 
+        # generate GLCM
+        glcm_ga = naipTrain.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
+        glcm_na = naipTrain.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
+        # add to naip 
+        naip2a = naipTrain.addBands(glcm_ga).addBands(glcm_na)
 
+        # average and standard deviation NDVI
+        ndvi_sd_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize)).rename(["nd_sd_neighborhood"])
+        ndvi_mean_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize)).rename(["nd_mean_neighborhood"])
 
+        # Bind ndvi after the glcm processall the bands together 
+        naipa = naipTrain.addBands(ndvia).addBands(ndvi_sd_neighborhooda).addBands(ndvi_mean_neighborhooda)
 
-# getNAIP(year=year, gridArea=mAOI)
+        bandsToUse_Cluster = ['R_mean', 'G_mean','B_mean', "N_mean", "nd_mean",'savg_g_mean', 'contrast_g_mean', 'entropy_g_mean', 'savg_n_mean',
+                        'contrast_n_mean', 'entropy_n_mean']
+        # apply snic classified 
+        naip2  = snicOutputs(naip = naipa,
+                                SNIC_SeedShape = SNIC_SeedShape, 
+                                SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
+                                SNIC_Compactness = SNIC_Compactness, 
+                                SNIC_Connectivity = SNIC_Connectivity,
+                                # nativeScaleOfImage = nativeScaleOfImage, 
+                                bandsToUse_Cluster = bandsToUse_Cluster).select(bandsToUse)
 
+        classifiedPixelsTrim = applyRFModel(imagery=naip2, bands=bandsToUse,classifier=rfPixelTrim).clip(aAOI).uint8()
 
-#### model grids that need to be reclassified 
-# integrate Gavins histogram matching work. Start byt 
-naip1 = matchSelf(gridArea= aAOI, 
-                  year = year)
+        # export image to asset 
+        # task = ee.batch.Export.image.toAsset(
+        #         image = classifiedPixelsTrim,
+        #         description = str(applyGrid) + str(year),
+        #         assetId = "projects/agroforestry2023/assets/"+ str(applyGrid) + 
+        #         "_"+ str(year)+ "_042025Runs",
+        #         region= aAOI.geometry(),
+        #         scale=1,
+        #         crs= naipa.projection(),
+        #         maxPixels = 1e13
+        # )
+        # task.start()
+        # # export image to drive 
+        # task = ee.batch.Export.image.toAsset(
+        #         image = classifiedPixelsTrim,
+        #         description = str(applyGrid) +"_"+ str(year),
+        #         assetId = "projects/agroforestry2023/assets/"+ str(applyGrid) + 
+        #         "_"+ str(year)+ "_042025Runs",
+        #         region= aAOI.geometry(),
+        #         scale=1,
+        #         crs= naipa.projection(),
+        #         maxPixels = 1e13
+        # )
 
-geePrint(naip1)
+       # 2. Define Export Parameters
+        export_params = {
+        'image': classifiedPixelsTrim,
+        'description': str(applyGrid) +"_"+ str(year) +"_harmoizedOutputs",  # Task name (appears in GEE Tasks tab)
+        'folder': 'agroforestry',  # Google Drive folder to export to
+        'scale': 1,  # Pixel resolution (in meters)
+        'region': aAOI.geometry(),  # Export area (image bounds)
+        # 'fileFormat': 'GeoTIFF',  # Output file format
+        'crs': naipa.projection(),       # Optional: Coordinate Reference System
+        # 'crsTransform': [30, 0, -2493045, 0, -30, 3310005], # Optional: CRS transform
+        'maxPixels': 1e13,        # Optional: Increase for large exports
+        }
 
-
-# Generate NDVI 
-ndvia = naip1.normalizedDifference(["N","R"])
-
-# generate GLCM
-glcm_ga = naipTrain.select('G').glcmTexture(size = windowSize).select(['G_savg','G_contrast','G_ent'],["savg_g", "contrast_g", "entropy_g"])
-glcm_na = naip1.select('N').glcmTexture(size= windowSize).select(['N_savg','N_contrast','N_ent'],["savg_n", "contrast_n", "entropy_n"])
-# add to naip 
-naip2a = naip1.addBands(glcm_ga).addBands(glcm_na)
-
-# average and standard deviation NDVI
-ndvi_sd_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer = ee.Reducer.stdDev(),kernel = ee.Kernel.circle(windowSize)).rename(["nd_sd_neighborhood"])
-ndvi_mean_neighborhooda =  ndvia.select('nd').reduceNeighborhood(reducer= ee.Reducer.mean(),  kernel= ee.Kernel.circle(windowSize)).rename(["nd_mean_neighborhood"])
-
-# Bind ndvi after the glcm processall the bands together 
-naipa = naip1.addBands(ndvia).addBands(ndvi_sd_neighborhooda).addBands(ndvi_mean_neighborhooda)
-
-# apply the model 
-classifiedPixelsTrim = applyRFModel(imagery=naipa, bands=bandsToUse,classifier=rfPixelTrim).clip(aAOI).uint8()
-
-# export image to asset 
-task = ee.batch.Export.image.toAsset(
-        image = classifiedPixelsTrim,
-        description = str(applyGrid) + "_histNorm_self",
-        assetId = "projects/agroforestry2023/assets/"+ str(applyGrid) + "_histNorm_self",
-        region=aoi1.geometry(),
-        scale=1,
-        crs= demoImage.projection(),
-        maxPixels = 1e13
-)
-task.start()
-
-# for i in years: 
-#     # define file location 
-#     processedData = 'data/processed/'+initGridID
-#     neighborGrid = pd.read_csv(processedData + "/neighborGrids.csv")
-#     grid36 = neighborGrid[neighborGrid['poisition'].isin([1,2,3,4])]
-#     # set aoi for the gee objects 
-#     aoiID = initGridID
-#     #Define bands to use -- setting manually 
-#     bandsToUse = vsurfNoCor
-#     ### this was used to generate the _b versions of the models 
-#     # bandsToUse = ["contrast_n_mean", "entropy_n_mean", "entropy_n", "entropy_g_mean","nd_mean_neighborhood","contrast_n","entropy_g","nd_mean","contrast_g_mean","contrast_g"] 
-#     # select multiple grids level 
-#     gridSelect =  grid.loc[grid.Unique_ID.isin(grid36.Unique_ID)].dissolve()
-#     # convert to a gee object 
-#     aoi1 = geemap.gdf_to_ee(gridSelect)
-#     # import training dataset 
-#     trainingData = gpd.read_file(filename="data/processed/" + str(initGridID) +"/"+ "agroforestrySamplingData_"+str(i)+".geojson") # initGridID defined int he config file
-#     # divide the data into test train spilts 
-#     trainingData = trainingData.sample(frac = 1)
-#     # get rows 
-#     total_rows = trainingData.shape[0]
-#     # get train size 
-#     train_size = int(total_rows*test_train_ratio)
-
-#     # Split data into test and train
-#     train = trainingData[0:train_size]
-#     test = trainingData[train_size:]
-#     # define the GEE objects
-#     training = geemap.gdf_to_ee(gdf=train)
-#     testing = geemap.gdf_to_ee(gdf=test)
-#     # train model
-#     rfPixelTrim = trainRFModel(bands=bandsToUse,  inputFeature=training, nTrees=nTrees,setSeed=setSeed )
-#     ## run validation using the testing set 
-#     pixelValidationTrim = testRFClassifier(classifier=rfPixelTrim, testingData= testing)
-
-#     # Generate model based on year define in config 
-#     # generate NAIP layer 
-#     naipEE = prepNAIP(aoi=aoi1, year=i,windowSize=windowSize)
-#     ##
-
-
-#     # geePrint(naipEE.bandNames())
-#     # normal the naip data
-#     # normalizedNAIP = normalize_by_maxes(img=naipEE, bandMaxes=bandMaxes)
-#     # produce the SNIC object 
-#     ## filtering the image bands right away based on the single model output 
-#     snicData = snicOutputs(naip = naipEE,
-#                         SNIC_SeedShape = SNIC_SeedShape, 
-#                         SNIC_SuperPixelSize = SNIC_SuperPixelSize, 
-#                         SNIC_Compactness = SNIC_Compactness, 
-#                         SNIC_Connectivity = SNIC_Connectivity,
-#                         # nativeScaleOfImage = nativeScaleOfImage, 
-#                         bandsToUse_Cluster = bandsToUse_Cluster).select(bandsToUse)
-#     # apply the model and clip to aoi and reclass to unsigned 8bit image 
-#     classifiedPixelsTrim = applyRFModel(imagery=snicData, bands=bandsToUse,classifier=rfPixelTrim).clip(aoi1).uint8()
-#     demoImage = classifiedPixelsTrim #.clip(exportAOI)
-#     print("projects/agroforestry2023/assets/"+ str(initGridID) + "_" + str(i) + "_36grid")
-#     # export image to asset 
-#     task = ee.batch.Export.image.toAsset(
-#         image = demoImage,
-#         description = str(initGridID) + "_" + str(i) + "_b_36grid",
-#         assetId = "projects/agroforestry2023/assets/"+ str(initGridID) + "_b_" + str(i) + "_36grid",
-#         region=aoi1.geometry(),
-#         scale=1,
-#         crs= demoImage.projection(),
-#         maxPixels = 1e13
-#     )
-#     task.start()
-
+        # 3. Create and Start the Export Task
+        task = ee.batch.Export.image.toDrive(**export_params)
+        task.start()

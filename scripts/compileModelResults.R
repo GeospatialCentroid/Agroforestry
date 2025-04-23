@@ -309,8 +309,8 @@ applyRiparianMask(year = "2010",
 
 
 ## Altering Mask for Harmonized images  ------------------------------------
-
-year <- "2010"
+modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
+year <- "2016"
 nlcdMasks <- list.files("data/products/nlcd",pattern = ".gpkg", full.names = TRUE, recursive = TRUE)
 # tccs <- nlcdMasks[grepl(pattern = "tcc", nlcdMasks)]
 forests <- nlcdMasks[grepl(pattern = "forest", nlcdMasks)]
@@ -339,21 +339,18 @@ mergeClass <- function(listOfImages){
 modelGridsID <- read.csv("data/processed/harmonizedImages/gridsToRework.csv")[,"gridsToRework"]
 
 generateFinalGridImagesHarmonized <- function(year, modelGrids, forests, urbanFiles2){
-  modelFolder <- paste0("data/processed/harmonizedImages")
+  modelFolder <- paste0("data/processed/combinedHaromized")
   # get all models for a year 
   models <- list.files(modelFolder, full.names = TRUE)
-  
-  # filter to the specific images I want to use b-self harmonized 
-  bModels <- models[grepl(pattern = "self_harmonized_map_b", x = models)]
   # filter to year 
-  bm_year <- bModels[grepl(pattern = "_2010.tif", x = bModels)]
+  mYear <- models[grepl(pattern = paste0("_",year,".tif"), x = models)]
   # get unique grid ID
-  basenames <- basename(bm_year) |>
+  basenames <- basename(mYear) |>
     stringr::str_split( pattern = "_")
   
   ids <- lapply(basenames, function(feature) {
-    if (length(feature) >= 5) {
-      return(feature[[5]])
+    if (length(feature) >= 2) {
+      return(feature[[1]])
     } else {
       return(NA) # Or some other indicator if the feature doesn't have 6 elements
     }
@@ -372,16 +369,22 @@ generateFinalGridImagesHarmonized <- function(year, modelGrids, forests, urbanFi
   # itorate over grids to produce outputs 
   for(i in ids){
     print(i)
-    allImages <- bm_year[grepl(pattern = paste0("map_b_",i), bm_year)]
+    allImages <- mYear[grepl(pattern = paste0(i,"_"),  mYear)]
     gridName <- paste0(i,"_harmonized") 
     unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
     # if there are images 
     if(length(allImages) > 0){
       if(!file.exists(unmaskedPath)){
-        r3 <- terra::rast(allImages)
+        r3 <- terra::rast(allImages)[[1]] # some images ending up with two layers 
+        # reclass -- pulled out for troubleshooting
+        r3 <- r3 |> 
+          terra::subst(NA,0)|>
+          terra::subst(2,1)
         # set the name of the object 
         rastName <-  paste0(gridName,"_",year)
         names(r3) <- rastName
+        # reclass to 0 and 1
+        
         # export 
         try(terra::writeRaster(x = r3, filename = unmaskedPath, overwrite = TRUE ))
         }else{
@@ -422,14 +425,16 @@ generateFinalGridImagesHarmonized <- function(year, modelGrids, forests, urbanFi
 }
 
 
+for(i in c("2016", "2020")){
+  generateFinalGridImagesHarmonized(year = i, 
+                                    modelGrids = modelGrids,
+                                    forests = forests, 
+                                    urbanFiles2 = urbanFiles2)
+}
 
-generateFinalGridImagesHarmonized(year = "2010", 
-                          modelGrids = modelGrids,
-                          forests = forests, 
-                          urbanFiles2 = urbanFiles2)
 
 # applied the riparian area mask 
-year = "2010"
+year = "2016"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 
 applyRiparianMask <- function(year,riparianData){
@@ -453,12 +458,13 @@ applyRiparianMask <- function(year,riparianData){
 
     fileName <- paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif")
     if(!file.exists(fileName)){
+      # reclass for the mask 
       image[image == 0] <- NA
       # crop riparian layer
       r30 <- terra::crop(x = riparianData,
                        y = image) |>
-      terra::as.polygons()|>
-      rasterize(image, values = 1, background = 0)
+        terra::as.polygons()|>
+        rasterize(image, values = 1, background = 0)
 
       # mask to the origin image
       c2 <- r30 + image
@@ -475,7 +481,9 @@ applyRiparianMask <- function(year,riparianData){
 }
 
 # apply the mask 
-applyRiparianMask(year = "2010",
+applyRiparianMask(year = "2016",
+                  riparianData = riparianData )
+applyRiparianMask(year = "2020",
                   riparianData = riparianData )
 
 

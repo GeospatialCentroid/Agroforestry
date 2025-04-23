@@ -1,6 +1,6 @@
 import ee
 import geemap
-
+ee.Initialize(project='agroforestry2023')
 Grids = ee.FeatureCollection("projects/agroforestry2023/assets/twelve_mi_shp")
 def getGridArea(gridID):
     Grid = ee.Feature(Grids.filter(ee.Filter.eq('Unique_ID', gridID)).first())
@@ -264,3 +264,5 @@ def matchGrid(gridIDs, referenceImage, year, verbose=False, sample=False):
     unionGeom = ee.FeatureCollection(gridFeatures).geometry()
     mosaicImage = ee.ImageCollection(mosaics).mosaic().clip(unionGeom)
     return mosaicImage
+
+

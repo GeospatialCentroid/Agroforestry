@@ -15,12 +15,65 @@ g2010 <- st_read("data/products/modelGrids_2010.gpkg")
 g2016 <- st_read("data/products/modelGrids_2016.gpkg")
 g2020 <- st_read("data/products/modelGrids_2020.gpkg")
 # 2 mile gird 
-mile2 <- st_read("data/products/two_sq_grid.gpkg")
-# |>
+mile2 <- st_read("data/products/two_sq_grid.gpkg") |>
   dplyr::select(gridID = FID_two_grid)
 
-qtm(mile2[mile2$gridID == "25518",])
-qtm(g2010[g2010$Unique_ID == "X12-636",])
+
+
+# 042025 update  ----------------------------------------------------------
+grids12m <- st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+subgrids10 <- c(28032)
+subgrids16 <- c(6603, 7729, 8345)
+subgrids20 <- c(12877, 16513)
+
+# select the model image by year 
+year <- 2010
+subgrid <- subgrids10[1]
+g12m <- grids12m 
+g2m <- mile2
+getSubSample <- function(year, subgrid, g12m, g2m ){
+  # select 2 mile subgrid 
+  g2 <- g2m[g2m$gridID == subgrid, ]
+  # get the centroid 
+  # c1 <- st_centroid(g2)
+  # extract the model grid 
+  m1 <- st_intersection(g12m, g2)
+  # gridName
+  # select model and year 
+  img <- list.files(
+    path = paste0("data/products/models", year,"/maskedImages/"),
+    pattern = paste0(m1$Unique_ID,"_harmonized"),
+    full.names = TRUE)
+  r0 <- terra::rast(img)
+  # crop image to 2mile grid 
+  r1 <- terra::crop(r0, terra::vect(g2))
+  #export 
+  terra::writeRaster(r1, paste0("data/products/subGridAreaEvaluations/subgrid_",subgrid,"_",year,".tif"))
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# older content  ----------------------------------------------------------
+
+
+
+qtm(mile2[mile2$gridID == "28032",])
+qtm(g2010[g2010$Unique_ID == "X12-519",])
 
 
 # randomly select new grids  ----------------------------------------------

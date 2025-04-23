@@ -268,7 +268,27 @@ files <- list.files(path = "data/products",
                     recursive = TRUE)
 
 hFiles <- files[grepl("_harmonized", x = files)]
-hGrids <- paste0("X12-", c(318,319,366,367,413))
+basenames <- basename(hFiles) |>
+  stringr::str_split( pattern = "_")
+hGrids <- lapply(basenames, function(feature) {
+  if (length(feature) >= 2) {
+    return(feature[[1]])
+  } else {
+    return(NA) # Or some other indicator if the feature doesn't have 6 elements
+  }
+}) |> unlist()|> unique()
+
+# remove all previous harmized files 
+# remove <- files[grepl(pattern = "2010", x = files)]
+# remove2 <- remove[!grepl(pattern = "harmonized", x = remove)]
+# for(i in hGrids){
+#   # test for grid match 
+#   sel <- remove2[grepl(pattern = i, x = remove2)] 
+#   if(length(sel) != 0){
+#     file.remove(sel)
+#   }
+# }
+
 
 
 # for processing 
@@ -291,6 +311,7 @@ renderFullRiparianMask <- function(grid, files){
       r1 <- lapply(X = f1, FUN = terra::rast) |>
         purrr::map(.f = reclas)
       # add them all together
+      ## 318 has some issues with different resolution 
       r2 <- terra::app(x = terra::rast(r1), fun = sum, na.rm = TRUE)
       # reclass and export
       r3 <- terra::ifel(r2 >0, 1 , NA)
