@@ -38,7 +38,7 @@ r1 <- terra::rast(cot[10])
 ###
 
 # temp dataframe with vailation values 
-validataion <-data.frame(
+validataion <- data.frame(
   modelGrid = c("X12-131", "X12-131", "X12-131"),
   gridID = c("X12-10", "X12-10","X12-10"),
   year = c(2010, 2016, 2020),
@@ -56,15 +56,15 @@ gridID = "X12-10" # for validation indexing
 # gridID = "X12-225" # for NA mask testing 
 
 
-test <- function(gridID, validataion,cot, grid10, grid16,grid20){
+test <- function(gridID, validataion, cot, grid10, grid16, grid20){
   
   # vector based method ----------------------------------------------------
   
   # used gridID and validation data to pull error measures per each year
   v1 <- validataion[validataion$gridID == gridID, ]
   v10 <- v1[v1$year == "2010",]
-  v16 <- v1[v1$year == "2010",]
-  v20 <- v1[v1$year == "2010",]
+  v16 <- v1[v1$year == "2016",]
+  v20 <- v1[v1$year == "2020",]
   # read in cot file
   r1 <- terra::rast(cot[grepl(pattern = paste0(gridID,"_change"), x = cot)])
   # split out cot and riparian
@@ -75,6 +75,8 @@ test <- function(gridID, validataion,cot, grid10, grid16,grid20){
 
   # transform data to vector
   vals <- as.data.frame(terra::values(cot1))
+  vals <- as.data.frame(vals[1:1000,]) 
+  names(vals) <- "ChangeOverTime"
   # regenerate values for each year as a column in dataframe
   allVals <- vals |>
     dplyr::mutate(
@@ -224,6 +226,7 @@ test <- function(gridID, validataion,cot, grid10, grid16,grid20){
     
     # add and reclass 
     # zero
+    tic()
     # r0 <- rast0 + rastRandom
     r0 <- terra::ifel(rastRandom < trueNeg, 1, rast0)
     # one 
@@ -236,14 +239,12 @@ test <- function(gridID, validataion,cot, grid10, grid16,grid20){
     naRast <- ifel(is.na(rast), NA, 1)
     # Multiple to bring in the NA  
     rSum <- rSum * naRast 
-    
+    toc()
     # examples of difference 
     diff <- rast - rSum
     terra::plot(diff)
     return(rSum)
-}
-
-  
+  }
 }
 
 

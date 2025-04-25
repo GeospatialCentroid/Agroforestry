@@ -27,17 +27,17 @@ subgrids16 <- c(6603, 7729, 8345)
 subgrids20 <- c(12877, 16513)
 
 # select the model image by year 
-year <- 2010
-subgrid <- subgrids10[1]
+year <- 2020
+subgrid <- subgrids20[2]
 g12m <- grids12m 
 g2m <- mile2
-getSubSample <- function(year, subgrid, g12m, g2m ){
+getSubSample <- function(subgrid, year, g12m, g2m ){
   # select 2 mile subgrid 
   g2 <- g2m[g2m$gridID == subgrid, ]
   # get the centroid 
-  # c1 <- st_centroid(g2)
+  c1 <- st_centroid(g2)
   # extract the model grid 
-  m1 <- st_intersection(g12m, g2)
+  m1 <- st_intersection(g12m, c1)
   # gridName
   # select model and year 
   img <- list.files(
@@ -52,8 +52,11 @@ getSubSample <- function(year, subgrid, g12m, g2m ){
 }
  
 
-
-
+library(purrr)
+purrr::map(.x = subgrids20, .f = getSubSample,
+           year <- 2020,
+           g12m <- grids12m, 
+           g2m <- mile2)
 
 
 

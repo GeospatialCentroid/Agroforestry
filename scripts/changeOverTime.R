@@ -35,6 +35,24 @@ readAndName<- function(year, name, files){
 # rasters <- purrr::map2(.x = years, .y = names, .f = readAndName, files = files) |>
 #   terra::rast()
 
+# remove all files that were effected by harmonization 
+df <- read.csv("data/processed/harmonizedImages/gridsToRework.csv")
+uniqueGrids <- unique(df$gridsToRework)
+for(i in uniqueGrids){
+  f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
+  try(file.remove(f1))
+}
+# remove all files that have had new models added 
+correctedGrid <- unique(c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6", 
+  "X12-7","X12-336", "X12-414", "X12-415", "X12-592", "X12-637",
+  "X12-682","X12-725","X12-740","X12-766","X12-336","X12-414","X12-415",
+  "X12-592","X12-637", "X12-682","X12-725", "X12-740", "X12-766"))
+for(i in correctedGrid){
+  f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
+  try(file.remove(f1))
+}
+
+
 # for processing 
 ## end up with 6 layers 3 riparian mask, 3 new value class 
 
@@ -45,6 +63,14 @@ renderFullRiparianMask <- function(grid, files){
   if(!file.exists(exportPath)){
     # filter and read in images 
     f1 <- files[grepl(pattern = paste0(grid,"_"), x = files)]
+    
+    # need condition in here for selecting the harmonized models then rep
+    f2 <- f1[grepl(pattern = "harmonized", f1)]
+    if(length(f2) >= 1){
+      harmonized = TRUE
+    }
+    
+    
     if(length(f1) > 0){
       
       # reclass function 1 
@@ -54,12 +80,20 @@ renderFullRiparianMask <- function(grid, files){
       # gather and reclass layers 
       r1 <- lapply(X = f1, FUN = terra::rast) |>
         purrr::map(.f = reclas)
+      # if crop all if harmonized image is present 
+      if(harmonized == TRUE){
+        selection <- paste0(grid,"_2010_riparianClass")
+        cropper <- terra::rast(f1[grepl(pattern = selection, x = f1)])
+        r1 <- r1 |> 
+          purrr::map(crop, cropper)
+      }
+      
       # add them all together
       r2 <- terra::app(x = terra::rast(r1), fun = sum, na.rm = TRUE)
       # reclass and export
       r3 <- terra::ifel(r2 >0, 1 , NA)
       terra::writeRaster(x = r3, filename = exportPath)
-    }
+    }s
   }
   gc()
 }
@@ -69,12 +103,13 @@ renderFullRiparianMask <- function(grid, files){
 
 # render riparian  --------------------------------------------------------
 print("generating Riparain Mask")
+# error on x1265 
 tic()
-purrr::map(.x = grids[4], .f = renderFullRiparianMask, files = files)
+purrr::map(.x = grids, .f = renderFullRiparianMask, files = files)
 toc()
 
 future::availableCores()
-plan(multicore)
+plan(multicore, workers = 4)
 tic()
 furrr::future_map(.x = grids, .f = renderFullRiparianMask, files = files)
 toc()
