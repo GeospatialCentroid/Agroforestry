@@ -75,3 +75,5 @@ l1 <- l1[!l1 %in% c("b","using")]
 
 df <- data.frame(gridsToRework = vals)
 write.csv(df, file = "data/processed/harmonizedImages/gridsToRework.csv" )
+df <- read.csv("data/processed/harmonizedImages/gridsToRework.csv")
+

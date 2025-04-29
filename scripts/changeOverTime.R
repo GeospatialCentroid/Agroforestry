@@ -26,6 +26,115 @@ readAndName<- function(year, name, files){
 }
 
 
+# clean up process --------------------------------------------------------
+## rewrite the change over time classification process 
+### select all _Masked.tif for grid 
+### select final ripairan mask 
+### reclass masked images by year 
+### sum features 
+### append riparian 
+
+maskedFiles <- list.files(path = "data/products", 
+                             pattern = "_Masked.tif",
+                             full.names = TRUE,
+                             recursive = TRUE)
+
+riparianFiles <- list.files(path = "data/products/riparian/allYears", 
+                          pattern = ".tif",
+                          full.names = TRUE)
+gridId <- grids[1]
+produceCOT <- function(gridID, maskedFiles, riparianFiles){
+  # select all _Masked images 
+  masked <- maskedFiles[grepl(pattern = paste0(gridId, "_Masked"), maskedFiles)]
+  if(length(masked) != 3){
+    print("Missing masked model")
+    stop()
+  }
+  # select the riparian feature 
+  rip <- riparianFiles[grepl(pattern = paste0(gridId, ".tif"), riparianFiles)]
+  if(length(rip) != 1){
+    print("missing riparian output")
+    stop()
+  }else{
+    r1 <- rast(rip)
+  }
+  # reclass masked images by year 
+  r10 <- masked[grepl(pattern = "models2010", masked)]|>
+    terra::rast()
+  names(r10) <- "r10"
+  r16 <- masked[grepl(pattern = "models2016", masked)]|>
+    terra::rast()|>
+    terra::subst(from = 1, to = 3)
+  names(r16) <- "r16"
+  r20 <- masked[grepl(pattern = "models2020", masked)]|>
+    terra::rast()|>
+    terra::subst(from = 1, to = 5)
+  names(r20) <- "r20"
+  # some minor ext mismatching so test area and crop to the smallest 
+  areas <- c(expanse(r10)[2],expanse(r16)[2],expanse(r20)[2]) |> unlist()
+  names(areas) <- c("r10","r16","r20")
+  if(length(unique(areas))>1){
+    t1 <- min(areas)
+    # select the feature that has min value 
+    min <- areas[grepl(pattern = t1, x = areas)] |> names()
+    # condition for the crop 
+    if(min[1] == "r10"){
+      r16 <- crop(r16,r10)
+      r20 <- crop(r20,r10)
+    }
+    if(min[1] == "r16"){
+      r10 <- crop(r10,r16)
+      r20 <- crop(r20,r16)
+    }
+    if(min[1] == "r20"){
+      r10 <- crop(r10,r20)
+      r16 <- crop(r16,r20)
+    }
+  }
+  # sum features 
+  cot <- r10 + r16 + r20
+  # add the riparian layer 
+  cot <- c(cot, r1 )
+  names(cot)<-c("ChangeOverTime", "RiparianMask")
+  rm(r10,r16,r20,r1)
+  gc()
+  return(cot)
+}
+
+
+# apply COT  --------------------------------------------------------------
+## some cases where COT layers have 4 features will check and delete if present 
+cots <- list.files(path = "data/products/changeOverTime",
+                   full.names = TRUE,
+                   pattern = "_2.tif")
+## quick read and remove if 4 features are present 
+for(i in cots){
+  r1 <- terra::rast(i)
+  if(length(names(r1))>2){
+    print(i)
+    file.remove(i)
+  }
+}
+
+# apply the change over time method 
+for(i in seq_along(grids)){
+  # select grid 
+  grid <- grids[i]
+  # export path 
+  exportPath <- paste0("data/products/changeOverTime/",grid,"_changeOverTime_2.tif")
+  #test for presence 
+  if(!file.exists(exportPath)){
+    print(grid)
+    # rended the cot file 
+    cot <- produceCOT(gridID = grid,
+                      maskedFiles = maskedFiles,
+                      riparianFiles = riparianFiles)
+    # export 
+    terra::writeRaster(x = cot, filename = exportPath)
+  }
+}
+
+
 
 # original  ---------------------------------------------------------------
 
@@ -39,8 +148,10 @@ readAndName<- function(year, name, files){
 df <- read.csv("data/processed/harmonizedImages/gridsToRework.csv")
 uniqueGrids <- unique(df$gridsToRework)
 for(i in uniqueGrids){
-  f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
-  try(file.remove(f1))
+  # f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
+  # try(file.remove(f1))
+  f2 <- paste0("data/products/changeOverTime/",i,"_changeOverTime_2.tif")
+  try(file.remove(f2))
 }
 # remove all files that have had new models added 
 correctedGrid <- unique(c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6", 
@@ -48,8 +159,10 @@ correctedGrid <- unique(c("X12-1","X12-2","X12-3","X12-4","X12-5","X12-6",
   "X12-682","X12-725","X12-740","X12-766","X12-336","X12-414","X12-415",
   "X12-592","X12-637", "X12-682","X12-725", "X12-740", "X12-766"))
 for(i in correctedGrid){
-  f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
-  try(file.remove(f1))
+  # f1 <- paste0("data/products/riparian/allYears/riparianMask_",i,".tif")
+  # try(file.remove(f1))
+  f2 <- paste0("data/products/changeOverTime/",i,"_changeOverTime_2.tif")
+  try(file.remove(f2))
 }
 
 
@@ -67,7 +180,12 @@ renderFullRiparianMask <- function(grid, files){
     # need condition in here for selecting the harmonized models then rep
     f2 <- f1[grepl(pattern = "harmonized", f1)]
     if(length(f2) >= 1){
-      harmonized = TRUE
+      harmonized <- TRUE
+      if(length(f2) == 3){
+        f1 <- f2
+      }
+    }else{
+      harmonized <- FALSE
     }
     
     
@@ -93,7 +211,7 @@ renderFullRiparianMask <- function(grid, files){
       # reclass and export
       r3 <- terra::ifel(r2 >0, 1 , NA)
       terra::writeRaster(x = r3, filename = exportPath)
-    }s
+    }
   }
   gc()
 }
@@ -103,8 +221,11 @@ renderFullRiparianMask <- function(grid, files){
 
 # render riparian  --------------------------------------------------------
 print("generating Riparain Mask")
-# error on x1265 
 tic()
+# issues with memory allocation on X12-319 
+errorGrids <- "X12-336" # error maybe lack of overlap between areas?  
+grids <- grids[337:length(grids)]
+
 purrr::map(.x = grids, .f = renderFullRiparianMask, files = files)
 toc()
 
@@ -245,8 +366,7 @@ furrApply <- function(grid,files){
   exportfile <- paste0("data/products/changeOverTime/",grid,"_changeOverTime.tif")
   
   # forcing rewrite. 
-  !file.exists(exportfile)
-  if(TRUE){
+  if(!file.exists(exportfile)){
     # set parameters
     files2 <- files[grepl(pattern = paste0(grid,"_"), x = files)]
     years <-  c("2010", "2016", "2020")
