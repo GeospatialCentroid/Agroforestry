@@ -4,6 +4,10 @@
 pacman::p_load(terra, leaflet, dplyr, readr)
 # read in all features ----------------------------------------------------
 refCSV <- read_csv("data/processed/harmonizedImages/gridsToRework.csv")
+# grid features 
+fullGrids <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+
+
 # images 
 images <- list.files(path = "data/processed/harmonizedImages",
                      pattern = ".tif",
@@ -15,40 +19,70 @@ y16 <- images[grepl(pattern = "2016.tif", images)]
 y20 <- images[grepl(pattern = "2020.tif", images)]
 
 # itorate over grids 
-grids <- refCSV$gridsToRework
+gridID <- refCSV$gridsToRework
 
-g1 <- grids[38]
+# subset grids 
+fGrid <- fullGrids[fullGrids$Unique_ID %in% gridID, ]
+leaflet(fGrid) |>
+  addProviderTiles("Esri.WorldImagery")|>
+  addPolygons(color = "#444000", weight = 3, smoothFactor = 0.5,
+              opacity = 1.0, 
+              fillOpacity = 0.1,
+              label = fGrid$Unique_ID)
 
-# test to see if there 
-sel <- y10[grepl(pattern = g1, x = y10)]
 
-names <- basename(sel)
+for(year in c("2010", "2016", "2020")){
+  im <- images[grepl(pattern = paste0(year,".tif"), images)]
+  # select all grids of interest 
+  
+  for(id in gridID){
+    # test to see if there are image for this grid 
+    sel <- im[grepl(pattern = paste0(id,"_using"), x = im)]
+    if(length(sel) >0 ){
+      print(id)
+      # get end file path 
+      baseName <- basename(sel)
+      # create raster object 
+      r1 <- terra::rast(sel)
+      # assing names 
+      names(r1) <- baseName
+      
+      # Define the output PDF file name
+      pdf_filename <- paste0( "data/processed/harmonizedCompare/raster_plots",id,"_",year,".pdf")
+      
+      # Open a PDF device to save the plots
+      pdf(file = pdf_filename)
+      
+      # Set up the plotting layout for 2 rows and 2 columns
+      par(mfrow = c(2, 2))
+      # Loop through the list of rasters and plot each one
+      for(r in baseName){
+        current_raster <- r1[[r]]
+        if(grepl(pattern = "ref_harmonized_map_b", r)){
+          n <- "ref b"
+        }
+        if(grepl(pattern = paste0("ref_harmonized_map_",id) , r)){
+          n <- "ref"
+        }
+        if(grepl(pattern = "self_harmonized_map_b", r)){
+          n <- "self b"
+        }
+        if(grepl(pattern = paste0("self_harmonized_map_",id), r)){
+          n <- "self"
+        }
+        plot(current_raster, main = n) # Use the raster name as the title
+      }
+      # Add a title to the entire page
+      mtext(paste0(id,"_", year), side = 3, line = -2, outer = TRUE, cex = 1.5, font = 2)
+      
+      # Close the PDF device to save the file
+      dev.off()
+    }else{
+      next()
+    }
+  }
+} 
 
-rast <- terra::rast(sel)
-names(rast) <- names
 
-maps <- leaflet() |> leaflet() |>
-  setView(lng = 0, lat = 0, zoom = 2)|> # Set initial view
-  # Add the first raster layer
-  addRasterImage(r1, color = pal1, opacity = 0.7, group = "Raster 1")|>
-  addLegend(pal = pal1, values = values(r1), title = "Raster 1", group = "Raster 1")|>
-  
-  # Add the second raster layer
-  addRasterImage(r2, color = pal2, opacity = 0.7, group = "Raster 2")|>
-  addLegend(pal = pal2, values = values(r2), title = "Raster 2", group = "Raster 2")|>
-  
-  # Add the third raster layer
-  addRasterImage(r3, color = pal3, opacity = 0.7, group = "Raster 3")|>
-  addLegend(pal = pal3, values = values(r3), title = "Raster 3", group = "Raster 3")|>
-  
-  # Add the fourth raster layer
-  addRasterImage(r4, color = pal4, opacity = 0.7, group = "Raster 4")|>
-  addLegend(pal = pal4, values = values(r4), title = "Raster 4", group = "Raster 4")|>
-  
-  # Add layer control to toggle raster visibility
-  addLayersControl(
-    overlayGroups = c("Raster 1", "Raster 2", "Raster 3", "Raster 4"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
-  
+
 
