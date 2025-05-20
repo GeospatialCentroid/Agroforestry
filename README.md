@@ -44,7 +44,7 @@ Important files
 
 ## Generalized workflow 
 
-[general workflow](./flowcharts/agroforestryOverview.drawio)
+![general workflow](./flowcharts/agroforestryOverview.svg)
 
 
 
