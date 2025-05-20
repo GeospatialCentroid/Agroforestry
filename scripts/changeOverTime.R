@@ -15,6 +15,23 @@ hFiles <- files[grepl("_harmonized", x = files)]
 hGrids <- paste0("X12-", c(318,319,366,367,413))
 grids <- paste0("X12-", 1:773)
 
+# errors from maps 
+areaFiles <- list.files(
+  path = "~/trueNAS/work/agroforestrySampling/data/derived/areaCounts/fullState",
+  full.names = TRUE
+)
+
+test <- paste0(grids,".csv")
+rerun <- c()
+for(i in seq_along(test)){
+  id <- test[i]
+  g <- grids[i]
+  presence <- grepl(pattern = id, x = areaFiles)
+  if(!TRUE %in% presence){
+    rerun <- append(rerun, g)
+  }
+}
+# use this to remove cot files 
 
 
 readAndName<- function(year, name, files){
@@ -45,13 +62,13 @@ riparianFiles <- list.files(path = "data/products/riparian/allYears",
 gridId <- grids[1]
 produceCOT <- function(gridID, maskedFiles, riparianFiles){
   # select all _Masked images 
-  masked <- maskedFiles[grepl(pattern = paste0(gridId, "_Masked"), maskedFiles)]
+  masked <- maskedFiles[grepl(pattern = paste0(gridID, "_Masked"), maskedFiles)]
   if(length(masked) != 3){
     print("Missing masked model")
     stop()
   }
   # select the riparian feature 
-  rip <- riparianFiles[grepl(pattern = paste0(gridId, ".tif"), riparianFiles)]
+  rip <- riparianFiles[grepl(pattern = paste0(gridID, ".tif"), riparianFiles)]
   if(length(rip) != 1){
     print("missing riparian output")
     stop()
@@ -81,14 +98,17 @@ produceCOT <- function(gridID, maskedFiles, riparianFiles){
     if(min[1] == "r10"){
       r16 <- crop(r16,r10)
       r20 <- crop(r20,r10)
+      r1 <- crop(r1, r10)
     }
     if(min[1] == "r16"){
       r10 <- crop(r10,r16)
       r20 <- crop(r20,r16)
+      r1 <- crop(r1, r16)
     }
     if(min[1] == "r20"){
       r10 <- crop(r10,r20)
       r16 <- crop(r16,r20)
+      r1 <- crop(r1, r20)
     }
   }
   # sum features 
@@ -107,6 +127,12 @@ produceCOT <- function(gridID, maskedFiles, riparianFiles){
 cots <- list.files(path = "data/products/changeOverTime",
                    full.names = TRUE,
                    pattern = "_2.tif")
+# remove some of these files based on 
+# for(i in rerun){
+#   t1 <- cots[grepl(paste0(i,"_"), cots)]
+#   file.remove(t1)
+# }
+
 ## quick read and remove if 4 features are present 
 for(i in cots){
   r1 <- terra::rast(i)
@@ -117,7 +143,8 @@ for(i in cots){
 }
 
 # apply the change over time method 
-for(i in seq_along(grids)){
+# 336 missing riparian layer 
+for(i in 337:length(grids)){
   # select grid 
   grid <- grids[i]
   # export path 

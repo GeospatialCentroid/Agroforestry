@@ -1,6 +1,7 @@
 pacman::p_load(dplyr, stringr, terra)
 
 
+
 files <- list.files(
   path = "data/raw/cleanUpModels/imageCleanup",
   full.names = TRUE
