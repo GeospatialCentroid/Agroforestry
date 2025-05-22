@@ -7,7 +7,10 @@ tmap::tmap_mode("view")
 
 # pull in the specific model grid elements 
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)
-
+mg20 <- sf::st_read(modelGrids[3]) 
+library(tmap)
+tmap_mode("view")
+qtm(mg20)
 # list files from from google drive
 images <- googledrive::drive_ls(path = "agroforestry",pattern = ".tif")  |>
   dplyr::filter(!grepl('validationGrid', name))|>
@@ -264,54 +267,64 @@ generateFinalGridImages(year = "2010",
                         forests = forests, 
                         urbanFiles2 = urbanFiles2)
 
-
-
-# applied the riparian area mask 
-year = "2010"
-riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
+### move riparian processing to "applyRiparianMasks.R" Script 
 # 
-applyRiparianMask <- function(year,riparianData){
-
-  # set the based path for images
-  base <- paste0("data/products/models",year)
-
-  # pull all masked images
-  files <- list.files(
-    path = paste0(base, "/maskedImages"),
-    full.names = TRUE,
-    pattern = ".tif"
-  )
-  for(i in files){
-    tic()
-    image <- terra::rast(i)
-    fileName <- paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif")
-    if(!file.exists(fileName)){
-      print(fileName)
-      image[image == 0] <- NA
-      # crop riparian layer
-      r30 <- terra::crop(x = riparianData,
-                       y = image) |>
-      terra::as.polygons()|>
-      rasterize(image, values = 1, background = 0)
-
-      # mask to the origin image
-      c2 <- r30 + image
-
-      #export the image
-      terra::writeRaster(x = c2,
-                  filename = paste0(base,"/maskedWithRiparian/",names(image), "_riparianClass.tif"),
-                  overwrite = TRUE)
-    }else{
-      print("file already exists")
-    }
-    toc()
-  }
-}
-
-# apply the mask 
-applyRiparianMask(year = "2016",
-                  riparianData = riparianData )
-
+# # applied the riparian area mask 
+# year = "2010"
+# riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
+# # 
+# applyRiparianMask <- function(year,riparianData){
+# 
+#   # set the based path for images
+#   base <- paste0("data/products/models",year)
+# 
+#   # pull all masked images
+#   files <- list.files(
+#     path = paste0(base, "/maskedImages"),
+#     full.names = TRUE,
+#     pattern = ".tif"
+#   )
+#   for(i in files){
+#     # grad specific grid name 
+#     name <- basename(i) |>
+#       stringr::str_split("_")|>
+#       unlist()
+#     
+#     tic()
+#     image <- terra::rast(i)
+#     fileName <- paste0(base,"/maskedWithRiparian/",name[1],"_",year, "_riparianClass.tif")
+#     if(!file.exists(fileName)){
+#       print(fileName)
+#       image[image == 0] <- NA
+#       # crop riparian layer
+#       r30 <- terra::crop(x = riparianData,
+#                        y = image) |>
+#       terra::as.polygons()|>
+#       rasterize(image, values = 1, background = 0)
+# 
+#       # mask to the origin image
+#       c2 <- r30 + image
+# 
+#       #export the image
+#       terra::writeRaster(x = c2,
+#                   filename = fileName,
+#                   overwrite = TRUE)
+#     }else{
+#       print("file already exists")
+#     }
+#     toc()
+#   }
+# }
+# 
+# # apply the mask 
+# applyRiparianMask(year = "2010",
+#                   riparianData = riparianData )
+# future::plan("multicore", workers = 3)
+# # future::plan("sequential")
+# 
+# furrr::future_map(.x = c("2010","2016","2020"), .f = applyRiparianMask,
+#                   riparianData = riparianData,
+#                           .progress = TRUE)
 
 ## Altering Mask for Harmonized images  ------------------------------------
 modelGrids <- list.files(path = "data/products", pattern = "modelGrids", full.names = TRUE)

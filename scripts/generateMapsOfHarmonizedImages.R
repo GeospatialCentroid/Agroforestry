@@ -7,7 +7,11 @@ refCSV <- read_csv("data/processed/harmonizedImages/gridsToRework.csv")
 # grid features 
 fullGrids <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 
-
+# temp 
+fullGrids <- terra::vect("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+fullGrids$area <- terra::expanse(x = fullGrids, unit = "m" )
+df <- as.data.frame(fullGrids)
+write_csv(df, file = "data/temp/gridAreas.csv")
 # images 
 images <- list.files(path = "data/processed/harmonizedImages",
                      pattern = ".tif",
@@ -30,8 +34,12 @@ leaflet(fGrid) |>
               fillOpacity = 0.1,
               label = fGrid$Unique_ID)
 
+# 2020 - reruns 
+gridID <- c("X12-179", "X12-227", "X12-103", "X12-141") 
+modelGrids <- c("X12-99","X12-99", "X12-99","X12-99")
 
-for(year in c("2010", "2016", "2020")){
+
+for(year in c("2020" )){ # "2010", "2016", 
   im <- images[grepl(pattern = paste0(year,".tif"), images)]
   # select all grids of interest 
   

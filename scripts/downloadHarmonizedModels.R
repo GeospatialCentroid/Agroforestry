@@ -37,6 +37,8 @@ for(i in 1:nrow(folder_contents)){
 # need to get a list of 2010 features to regenerate 
 images <- list.files("data/processed/harmonizedImages",
                      full.names = TRUE)
+# test
+
 
 # drop all xml features 
 tifs <- images[grepl("\\.tif$", images)]

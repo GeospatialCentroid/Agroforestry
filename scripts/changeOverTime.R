@@ -59,7 +59,7 @@ maskedFiles <- list.files(path = "data/products",
 riparianFiles <- list.files(path = "data/products/riparian/allYears", 
                           pattern = ".tif",
                           full.names = TRUE)
-gridId <- grids[1]
+gridId <- grids[336]
 produceCOT <- function(gridID, maskedFiles, riparianFiles){
   # select all _Masked images 
   masked <- maskedFiles[grepl(pattern = paste0(gridID, "_Masked"), maskedFiles)]
@@ -88,7 +88,7 @@ produceCOT <- function(gridID, maskedFiles, riparianFiles){
     terra::subst(from = 1, to = 5)
   names(r20) <- "r20"
   # some minor ext mismatching so test area and crop to the smallest 
-  areas <- c(expanse(r10)[2],expanse(r16)[2],expanse(r20)[2]) |> unlist()
+  areas <- c(ncell(r10),ncell(r16),ncell(r20)) 
   names(areas) <- c("r10","r16","r20")
   if(length(unique(areas))>1){
     t1 <- min(areas)
@@ -113,6 +113,8 @@ produceCOT <- function(gridID, maskedFiles, riparianFiles){
   }
   # sum features 
   cot <- r10 + r16 + r20
+  # crop just because 
+  r1 <- terra::crop(r1, cot)
   # add the riparian layer 
   cot <- c(cot, r1 )
   names(cot)<-c("ChangeOverTime", "RiparianMask")
@@ -144,7 +146,7 @@ for(i in cots){
 
 # apply the change over time method 
 # 336 missing riparian layer 
-for(i in 337:length(grids)){
+for(i in 1:length(grids)){
   # select grid 
   grid <- grids[i]
   # export path 
@@ -193,74 +195,6 @@ for(i in correctedGrid){
 }
 
 
-# for processing 
-## end up with 6 layers 3 riparian mask, 3 new value class 
-
-renderFullRiparianMask <- function(grid, files){
-  
-  exportPath <- paste0("data/products/riparian/allYears/riparianMask_",grid,".tif")
-  print(grid)
-  if(!file.exists(exportPath)){
-    # filter and read in images 
-    f1 <- files[grepl(pattern = paste0(grid,"_"), x = files)]
-    
-    # need condition in here for selecting the harmonized models then rep
-    f2 <- f1[grepl(pattern = "harmonized", f1)]
-    if(length(f2) >= 1){
-      harmonized <- TRUE
-      if(length(f2) == 3){
-        f1 <- f2
-      }
-    }else{
-      harmonized <- FALSE
-    }
-    
-    
-    if(length(f1) > 0){
-      
-      # reclass function 1 
-      reclas <- function(raster){
-        ifel(raster == 2, 1 , 0)
-      }
-      # gather and reclass layers 
-      r1 <- lapply(X = f1, FUN = terra::rast) |>
-        purrr::map(.f = reclas)
-      # if crop all if harmonized image is present 
-      if(harmonized == TRUE){
-        selection <- paste0(grid,"_2010_riparianClass")
-        cropper <- terra::rast(f1[grepl(pattern = selection, x = f1)])
-        r1 <- r1 |> 
-          purrr::map(crop, cropper)
-      }
-      
-      # add them all together
-      r2 <- terra::app(x = terra::rast(r1), fun = sum, na.rm = TRUE)
-      # reclass and export
-      r3 <- terra::ifel(r2 >0, 1 , NA)
-      terra::writeRaster(x = r3, filename = exportPath)
-    }
-  }
-  gc()
-}
-
-
-
-
-# render riparian  --------------------------------------------------------
-print("generating Riparain Mask")
-tic()
-# issues with memory allocation on X12-319 
-errorGrids <- "X12-336" # error maybe lack of overlap between areas?  
-grids <- grids[337:length(grids)]
-
-purrr::map(.x = grids, .f = renderFullRiparianMask, files = files)
-toc()
-
-future::availableCores()
-plan(multicore, workers = 4)
-tic()
-furrr::future_map(.x = grids, .f = renderFullRiparianMask, files = files)
-toc()
 
 
 # 12-2024 update, add riparian data back to models ------------------------

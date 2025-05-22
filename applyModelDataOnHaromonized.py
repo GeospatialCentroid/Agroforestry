@@ -1,5 +1,10 @@
 import ee
-ee.Initialize(project='agroforestry2023')
+try:
+        ee.Initialize()
+except Exception as e:
+        ee.Authenticate(auth_mode = 'notebook') # to force browser popup. Unsucessful with gcloud cmd based authentications. 
+        # ee.Initialize()
+
 
 import os, time
 from datetime import datetime
@@ -12,9 +17,10 @@ from agroforestry1.randomForest import *
 from agroforestry1.histMatch import *
 
 ###############################################################################################################
-year = 2010
-target_grids = ['X12-698']
-reference_grids = ['X12-602']
+year = 2020
+target_grids = ["X12-227", "X12-103", "X12-141"]
+# c("X12-179", "X12-227", "X12-103", "X12-141") 
+reference_grids = ['X12-150']
 
 grid = gpd.read_file('data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg')
 test_train_ratio = 0.8
