@@ -28,40 +28,38 @@ calculateArea <- function(gridID, grids, cotFiles){
     f1 <- cotFiles[grepl(pattern = paste0(gridID,"_c"), x = cotFiles)]
     # if(length(f1)==0) 
     r1 <- terra::rast(f1)
-    if(length(unique(values(r1$ChangeOverTime))) == 2){
-      # reclass to year 
-      y10 <- getYearMap(r1, 2010) 
-      area10 <- y10|>
-        terra::expanse(unit = "m", byValue = TRUE)
-      freq10 <- terra::freq(y10)
-      rm(y10)
-      
-      y16 <- getYearMap(r1, 2016)
-      area16 <- y16 |>
-        terra::expanse(unit = "m", byValue = TRUE)
-      freq16 <- terra::freq(y16)
-      rm(y16)
-      
-      y20 <- getYearMap(r1, 2020)
-      area20 <- y20|>
-        terra::expanse(unit = "m", byValue = TRUE)
-      freq20 <- terra::freq(y20)
-      rm(y20)
-      # 
-      rm(r1)
-      # add values to dataframe 
-      df <- data.frame(
-        gridID = gridID,
-        area10 = area10[area10$value==1 , "area"],
-        area16 = area16[area16$value==1 , "area"],
-        area20 = area20[area20$value==1 , "area"],
-        cell10 = freq10[freq10$value==1, "count"],
-        cell16 = freq16[freq16$value==1, "count"],
-        cell20 = freq20[freq20$value==1, "count"]
-      )
-      #export 
-      readr::write_csv(df, exportPath)
-    }
+    # reclass to year 
+    y10 <- getYearMap(r1, 2010) 
+    area10 <- y10|>
+      terra::expanse(unit = "m", byValue = TRUE)
+    freq10 <- terra::freq(y10)
+    rm(y10)
+    
+    y16 <- getYearMap(r1, 2016)
+    area16 <- y16 |>
+      terra::expanse(unit = "m", byValue = TRUE)
+    freq16 <- terra::freq(y16)
+    rm(y16)
+    
+    y20 <- getYearMap(r1, 2020)
+    area20 <- y20|>
+      terra::expanse(unit = "m", byValue = TRUE)
+    freq20 <- terra::freq(y20)
+    rm(y20)
+    # 
+    rm(r1)
+    # add values to dataframe 
+    df <- data.frame(
+      gridID = gridID,
+      area10 = area10[area10$value==1 , "area"],
+      area16 = area16[area16$value==1 , "area"],
+      area20 = area20[area20$value==1 , "area"],
+      cell10 = freq10[freq10$value==1, "count"],
+      cell16 = freq16[freq16$value==1, "count"],
+      cell20 = freq20[freq20$value==1, "count"]
+    )
+    #export 
+    readr::write_csv(df, exportPath)
   }
   gc()
 }
@@ -121,7 +119,7 @@ generatePlots <- function(gridID, grids, cotFiles){
 
 future::plan("multicore", workers = 6)
 # future::plan("sequential")
-# plots 
+# plots
 tic()
 furrr::future_map(.x = gridIDs, .f = generatePlots,
                   grids = grids,
@@ -130,6 +128,8 @@ toc()
 
 # future::plan("sequential")
 # area measurements  
+calculateArea(gridID = "X12-772", grids = grids, cotFiles = cotFiles)
+
 tic()
 furrr::future_map(.x = gridIDs, .f = calculateArea,
                   grids = grids,
@@ -138,10 +138,21 @@ toc()
 
 
 
-# read in data and summarise 
+# read in data and summarise
 # d1 <- list.files(path = "data/products/imagesOfResults",
 #                  pattern = "_cot.csv",
 #                  full.names = TRUE) |>
 #   readr::read_csv()
+# dim(d1)
+# View(d1)
 # readr::write_csv(x = d1, file = "data/products/imagesOfResults/allAreaMeasures.csv")
 
+# few with 0 vaules across the board. 
+# errors <- d1[d1$area10==0,]
+# # files 
+# allFiles <- list.files("data/products/imagesOfResults",
+#                        full.names = TRUE)
+# for(i in errors$gridID){
+#   r <- allFiles[grepl(pattern = paste0(i,"_cot"), allFiles)]
+#   file.remove(r)
+# }

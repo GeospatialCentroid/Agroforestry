@@ -2,7 +2,7 @@ pacman::p_load(terra,dplyr,stringr,purrr,furrr, tictoc)
 
 
 # applied the riparian area mask 
-year = "2010"
+year = "2016"
 riparianData = terra::rast("data/products/riparian/nebraskaRiparian10.tif")
 # 
 applyRiparianMask <- function(year,riparianData){
@@ -55,7 +55,7 @@ applyRiparianMask <- function(year,riparianData){
 # apply the mask 
 # applyRiparianMask(year = "2010",
 #                   riparianData = riparianData )
-future::plan("multicore", workers = 3)
+future::plan("multicore", workers = 2)
 # future::plan("sequential")
 
 furrr::future_map(.x = c("2010","2016","2020"), .f = applyRiparianMask,
@@ -170,6 +170,7 @@ files <- list.files(path = "data/products",
 
 # all features 
 for(i in grids){
+  print(i)
   renderFullRiparianMask(grid = i, files = files)
 }
 
