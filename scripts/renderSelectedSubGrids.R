@@ -3,8 +3,8 @@ tmap_mode("view")
 
 # read in refernce data 
 d10 <- read_csv("data/products/selectedSubGrids/selections_2010.csv")
-d16 <- read_csv("data/products/selectedSubGrids/selections_2010.csv")
-d20 <- read_csv("data/products/selectedSubGrids/selections_2010.csv")
+d16 <- read_csv("data/products/selectedSubGrids/selections_2016.csv")
+d20 <- read_csv("data/products/selectedSubGrids/selections_2020.csv")
 allGrids <- bind_rows(d10,d16,d20)
 write_csv(x = allGrids, file = "data/products/selectedSubGrids/allSelectedGrids.csv")
 # read in grid objects 
@@ -13,8 +13,6 @@ m2 <- sf::st_read("data/products/two_sq_grid.gpkg") |>
 grid12 <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
 
 # function for producing Imagery 
-data <- d10
-year <- "2010"
 produce2MileImages <- function(data, year, m2, grid12){
   # for each 2m grid id 
   for(model in data$model){

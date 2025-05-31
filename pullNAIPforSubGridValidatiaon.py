@@ -12,7 +12,6 @@ grids = pd.read_csv("data/products/selectedSubGrids/allSelectedGrids.csv")
 # read in 2 mile grid 
 m2 = gpd.read_file("data/products/two_sq_grid.gpkg")
 
-m2ee = geemap.gdf_to_ee(m2)
 # 
 for i in range(len(grids)):
     row = grids.iloc[i]
