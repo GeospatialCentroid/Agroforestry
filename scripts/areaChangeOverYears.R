@@ -6,7 +6,7 @@ pacman::p_load(terra, dplyr, tidyr, purrr, furrr, tictoc)
 cotFiles <- list.files(path = "data/products/changeOverTime",
                        pattern = "_2.tif",
                        full.names = TRUE )
-path <- cotFiles[10]
+path <- cotFiles[grepl(pattern = "X12-366", x = cotFiles) ]
 
 # r1 <- terra::rast(path)
 
@@ -64,4 +64,4 @@ names(results) <- c("gridID", "No Trees", "Loss 2016", "Gain 2016", "Loss 2020",
                     "Gain 2020", "Loss 16 Gain 20", "Gain 16", "All Tree", 
                     "Total Cells", "Total TOF cells")
 print(results)
-write.csv(x = results, file = "data/products/areaMeasures/allGrids_06_2025.csv")
+write.csv(x = results, file = "data/products/areaMeasures/allGrids_07_2025.csv")

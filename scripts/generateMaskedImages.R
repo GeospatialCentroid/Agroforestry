@@ -36,18 +36,13 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
   models <- list.files(paste0(modelFolder,"/fullImages"), full.names = TRUE)
   # # select images for specific grid 
   # grids <- terra::vect(modelGrids[grepl(pattern = year, x = modelGrids)])
-  # Select the forest and urban layers
-  forest <- terra::vect(forests[grepl(pattern = year, x = forests)]) |>
-    terra::project("+init=EPSG:4326")
-  # terra::writeVector(forest, filename ="data/products/foresttest.gpkg" )
-  urban <- terra::vect(urbanFiles2[grepl(pattern = year, x = urbanFiles2)])|>
-    terra::project("+init=EPSG:4326")
+
   ## add the riparian layer once that is created 
   
   # select all unique grids 
   ids <- modelGrids$Unique_ID
   # troubleshooting
-  # ids <- c("X12-183"    ,"X12-156" )
+  # ids <- c("X12-515")
   
   
   # itorate over grids to produce outputs 
@@ -56,7 +51,10 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
     
     gridName <- i 
     print(i)
-    unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
+    # unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_fullUnMasked.tif")
+    # using the harmonized image for 2010 error resolution 
+    unmaskedPath <- paste0("data/products/models",year,"/fullImages/",gridName,"_harmonized_fullUnMasked.tif")
+    
     # if there are images 
     if(length(allImages) > 0){
       if(!file.exists(unmaskedPath)){
@@ -96,6 +94,13 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
       # produce a mask object
       maskedPath <- paste0("data/products/models",year,"/maskedImages/",gridName,"_Masked.tif")
       if(!file.exists(maskedPath)){
+        # Select the forest and urban layers
+        forest <- terra::vect(forests[grepl(pattern = year, x = forests)]) |>
+          terra::project("+init=EPSG:4326")
+        # terra::writeVector(forest, filename ="data/products/foresttest.gpkg" )
+        urban <- terra::vect(urbanFiles2[grepl(pattern = year, x = urbanFiles2)])|>
+          terra::project("+init=EPSG:4326")
+        
         print("generating mask")
         #  nlcd tree mask 
         ## something going on the with forest mask not getting applied 
@@ -125,6 +130,8 @@ generateFinalGridImages <- function(year, modelGrids, forests, urbanFiles2){
         rm(f2)
         rm(r4)
         rm(r3)
+        rm(forest)
+        rm(urban)
       }
     }else{
       print(paste0("no image for ",i))
@@ -139,10 +146,16 @@ years <- c("2010", "2016","2020")
 
 # troubleshooting 
 # modelGrids <- "X12-183"
+modelGrids <- modelGrids[ modelGrids$Unique_ID %in% c("X12-319","X12-366",  "X12-367","X12-413",  "X12-513","X12-514", 
+                           "X12-515","X12-516",  "X12-517","X12-559",  "X12-560","X12-561", 
+                           "X12-562","X12-563",  "X12-604","X12-605",  "X12-606","X12-607",  
+                           "X12-608","X12-649",  "X12-650","X12-651",  "X12-652","X12-653",  
+                           "X12-694","X12-695",  "X12-696","X12-697",  "X12-698") ,] 
+
 
 for(i in years){
   print(i)
-  generateFinalGridImages(year = i, 
+  generateFinalGridImages(year = "2010", 
                           modelGrids = modelGrids,
                           forests = forests, 
                           urbanFiles2 = urbanFiles2)
