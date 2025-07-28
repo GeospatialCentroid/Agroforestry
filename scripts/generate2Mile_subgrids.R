@@ -7,3 +7,8 @@ source("scripts/define2mSubGrids.R")
 
 # render imager for selected sub grids 
 source("scripts/renderSelectedSubGrids.R")
+
+
+# matching subgrids to 2016 catpures  -------------------------------------
+
+

@@ -1,5 +1,7 @@
 
-pacman::p_load(sf, dplyr, readr, tmap, furrr)
+
+
+pacman::p_load(sf, dplyr, readr, tmap, furrr, readr, terra)
 tmap_mode("view")
 # read in models grids for specific years 
 g10 <- sf::st_read("data/products/modelGrids_2010.gpkg")
@@ -7,6 +9,9 @@ g16 <- sf::st_read("data/products/modelGrids_2016.gpkg")
 g20 <- sf::st_read("data/products/modelGrids_2020.gpkg")
 m2 <- sf::st_read("data/products/two_sq_grid.gpkg") |> 
   dplyr::select(FID_two_grid)
+
+
+# Original  ---------------------------------------------------------------
 # assign original areas measures 
 m2$originalArea <- as.numeric(sf::st_area(m2))
 # set seed 
