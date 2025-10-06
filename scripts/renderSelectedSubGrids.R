@@ -43,7 +43,21 @@ produce2MileImages <- function(data, year, m2, grid12){
   }
 }
 
-plan(strategy = "multicore", workers = 3) 
-furrr::future_map2(.x = list(d10,d16,d20), .y = c("2010","2016","2020"), .f = produce2MileImages,
-                   m2 = m2,
-                   grid12 = grid12)
+# full image set render  --------------------------------------------------
+# plan(strategy = "multicore", workers = 3) 
+# furrr::future_map2(.x = list(d10,d16,d20), .y = c("2010","2016","2020"), .f = produce2MileImages,
+#                    m2 = m2,
+#                    grid12 = grid12)
+
+
+
+# single image reruns  ----------------------------------------------------
+# read in refernce data 
+d10 <- read_csv("data/products/selectedSubGrids/selections_2010_2.csv")
+# write_csv(x = allGrids, file = "data/products/selectedSubGrids/allSelectedGrids.csv")
+# read in grid objects 
+m2 <- sf::st_read("data/products/two_sq_grid.gpkg") |> 
+  dplyr::select(FID_two_grid)
+grid12 <- sf::st_read("data/processed/griddedFeatures/twelve_mi_grid_uid.gpkg")
+
+produce2MileImages(data = d10, year = "2010",m2 = m2, grid12 = grid12)

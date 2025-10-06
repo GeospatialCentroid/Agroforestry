@@ -51,3 +51,25 @@ Important files
 ## Maintainer
 
 [dcarver1](https://github.com/dcarver1)
+
+
+
+## methods notes 
+
+**gather 2x miles girds for validation**
+- 1. define2mSubGrids.R : use this to generate a file that selects two mile subgrids within the model area that are off full area 
+  - note export path must be editied within the funciton to over write 
+  - some edits for a single feature run rather then the full year... works but not really attended use so careful 
+  
+- 2. renderSelectedSubGrids.R : used the selected two mile sub grid to gather the correct classification and then crop to two mile grid 
+  - pretty easy to adapt to single feature run as 2-mile gird id is stored in the export path 
+  
+- 3. pullNAIPforSubGridValidation.py : python with GEE interactino 
+  - manually update the year, sub grids and run.
+  - might want to alter export from GEE to exclude the 4th band as it tends to assign that to a transparency layer when loaded into QGIS 
+  
+
+
+
+
+

@@ -31,7 +31,7 @@ collect4Grids <- function(grid, year, m2){
   # drop all NA model areas 
   grid2 <- grid2[!is.na(grid2$modelGrid), ]
   
-  exportPath <- paste0("data/products/selectedSubGrids/selections_",year,".csv")
+  exportPath <- paste0("data/products/selectedSubGrids/selections_",year,"_2.csv")
   if(!file.exists(exportPath)){
     # data storage 
     df <- data.frame(model = models, year = year, grid1 = NA, grid2 = NA, grid3 = NA, grid4 = NA )
@@ -74,6 +74,10 @@ collect4Grids <- function(grid, year, m2){
 plan(strategy = "multicore", workers = 3) 
 furrr::future_map2(.x = list(g10,g16,g20), .y = c("2010","2016","2020"), .f = collect4Grids,
                    m2 = m2)
+# single year rerun -356
+g10_select <- g10 |> dplyr::filter(modelGrid == "X12-356")
+set.seed(seed = 123)
+single <- collect4Grids(grid = g10_select, year = "2010", m2 = m2)
 # purrr::map2(.x = list(g10,g16,g20), .y = c("2010","2016","2020"), .f = collect4Grids,
 #             m2 = m2)
 
