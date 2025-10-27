@@ -1,6 +1,6 @@
 import ee
 import geemap
-ee.Initialize(project='agroforestry2023')
+# ee.Initialize(project='agroforestry2023')
 Grids = ee.FeatureCollection("projects/agroforestry2023/assets/twelve_mi_shp")
 def getGridArea(gridID):
     Grid = ee.Feature(Grids.filter(ee.Filter.eq('Unique_ID', gridID)).first())

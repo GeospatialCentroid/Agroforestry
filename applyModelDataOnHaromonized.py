@@ -17,8 +17,8 @@ from agroforestry1.randomForest import *
 from agroforestry1.histMatch import *
 
 ###############################################################################################################
-year = 2020
-target_grids = ["X12-227", "X12-103", "X12-141"]
+year = 2016
+target_grids = ["X12-319", "X12-319", "X12-366", "X12-367"]
 # c("X12-179", "X12-227", "X12-103", "X12-141") 
 reference_grids = ['X12-150']
 
