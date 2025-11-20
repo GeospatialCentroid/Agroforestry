@@ -1,4 +1,4 @@
-pacman::p_load(reader, dplyr, sf, purrr, stringr, terra, furrr)
+pacman::p_load(reader, dplyr, sf, purrr, stringr, terra, furrr, readr)
 
 # grab all ids
 grids2016 <- sf::st_read("data/products/modelGrids_2016.gpkg")
@@ -133,107 +133,109 @@ plan(multisession, workers = 8)
 
 # using walk because I'm not reutning and object
 # 2010
-furrr::future_walk(
-  .x = ids,
-  .f = aggregateAndExport,
-  .progress = TRUE,
-  paths = tif10,
-  year = "2010",
-  overwrite = TRUE
-)
-# 2016
-furrr::future_walk(
-  .x = ids,
-  .f = aggregateAndExport,
-  .progress = TRUE,
-  paths = tif16,
-  year = "2016",
-  overwrite = TRUE
-)
-# 2020
-furrr::future_walk(
-  .x = ids,
-  .f = aggregateAndExport,
-  .progress = TRUE,
-  paths = tif20,
-  year = "2020",
-  overwrite = TRUE
-)
+## need to change to TRUE to run, but it's a big process so best to avoid if possible
+if (FALSE) {
+  furrr::future_walk(
+    .x = ids,
+    .f = aggregateAndExport,
+    .progress = TRUE,
+    paths = tif10,
+    year = "2010",
+    overwrite = TRUE
+  )
+  # 2016
+  furrr::future_walk(
+    .x = ids,
+    .f = aggregateAndExport,
+    .progress = TRUE,
+    paths = tif16,
+    year = "2016",
+    overwrite = TRUE
+  )
+  # 2020
+  furrr::future_walk(
+    .x = ids,
+    .f = aggregateAndExport,
+    .progress = TRUE,
+    paths = tif20,
+    year = "2020",
+    overwrite = TRUE
+  )
+}
 
 
+# area method ------------------------------------------------------------
 
+# get the area of each image
+rastPaths <- list.files("data/products/tenMeterModels", full.names = TRUE)
 
-
-# get the area of each image 
-rastPaths <- list.files("data/products/tenMeterModels", 
-                     full.names = TRUE)
-
-gridID <- "X12-166"
+gridID <- "X12-1"
 
 # loop over grid IDs
-# generate a area raster 
-# generate masks from the images 
-# multiple area rast by mask 
-# record results 
+# generate a area raster
+# generate masks from the images
+# multiple area rast by mask
+# record results
+
+## need to troubleshoot the variable extent of the area vs project layers
+# process features individually
+areas <- function(path) {
+  r1 <- terra::rast(path)
+  area <- terra::cellSize(r1, unit = "km")
+  a1 <- r1 |>
+    terra::subst(0, NA)
+  a_area <- a1 * area
+  area_value <- sum(terra::values(a_area, na.rm = TRUE))
+  return(area_value)
+}
 
 
-## need to troubleshoot the variable extent of the area vs project layers 
-
-calcArea <- function(gridID, rastPaths){
-  # pull in three images 
-  images <-rastPaths[grepl(pattern = gridID, x = rastPaths)]
-  # parse to years 
-  y10 <- images[grepl(pattern ="_2010.tif", images)]
-  y16 <- images[grepl(pattern ="_2016.tif", images)]
-  y20 <- images[grepl(pattern ="_2020.tif", images)]
-  # storage df 
+calcArea <- function(gridID, rastPaths) {
+  message("Working on gridID: ", gridID)
+  # pull in three images
+  images <- rastPaths[grepl(pattern = paste0(gridID, "_"), x = rastPaths)]
+  # parse to years
+  y10 <- images[grepl(pattern = "_2010.tif", images)]
+  y16 <- images[grepl(pattern = "_2016.tif", images)]
+  y20 <- images[grepl(pattern = "_2020.tif", images)]
+  # storage df
   df <- data.frame(
-    gridID = gridID, 
+    gridID = gridID,
     totalArea = NA,
     area2010 = NA,
     area2016 = NA,
     area2020 = NA
   )
-  
-  # generate a area raster 
+
+  # generate a area raster for the full featue
   r1 <- terra::rast(y10)
   area <- terra::cellSize(r1, unit = "km")
-  df$totalArea <-  sum(terra::values(area, na.rm = TRUE))
+  df$totalArea <- sum(terra::values(area, na.rm = TRUE))
   rm(r1)
+
   # process features individually
-  a10 <- terra::rast(y10) |>
-    terra::subst(0,NA)
-  a_10 <- a10 * area
-  # assign values 
-  df$area2010  <- sum(terra::values(a_10, na.rm = TRUE))
-  rm(a10,a_10)
-  
-  # process features individually
-  a16 <- terra::rast(y16) |>
-    terra::subst(0,NA)
-  a_16 <- a16 * area
-  # assign values 
-  df$area2016  <- sum(terra::values(a_16, na.rm = TRUE))
-  rm(a16,a_16)
-  
-  # process features individually
-  a20 <- terra::rast(y20) |>
-    terra::subst(0,NA)
-  a_20 <- a20 * area
-  # assign values 
-  df$area2020  <- sum(terra::values(a_20, na.rm = TRUE))
-  rm(a20,a_20)
+  df$area2010 <- areas(y10)
+  df$area2016 <- areas(y16)
+  df$area2020 <- areas(y20)
   # export the results
   return(df)
 }
 
+# test run
+# vals <- calcArea(gridID = gridID, rastPaths = rastPaths)
 
-data <- furrr::future_map(.x = ids[350:355], 
-                          .f = calcArea, 
-                          rastPaths = rastPaths )
+data <- furrr::future_map(
+  .x = ids,
+  .f = calcArea,
+  rastPaths = rastPaths,
+  .options = furrr::furrr_options(seed = TRUE)
+)
+# group and export
+allData <- dplyr::bind_rows(data)
+readr::write_csv(
+  allData,
+  "data/products/tenMeterModels/tenMeterModel_Areas2025.csv"
+)
 
-
-
-
-
-
+# stop parallel workers
+plan(sequential)
