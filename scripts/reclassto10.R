@@ -159,3 +159,81 @@ furrr::future_walk(
   year = "2020",
   overwrite = TRUE
 )
+
+
+
+
+
+# get the area of each image 
+rastPaths <- list.files("data/products/tenMeterModels", 
+                     full.names = TRUE)
+
+gridID <- "X12-166"
+
+# loop over grid IDs
+# generate a area raster 
+# generate masks from the images 
+# multiple area rast by mask 
+# record results 
+
+
+## need to troubleshoot the variable extent of the area vs project layers 
+
+calcArea <- function(gridID, rastPaths){
+  # pull in three images 
+  images <-rastPaths[grepl(pattern = gridID, x = rastPaths)]
+  # parse to years 
+  y10 <- images[grepl(pattern ="_2010.tif", images)]
+  y16 <- images[grepl(pattern ="_2016.tif", images)]
+  y20 <- images[grepl(pattern ="_2020.tif", images)]
+  # storage df 
+  df <- data.frame(
+    gridID = gridID, 
+    totalArea = NA,
+    area2010 = NA,
+    area2016 = NA,
+    area2020 = NA
+  )
+  
+  # generate a area raster 
+  r1 <- terra::rast(y10)
+  area <- terra::cellSize(r1, unit = "km")
+  df$totalArea <-  sum(terra::values(area, na.rm = TRUE))
+  rm(r1)
+  # process features individually
+  a10 <- terra::rast(y10) |>
+    terra::subst(0,NA)
+  a_10 <- a10 * area
+  # assign values 
+  df$area2010  <- sum(terra::values(a_10, na.rm = TRUE))
+  rm(a10,a_10)
+  
+  # process features individually
+  a16 <- terra::rast(y16) |>
+    terra::subst(0,NA)
+  a_16 <- a16 * area
+  # assign values 
+  df$area2016  <- sum(terra::values(a_16, na.rm = TRUE))
+  rm(a16,a_16)
+  
+  # process features individually
+  a20 <- terra::rast(y20) |>
+    terra::subst(0,NA)
+  a_20 <- a20 * area
+  # assign values 
+  df$area2020  <- sum(terra::values(a_20, na.rm = TRUE))
+  rm(a20,a_20)
+  # export the results
+  return(df)
+}
+
+
+data <- furrr::future_map(.x = ids[350:355], 
+                          .f = calcArea, 
+                          rastPaths = rastPaths )
+
+
+
+
+
+
