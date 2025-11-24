@@ -1,5 +1,4 @@
-pacman::p_load(reader, dplyr, sf, purrr, stringr, terra, furrr, readr)
-
+pacman::p_load(reader, dplyr, sf, purrr, stringr, terra, furrr, readr, tictoc)
 # grab all ids
 grids2016 <- sf::st_read("data/products/modelGrids_2016.gpkg")
 # ids
@@ -11,8 +10,8 @@ prioritized_files <- function(file_paths) {
     # Get just the filename to work with
     mutate(filename = basename(path)) |>
     # 1. Create a common 'base_id' by removing the suffixes
-    # This removes either "_harmonized_Masked.tif" or just "_Masked.tif"
-    mutate(base_id = str_remove(filename, "(_harmonized)?_Masked\\.tif$")) |>
+    # This removes either "_harmonized_images.tif" or just "_images.tif"
+    mutate(base_id = str_remove(filename, "(_harmonized)?_images\\.tif$")) |>
     # 2. Create a priority flag (TRUE is better)
     mutate(is_harmonized = str_detect(filename, "_harmonized_")) |>
     # 3. Group by the common ID
@@ -100,19 +99,19 @@ aggregateAndExport <- function(id, paths, year, overwrite = FALSE) {
 # read in all images per year and reorder the haromized images
 tif10 <- prioritized_files(list.files(
   "data/products/models2010/",
-  pattern = "_Masked.tif",
+  pattern = "_images.tif",
   recursive = TRUE,
   full.names = TRUE
 ))
 tif16 <- prioritized_files(list.files(
   "data/products/models2016/",
-  pattern = "_Masked.tif",
+  pattern = "_images.tif",
   recursive = TRUE,
   full.names = TRUE
 ))
 tif20 <- prioritized_files(list.files(
   "data/products/models2020/",
-  pattern = "_Masked.tif",
+  pattern = "_images.tif",
   recursive = TRUE,
   full.names = TRUE
 ))
@@ -239,3 +238,72 @@ readr::write_csv(
 
 # stop parallel workers
 plan(sequential)
+
+
+# generate the cot files
+rastPaths <- list.files("data/products/tenMeterModels", full.names = TRUE)
+# select grid ids
+grids <- paste0("X12-", 1:773)
+
+# cot function
+genCOT_10m <- function(gridID, rastPaths) {
+  message("Working on gridID: ", gridID)
+  # define export location
+  exportPath <- paste0(
+    "data/products/cot_10meter/COT_10m_",
+    gridID,
+    ".tif"
+  )
+  if (!file.exists(exportPath)) {
+    # pull in three images
+    images <- rastPaths[grepl(pattern = paste0(gridID, "_"), x = rastPaths)]
+    # parse to years
+    # reclass images images by year
+    r10 <- images[grepl(pattern = "_2010", images)] |>
+      terra::vrt()
+    names(r10) <- "r10"
+    r16 <- images[grepl(pattern = "_2016", images)] |>
+      terra::vrt() |>
+      terra::subst(from = 1, to = 3)
+    names(r16) <- "r16"
+    r20 <- images[grepl(pattern = "_2020", images)] |>
+      terra::vrt() |>
+      terra::subst(from = 1, to = 5)
+    names(r20) <- "r20"
+
+    # store as list for processing steps
+    # calculate the ncell to test for difference in extent
+    areas <- sapply(rasters, ncell)
+
+    # Find the name/index of the smallest one
+    smallest_idx <- which.min(areas)
+    template_raster <- rasters[[smallest_idx]]
+    aligned_rasters <- lapply(rasters, function(x) {
+      # If it's already the template, return as is to save processing time
+      if (compareGeom(x, template_raster, stopOnError = FALSE)) {
+        return(x)
+      } else {
+        return(terra::resample(x, template_raster, method = "near"))
+      }
+    })
+    # cot features
+    cot <- terra::rast(aligned_rasters) |>
+      sum(na.rm = TRUE)
+    # export
+    terra::writeRaster(
+      x = cot,
+      filename = exportPath,
+      overwrite = TRUE
+    )
+  }
+}
+
+# 1.137 sec elapsed
+tic()
+genCOT_10m(gridID = "X12-150", rastPaths = rastPaths)
+toc()
+
+# 8 seconds
+tic()
+purrr::walk(.x = grids, .f = genCOT_10m, rastPaths = rastPaths)
+toc()
